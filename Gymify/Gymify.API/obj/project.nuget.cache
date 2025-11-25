@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "wvgm6OZqNDA=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.API\\Gymify.API.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Korisnik\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.9\\microsoft.aspnetcore.openapi.9.0.9.nupkg.sha512",
+    "C:\\Users\\Korisnik\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512",
+    "C:\\Users\\Korisnik\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.22.1\\microsoft.visualstudio.azure.containers.tools.targets.1.22.1.nupkg.sha512"
+  ],
+  "logs": []
+}
