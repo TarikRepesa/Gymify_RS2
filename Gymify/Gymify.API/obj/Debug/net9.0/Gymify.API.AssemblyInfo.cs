@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Gymify.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8336eb3d093b0f3b7fc413412f596da25c434111")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6ba9a4580bbed54e949bd0f1f26a27fc0a2f26c8")]
 [assembly: System.Reflection.AssemblyProductAttribute("Gymify.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Gymify.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
