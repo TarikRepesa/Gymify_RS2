@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{AF6674E1-67FD-477C-AC45-51FC52C86C16}|Gymify.API\\Gymify.API.csproj|c:\\users\\korisnik\\desktop\\gymify_rs2\\gymify\\gymify.api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{AF6674E1-67FD-477C-AC45-51FC52C86C16}|Gymify.API\\Gymify.API.csproj|solutionrelative:gymify.api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{AF6674E1-67FD-477C-AC45-51FC52C86C16}|Gymify.API\\Gymify.API.csproj|c:\\users\\korisnik\\desktop\\gymify_rs2\\gymify\\gymify.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AF6674E1-67FD-477C-AC45-51FC52C86C16}|Gymify.API\\Gymify.API.csproj|solutionrelative:gymify.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -18,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -38,27 +34,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.API\\Program.cs",
               "RelativeDocumentMoniker": "Gymify.API\\Program.cs",
               "ToolTip": "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.API\\Program.cs",
               "RelativeToolTip": "Gymify.API\\Program.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAmwCoAAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-27T14:10:16.093Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.API\\Properties\\launchSettings.json",
-              "RelativeDocumentMoniker": "Gymify.API\\Properties\\launchSettings.json",
-              "ToolTip": "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.API\\Properties\\launchSettings.json",
-              "RelativeToolTip": "Gymify.API\\Properties\\launchSettings.json",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAgwBMAAAAdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-27T14:08:14.857Z",
+              "WhenOpened": "2025-11-27T14:10:16.093Z",
               "EditorCaption": ""
             }
           ]
