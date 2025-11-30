@@ -1,4 +1,8 @@
+using Gymify.Services;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddTransient<IClanoviService, ClanoviService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

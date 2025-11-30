@@ -8,6 +8,8 @@
     ".NETCoreApp,Version=v9.0": {
       "Gymify.API/1.0.0": {
         "dependencies": {
+          "Gymify.Model": "1.0.0",
+          "Gymify.Services": "1.0.0",
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "1.22.1",
           "Swashbuckle.AspNetCore": "10.0.1"
         },
@@ -66,7 +68,26 @@
           }
         }
       },
-      "System.Text.Json/8.0.5": {}
+      "System.Text.Json/8.0.5": {},
+      "Gymify.Model/1.0.0": {
+        "runtime": {
+          "Gymify.Model.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Gymify.Services/1.0.0": {
+        "dependencies": {
+          "Gymify.Model": "1.0.0"
+        },
+        "runtime": {
+          "Gymify.Services.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
     }
   },
   "libraries": {
@@ -130,6 +151,16 @@
       "sha512": "sha512-0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg==",
       "path": "system.text.json/8.0.5",
       "hashPath": "system.text.json.8.0.5.nupkg.sha512"
+    },
+    "Gymify.Model/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Gymify.Services/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }
