@@ -117,6 +117,29 @@
         "build": {
           "buildTransitive/net6.0/System.Text.Json.targets": {}
         }
+      },
+      "Gymify.Model/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "compile": {
+          "bin/placeholder/Gymify.Model.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Gymify.Model.dll": {}
+        }
+      },
+      "Gymify.Services/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Gymify.Model": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Gymify.Services.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Gymify.Services.dll": {}
+        }
       }
     }
   },
@@ -625,10 +648,22 @@
         "system.text.json.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "Gymify.Model/1.0.0": {
+      "type": "project",
+      "path": "../Gymify.Model/Gymify.Model.csproj",
+      "msbuildProject": "../Gymify.Model/Gymify.Model.csproj"
+    },
+    "Gymify.Services/1.0.0": {
+      "type": "project",
+      "path": "../Gymify.Services/Gymify.Services.csproj",
+      "msbuildProject": "../Gymify.Services/Gymify.Services.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "Gymify.Model >= 1.0.0",
+      "Gymify.Services >= 1.0.0",
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets >= 1.22.1",
       "Swashbuckle.AspNetCore >= 10.0.1"
     ]
@@ -665,7 +700,14 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.Model\\Gymify.Model.csproj": {
+              "projectPath": "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.Model\\Gymify.Model.csproj"
+            },
+            "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.Services\\Gymify.Services.csproj": {
+              "projectPath": "C:\\Users\\Korisnik\\Desktop\\Gymify_RS2\\Gymify\\Gymify.Services\\Gymify.Services.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

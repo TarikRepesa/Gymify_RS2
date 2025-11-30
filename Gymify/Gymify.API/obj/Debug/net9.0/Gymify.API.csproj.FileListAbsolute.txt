@@ -34,3 +34,7 @@ C:\Users\Korisnik\Desktop\Gymify_RS2\Gymify\Gymify.API\obj\Debug\net9.0\refint\G
 C:\Users\Korisnik\Desktop\Gymify_RS2\Gymify\Gymify.API\obj\Debug\net9.0\Gymify.API.pdb
 C:\Users\Korisnik\Desktop\Gymify_RS2\Gymify\Gymify.API\obj\Debug\net9.0\Gymify.API.genruntimeconfig.cache
 C:\Users\Korisnik\Desktop\Gymify_RS2\Gymify\Gymify.API\obj\Debug\net9.0\ref\Gymify.API.dll
+C:\Users\Korisnik\Desktop\Gymify_RS2\Gymify\Gymify.API\bin\Debug\net9.0\Gymify.Model.dll
+C:\Users\Korisnik\Desktop\Gymify_RS2\Gymify\Gymify.API\bin\Debug\net9.0\Gymify.Services.dll
+C:\Users\Korisnik\Desktop\Gymify_RS2\Gymify\Gymify.API\bin\Debug\net9.0\Gymify.Model.pdb
+C:\Users\Korisnik\Desktop\Gymify_RS2\Gymify\Gymify.API\bin\Debug\net9.0\Gymify.Services.pdb

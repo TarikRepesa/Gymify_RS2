@@ -13,4 +13,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Gymify.Model\Gymify.Model.csproj" />
+    <ProjectReference Include="..\Gymify.Services\Gymify.Services.csproj" />
+  </ItemGroup>
+
 </Project>
