@@ -16,11 +16,11 @@ namespace Gymify.API.Controllers
             _userService = service;
         }
 
-        // [AllowAnonymous]
-        // [HttpPost("login")]
-        // public async Task<LoginResponse> Login([FromBody] LoginRequest request)
-        // {
-        //     return await _userService.LoginAsync(request);
-        // }
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<LoginResponse> Login([FromBody] LoginRequest request)
+        {
+            return await _userService.LoginAsync(request);
+        }
     }
 }

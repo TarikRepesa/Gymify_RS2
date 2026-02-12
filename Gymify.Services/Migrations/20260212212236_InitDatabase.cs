@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Gymify.Services.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,6 +74,10 @@ namespace Gymify.Services.Migrations
                     UserImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsUser = table.Column<bool>(type: "bit", nullable: true),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: true),
+                    IsTrener = table.Column<bool>(type: "bit", nullable: true),
+                    IsRadnik = table.Column<bool>(type: "bit", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastLoginAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true)
@@ -292,6 +298,51 @@ namespace Gymify.Services.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "CreatedAt", "Description", "IsActive", "Name" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2026, 2, 12, 21, 22, 35, 759, DateTimeKind.Utc).AddTicks(46), "", true, "Korisnik" },
+                    { 2, new DateTime(2026, 2, 12, 21, 22, 35, 759, DateTimeKind.Utc).AddTicks(500), "", true, "Admin" },
+                    { 3, new DateTime(2026, 2, 12, 21, 22, 35, 759, DateTimeKind.Utc).AddTicks(502), "", true, "Trener" },
+                    { 4, new DateTime(2026, 2, 12, 21, 22, 35, 759, DateTimeKind.Utc).AddTicks(503), "", true, "Radnik" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "CreatedAt", "DateOfBirth", "Email", "FirstName", "IsActive", "IsAdmin", "IsRadnik", "IsTrener", "IsUser", "LastLoginAt", "LastName", "PasswordHash", "PasswordSalt", "PhoneNumber", "UserImage", "Username" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(4473), null, "ajdin@example.com", "Tarik", true, true, null, null, null, null, "Malic", "Zr1yNL0PufElmoWUKiywJXZiR9ph00sz67ucqetSNOqEGdxODG4plmzu/jquyPnS+9BxZIb3y9h5EaQQJUVOPw==", "i3sFkRAERrTgIDIz5MbXP6B5cyYSqTD7DOpOhq1zurYgCJn3BjA1SpE/a9Qv1huFaH57SteTbaA2uId7c4/o7+n5VDXnEb/Y7I/am9LrKOQGeOSdrSg/cgUBf/L6Mw8wlWWiSij7iMUw5zW4zExKzwYLpi2Y28x/0lJotdYvfSA=", null, null, "tare45" },
+                    { 2, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(4916), null, "amir@example.com", "Amir", true, true, null, null, null, null, "Ibrahimovic", "Zr1yNL0PufElmoWUKiywJXZiR9ph00sz67ucqetSNOqEGdxODG4plmzu/jquyPnS+9BxZIb3y9h5EaQQJUVOPw==", "i3sFkRAERrTgIDIz5MbXP6B5cyYSqTD7DOpOhq1zurYgCJn3BjA1SpE/a9Qv1huFaH57SteTbaA2uId7c4/o7+n5VDXnEb/Y7I/am9LrKOQGeOSdrSg/cgUBf/L6Mw8wlWWiSij7iMUw5zW4zExKzwYLpi2Y28x/0lJotdYvfSA=", null, null, "amir56" },
+                    { 3, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5052), null, "marko@example.com", "Marko", true, null, null, true, null, null, "Markovic", "rf+iRBC3+Or3QUIDpDUuoHiS88jzJ5YEpvK/eiNLPouKobVrWctIAYyzIUoL0++XIDsaqFXuSUgGtv5K20MiPg==", "/P1/X5G5cYEYmWouZSL7au0ZJ9pvffTAes5jpZK1ShVOUu1WJNxiZGIz9mV/zfAhLU2HDrxhxlRdU5ISmEBcu5GC7/sUiq3+fGzZRrxaBVNO4cFpNJND+XA/k5NHykxwYCN7PqX3+a2/O3sj4Vg7ef9G786TCT5vVRqJsoCC70w=", null, null, "marko78" },
+                    { 4, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5056), null, "ivan@example.com", "Ivan", true, null, null, true, null, null, "Ivic", "rf+iRBC3+Or3QUIDpDUuoHiS88jzJ5YEpvK/eiNLPouKobVrWctIAYyzIUoL0++XIDsaqFXuSUgGtv5K20MiPg==", "/P1/X5G5cYEYmWouZSL7au0ZJ9pvffTAes5jpZK1ShVOUu1WJNxiZGIz9mV/zfAhLU2HDrxhxlRdU5ISmEBcu5GC7/sUiq3+fGzZRrxaBVNO4cFpNJND+XA/k5NHykxwYCN7PqX3+a2/O3sj4Vg7ef9G786TCT5vVRqJsoCC70w=", null, null, "ivan11" },
+                    { 5, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5058), null, "petar@example.com", "Petar", true, null, null, true, null, null, "Petrovic", "rf+iRBC3+Or3QUIDpDUuoHiS88jzJ5YEpvK/eiNLPouKobVrWctIAYyzIUoL0++XIDsaqFXuSUgGtv5K20MiPg==", "/P1/X5G5cYEYmWouZSL7au0ZJ9pvffTAes5jpZK1ShVOUu1WJNxiZGIz9mV/zfAhLU2HDrxhxlRdU5ISmEBcu5GC7/sUiq3+fGzZRrxaBVNO4cFpNJND+XA/k5NHykxwYCN7PqX3+a2/O3sj4Vg7ef9G786TCT5vVRqJsoCC70w=", null, null, "petar21" },
+                    { 6, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5060), null, "luka@example.com", "Luka", true, null, null, true, null, null, "Lukic", "rf+iRBC3+Or3QUIDpDUuoHiS88jzJ5YEpvK/eiNLPouKobVrWctIAYyzIUoL0++XIDsaqFXuSUgGtv5K20MiPg==", "/P1/X5G5cYEYmWouZSL7au0ZJ9pvffTAes5jpZK1ShVOUu1WJNxiZGIz9mV/zfAhLU2HDrxhxlRdU5ISmEBcu5GC7/sUiq3+fGzZRrxaBVNO4cFpNJND+XA/k5NHykxwYCN7PqX3+a2/O3sj4Vg7ef9G786TCT5vVRqJsoCC70w=", null, null, "luka34" },
+                    { 7, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5194), null, "nedim@example.com", "Nedim", true, null, true, null, null, null, "Nedimovic", "WFiLOJuHLZNlNwIn/7JPsZRWwSbX9d4WOPZfrudDIMCzL+yrSoIUGfflS6Nb6O159An87pMC/7xgTXcvC+bXug==", "xa7tCyzbFr4FJ8QeeJa47dDbRHC2u+F57iwgrlipKAH/5Y9huunkmoy2yQdjxhoDSEDfgp2dbyU91v8/lPmtL1nDy2OpOMQc+86Z3TfatN7J6szK0qSLYb/VjlG3tKaSrVN6cpmBdF5D777aVOyBlf+D+vxBEpeGXUZfOG4jYUM=", null, null, "nedim89" },
+                    { 8, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5197), null, "amela@example.com", "Amela", true, null, true, null, null, null, "Amelovic", "WFiLOJuHLZNlNwIn/7JPsZRWwSbX9d4WOPZfrudDIMCzL+yrSoIUGfflS6Nb6O159An87pMC/7xgTXcvC+bXug==", "xa7tCyzbFr4FJ8QeeJa47dDbRHC2u+F57iwgrlipKAH/5Y9huunkmoy2yQdjxhoDSEDfgp2dbyU91v8/lPmtL1nDy2OpOMQc+86Z3TfatN7J6szK0qSLYb/VjlG3tKaSrVN6cpmBdF5D777aVOyBlf+D+vxBEpeGXUZfOG4jYUM=", null, null, "amela900" },
+                    { 9, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5199), null, "tarik@example.com", "Tarik", true, null, true, null, null, null, "Tarikovic", "WFiLOJuHLZNlNwIn/7JPsZRWwSbX9d4WOPZfrudDIMCzL+yrSoIUGfflS6Nb6O159An87pMC/7xgTXcvC+bXug==", "xa7tCyzbFr4FJ8QeeJa47dDbRHC2u+F57iwgrlipKAH/5Y9huunkmoy2yQdjxhoDSEDfgp2dbyU91v8/lPmtL1nDy2OpOMQc+86Z3TfatN7J6szK0qSLYb/VjlG3tKaSrVN6cpmBdF5D777aVOyBlf+D+vxBEpeGXUZfOG4jYUM=", null, null, "tarik345" },
+                    { 10, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5201), null, "emina@example.com", "Emina", true, null, true, null, null, null, "Eminovic", "WFiLOJuHLZNlNwIn/7JPsZRWwSbX9d4WOPZfrudDIMCzL+yrSoIUGfflS6Nb6O159An87pMC/7xgTXcvC+bXug==", "xa7tCyzbFr4FJ8QeeJa47dDbRHC2u+F57iwgrlipKAH/5Y9huunkmoy2yQdjxhoDSEDfgp2dbyU91v8/lPmtL1nDy2OpOMQc+86Z3TfatN7J6szK0qSLYb/VjlG3tKaSrVN6cpmBdF5D777aVOyBlf+D+vxBEpeGXUZfOG4jYUM=", null, null, "emina112" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "UserRoles",
+                columns: new[] { "Id", "DateAssigned", "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(5877), 2, 1 },
+                    { 2, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6337), 2, 2 },
+                    { 3, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6338), 3, 3 },
+                    { 4, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6339), 3, 4 },
+                    { 5, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6340), 3, 5 },
+                    { 6, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6341), 3, 6 },
+                    { 7, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6342), 4, 7 },
+                    { 8, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6342), 4, 8 },
+                    { 9, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6381), 4, 9 },
+                    { 10, new DateTime(2026, 2, 12, 21, 22, 35, 764, DateTimeKind.Utc).AddTicks(6382), 4, 10 }
                 });
 
             migrationBuilder.CreateIndex(

@@ -6,6 +6,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Gymify.WebAPI.Authentication;
+using Gymify.Services.Interfaces;
+using Gymify.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +54,18 @@ TypeAdapterConfig.GlobalSettings.Default
 
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddTransient<IMapper, ServiceMapper>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<ILoyaltyPointHistoryService, LoyaltyPointHistoryService>();
+builder.Services.AddTransient<ILoyaltyPointService, LoyaltyPointService>();
+builder.Services.AddTransient<IMemberService, MemberService>();
+builder.Services.AddTransient<IMembershipService, MembershipService>();
+builder.Services.AddTransient<IPaymentService, PaymentService>();
+builder.Services.AddTransient<IReservationService, ReservationService>();
+builder.Services.AddTransient<IReviewService, ReviewService>();
+builder.Services.AddTransient<ISpecialOfferService, SpecialOfferService>();
+builder.Services.AddTransient<ITrainingService, TrainingService>();
+builder.Services.AddTransient<IWorkerTaskService, WorkerTaskService>();
+builder.Services.AddTransient<IRoleService, RoleService>();
 
 
 builder.Services.AddJwtAuthentication(builder.Configuration);

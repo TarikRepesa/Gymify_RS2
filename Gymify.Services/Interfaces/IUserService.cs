@@ -7,6 +7,6 @@ namespace Gymify.Services.Interfaces
 {
     public interface IUserService : ICRUDService<UserResponse, BaseSearchObject, UserInsertRequest, UserUpdateRequest>
     {
-        // Task<LoginResponse> LoginAsync(LoginRequest request);
+        Task<LoginResponse> LoginAsync(LoginRequest request);
     }
 }

@@ -28,6 +28,9 @@ namespace Gymify.Model.RequestObjects
         public string? UserImage { get; set; }
 
         public bool IsActive { get; set; } = true;
-        public bool IsVlasnik { get; set; } = false;
+        public bool? IsUser { get; set; }
+        public bool? IsAdmin { get; set; }
+        public bool? IsTrener { get; set; }
+        public bool? IsRadnik { get; set; }
     }
 }
