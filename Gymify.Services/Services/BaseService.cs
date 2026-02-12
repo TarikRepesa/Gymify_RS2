@@ -9,7 +9,7 @@ using Gymify.Model.SearchObjects;
 using Gymify.Services.Database;
 using Gymify.Model.ResponseObjects;
 
-namespace Rentify.Services.Services
+namespace Gymify.Services.Services
 {
     public abstract class BaseService<T, TSearch, TEntity> : IService<T, TSearch> where T : class where TSearch : BaseSearchObject where TEntity : class
     {

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Gymify.API.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(GymifyDbContext))]
     [Migration("20260204203748_InitialCreate")]
     partial class InitialCreate
     {

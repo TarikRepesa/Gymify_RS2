@@ -1,14 +1,13 @@
-using Rentify.Model;
-using Rentify.Model.SearchObjects;
-using Rentify.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Rentify.Model.ResponseObjects;
-using Rentify.Services.Interfaces;
+using Gymify.Services.Interfaces;
+using Gymify.Model.ResponseObjects;
+using Gymify.Model.SearchObjects;
 
-namespace Rentify.WebAPI.Controllers
+
+namespace Gymify.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]

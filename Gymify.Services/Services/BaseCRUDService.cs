@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using Gymify.Services.Interfaces;
 using Gymify.Model.SearchObjects;
 
-namespace Rentify.Services.Services
+namespace Gymify.Services.Services
 {
     public abstract class BaseCRUDService<T, TSearch, TEntity, TInsert, TUpdate> 
     : BaseService<T, TSearch, TEntity>, ICRUDService<T, TSearch, TInsert, TUpdate> 
