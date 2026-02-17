@@ -43,7 +43,7 @@ class BaseDialog extends StatelessWidget {
             // 🔹 HEADER
             Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF5F9F3B), 
+                color: Color(0xFF387EFF), 
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Padding(

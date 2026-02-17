@@ -66,6 +66,7 @@ builder.Services.AddTransient<ISpecialOfferService, SpecialOfferService>();
 builder.Services.AddTransient<ITrainingService, TrainingService>();
 builder.Services.AddTransient<IWorkerTaskService, WorkerTaskService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IImageService, ImageService>();
 
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -81,6 +82,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
