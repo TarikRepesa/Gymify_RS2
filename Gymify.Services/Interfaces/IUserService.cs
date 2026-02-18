@@ -5,7 +5,7 @@ using Gymify.Model.SearchObjects;
 
 namespace Gymify.Services.Interfaces
 {
-    public interface IUserService : ICRUDService<UserResponse, BaseSearchObject, UserInsertRequest, UserUpdateRequest>
+    public interface IUserService : ICRUDService<UserResponse, UserSearchObject, UserInsertRequest, UserUpdateRequest>
     {
         Task<LoginResponse> LoginAsync(LoginRequest request);
     }

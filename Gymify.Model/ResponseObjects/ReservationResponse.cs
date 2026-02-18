@@ -6,7 +6,9 @@ namespace Gymify.Model.ResponseObjects
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public UserResponse User {get; set;}
         public int TrainingId { get; set; }
+        public TrainingResponse Training {get; set;}
         public DateTime CreatedAt { get; set; }
     }
 }

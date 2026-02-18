@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gymify.API.Controllers
 {
-    public class TrainingController : BaseCRUDController<TrainingResponse, BaseSearchObject, TrainingUpsertRequest, TrainingUpsertRequest>
+    public class TrainingController : BaseCRUDController<TrainingResponse, TrainingSearchObject, TrainingUpsertRequest, TrainingUpsertRequest>
     {
         public TrainingController(ITrainingService service) : base(service)
         {

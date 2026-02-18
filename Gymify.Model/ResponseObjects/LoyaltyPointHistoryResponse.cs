@@ -8,6 +8,8 @@ namespace Gymify.Model.ResponseObjects
 
         public int UserId { get; set; }
 
+        public UserResponse User { get; set; }
+
         public string Status { get; set; } = string.Empty;
 
         public int AmountPointsParticipation { get; set; }
