@@ -26,6 +26,7 @@ namespace Gymify.Services.Services
         {
             var query = _context.Set<TEntity>().AsQueryable();
             query = ApplyFilter(query, search);
+            query = AddInclude(query, search);
 
             int? totalCount = null;
             if (search.IncludeTotalCount){
@@ -53,6 +54,11 @@ namespace Gymify.Services.Services
         }
 
         protected virtual IQueryable<TEntity> ApplyFilter(IQueryable<TEntity> query, TSearch search)
+        {
+            return query;
+        }
+
+        protected virtual IQueryable<TEntity> AddInclude(IQueryable<TEntity> query, TSearch search)
         {
             return query;
         }

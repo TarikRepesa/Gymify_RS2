@@ -14,7 +14,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Gymify.Services.Services
 {
-    public class UserService : BaseCRUDService<UserResponse, BaseSearchObject, User, UserInsertRequest, UserUpdateRequest>, IUserService
+    public class UserService : BaseCRUDService<UserResponse, UserSearchObject, User, UserInsertRequest, UserUpdateRequest>, IUserService
     {
         IConfiguration _configuration;
         public UserService(GymifyDbContext context, IMapper mapper, IConfiguration configuration) : base(context, mapper)
@@ -22,10 +22,41 @@ namespace Gymify.Services.Services
             _configuration = configuration;
         }
 
-        protected override IQueryable<User> ApplyFilter(IQueryable<User> query, BaseSearchObject search)
+        protected override IQueryable<User> ApplyFilter(IQueryable<User> query, UserSearchObject search)
         {
-            return base.ApplyFilter(query, search);
+            query = base.ApplyFilter(query, search);
+
+            if (!string.IsNullOrEmpty(search.FTS))
+            {
+                query = query.Where(x =>
+                    (x.FirstName + " " + x.LastName).ToLower().Contains(search.FTS.ToLower())
+                    || x.Email.ToLower().Contains(search.FTS.ToLower())
+                );
+            }
+
+            if (search.IsRadnik == true && search.IsTrener == true)
+            {
+                query = query.Where(x => x.IsRadnik == true || x.IsTrener == true);
+            }
+            else
+            {
+                if (search.IsRadnik.HasValue)
+                    query = query.Where(x => x.IsRadnik == search.IsRadnik.Value);
+
+                if (search.IsTrener.HasValue)
+                    query = query.Where(x => x.IsTrener == search.IsTrener.Value);
+            }
+
+            if (search.IsAdmin.HasValue)
+                query = query.Where(x => x.IsAdmin == search.IsAdmin.Value);
+
+            if (search.IsUser.HasValue)
+                query = query.Where(x => x.IsUser == search.IsUser.Value);
+
+            return query;
         }
+
+
 
         protected override User MapInsertToEntity(User entity, UserInsertRequest request)
         {

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/providers/auth_provider.dart';
+import 'package:gymify_desktop/providers/member_provider.dart';
+import 'package:gymify_desktop/providers/membership_provider.dart';
+import 'package:gymify_desktop/providers/training_provider.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
 import 'package:gymify_desktop/routes/app_routes.dart';
 import 'package:gymify_desktop/screens/login_screen.dart';
@@ -13,6 +16,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => MemberProvider()),
+        ChangeNotifierProvider(create: (_) => MembershipProvider()),
+        ChangeNotifierProvider(create: (_) => TrainingProvider()),
       ],
       child: const RentifyApp(),
     ),

@@ -51,7 +51,7 @@ namespace Gymify.Services.Database
 
             modelBuilder.Entity<Training>()
                 .HasOne(t => t.User)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -65,6 +65,8 @@ namespace Gymify.Services.Database
             UserHelper.CreatePasswordHash("Admin123!", out string adminHash, out string adminSalt);
             UserHelper.CreatePasswordHash("Radnik123!", out string radnikHash, out string radnikSalt);
             UserHelper.CreatePasswordHash("Trener123!", out string trenerHash, out string trenerSalt);
+            UserHelper.CreatePasswordHash("User123!", out string userHash, out string userSalt);
+
 
             modelBuilder.Entity<User>().HasData(
                 new User { Id = 1, FirstName = "Tarik", LastName = "Malic", Username = "tare45", Email = "ajdin@example.com", IsActive = true, IsAdmin = true, CreatedAt = DateTime.UtcNow, PasswordHash = adminHash, PasswordSalt = adminSalt },
@@ -78,7 +80,17 @@ namespace Gymify.Services.Database
                 new User { Id = 7, FirstName = "Nedim", LastName = "Nedimovic", Username = "nedim89", Email = "nedim@example.com", IsActive = true, IsRadnik = true, CreatedAt = DateTime.UtcNow, PasswordHash = radnikHash, PasswordSalt = radnikSalt },
                 new User { Id = 8, FirstName = "Amela", LastName = "Amelovic", Username = "amela900", Email = "amela@example.com", IsActive = true, IsRadnik = true, CreatedAt = DateTime.UtcNow, PasswordHash = radnikHash, PasswordSalt = radnikSalt },
                 new User { Id = 9, FirstName = "Tarik", LastName = "Tarikovic", Username = "tarik345", Email = "tarik@example.com", IsActive = true, IsRadnik = true, CreatedAt = DateTime.UtcNow, PasswordHash = radnikHash, PasswordSalt = radnikSalt },
-                new User { Id = 10, FirstName = "Emina", LastName = "Eminovic", Username = "emina112", Email = "emina@example.com", IsActive = true, IsRadnik = true, CreatedAt = DateTime.UtcNow, PasswordHash = radnikHash, PasswordSalt = radnikSalt }
+                new User { Id = 10, FirstName = "Emina", LastName = "Eminovic", Username = "emina112", Email = "emina@example.com", IsActive = true, IsRadnik = true, CreatedAt = DateTime.UtcNow, PasswordHash = radnikHash, PasswordSalt = radnikSalt },
+                new User { Id = 11, FirstName = "Haris", LastName = "Hasic", Username = "haris1", Email = "haris1@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 12, FirstName = "Denis", LastName = "Denisovic", Username = "denis2", Email = "denis2@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 13, FirstName = "Alen", LastName = "Alenovic", Username = "alen3", Email = "alen3@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 14, FirstName = "Kenan", LastName = "Kenanovic", Username = "kenan4", Email = "kenan4@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 15, FirstName = "Jasmin", LastName = "Jasminovic", Username = "jasmin5", Email = "jasmin5@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 16, FirstName = "Lejla", LastName = "Lejlovic", Username = "lejla6", Email = "lejla6@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 17, FirstName = "Sara", LastName = "Saric", Username = "sara7", Email = "sara7@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 18, FirstName = "Amina", LastName = "Aminovic", Username = "amina8", Email = "amina8@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 19, FirstName = "Emir", LastName = "Emirovic", Username = "emir9", Email = "emir9@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt },
+                new User { Id = 20, FirstName = "Nermin", LastName = "Nerminovic", Username = "nermin10", Email = "nermin10@example.com", IsActive = true, IsUser = true, CreatedAt = DateTime.UtcNow, PasswordHash = userHash, PasswordSalt = userSalt }
             );
 
             modelBuilder.Entity<UserRole>().HasData(
@@ -95,6 +107,78 @@ namespace Gymify.Services.Database
                 new UserRole { Id = 8, UserId = 8, RoleId = 4 },
                 new UserRole { Id = 9, UserId = 9, RoleId = 4 },
                 new UserRole { Id = 10, UserId = 10, RoleId = 4 }
+            );
+
+            modelBuilder.Entity<Membership>().HasData(
+    new Membership
+    {
+        Id = 1,
+        Name = "Basic",
+        MonthlyPrice = 30.00,
+        YearPrice = 300.00,
+        CreatedAt = new DateTime(2025, 1, 1)
+    },
+    new Membership
+    {
+        Id = 2,
+        Name = "Standard",
+        MonthlyPrice = 45.00,
+        YearPrice = 450.00,
+        CreatedAt = new DateTime(2025, 1, 1)
+    },
+    new Membership
+    {
+        Id = 3,
+        Name = "Premium",
+        MonthlyPrice = 60.00,
+        YearPrice = 600.00,
+        CreatedAt = new DateTime(2025, 1, 1)
+    },
+    new Membership
+    {
+        Id = 4,
+        Name = "VIP",
+        MonthlyPrice = 80.00,
+        YearPrice = 800.00,
+        CreatedAt = new DateTime(2025, 1, 1)
+    }
+);
+
+
+            modelBuilder.Entity<Member>().HasData(
+                new Member { Id = 1, UserId = 11, MembershipId = 1, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(30) },
+                new Member { Id = 2, UserId = 12, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(90) },
+                new Member { Id = 3, UserId = 13, MembershipId = 3, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(180) },
+                new Member { Id = 4, UserId = 14, MembershipId = 4, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(365) },
+                new Member { Id = 5, UserId = 15, MembershipId = 1, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(30) },
+                new Member { Id = 6, UserId = 16, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(90) },
+                new Member { Id = 7, UserId = 17, MembershipId = 3, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(180) },
+                new Member { Id = 8, UserId = 18, MembershipId = 4, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(365) },
+                new Member { Id = 9, UserId = 19, MembershipId = 1, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(30) },
+                new Member { Id = 10, UserId = 20, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(90) }
+            );
+
+            modelBuilder.Entity<Training>().HasData(
+                new Training { Id = 1, UserId = 3, Name = "HIIT", MaxAmountOfParticipants = 15, CurrentParticipants = 10, StartDate = DateTime.UtcNow.AddDays(1) },
+                new Training { Id = 2, UserId = 3, Name = "Cardio Blast", MaxAmountOfParticipants = 20, CurrentParticipants = 12, StartDate = DateTime.UtcNow.AddDays(2) },
+                new Training { Id = 3, UserId = 4, Name = "CrossFit", MaxAmountOfParticipants = 18, CurrentParticipants = 14, StartDate = DateTime.UtcNow.AddDays(3) },
+                new Training { Id = 4, UserId = 4, Name = "Yoga Flow", MaxAmountOfParticipants = 12, CurrentParticipants = 8, StartDate = DateTime.UtcNow.AddDays(4) },
+                new Training { Id = 5, UserId = 5, Name = "Pilates", MaxAmountOfParticipants = 10, CurrentParticipants = 6, StartDate = DateTime.UtcNow.AddDays(5) },
+                new Training { Id = 6, UserId = 5, Name = "Strength Training", MaxAmountOfParticipants = 16, CurrentParticipants = 11, StartDate = DateTime.UtcNow.AddDays(6) },
+                new Training { Id = 7, UserId = 6, Name = "Boxing", MaxAmountOfParticipants = 14, CurrentParticipants = 9, StartDate = DateTime.UtcNow.AddDays(7) },
+                new Training { Id = 8, UserId = 6, Name = "Kickboxing", MaxAmountOfParticipants = 15, CurrentParticipants = 7, StartDate = DateTime.UtcNow.AddDays(8) },
+                new Training { Id = 9, UserId = 3, Name = "Morning Fitness", MaxAmountOfParticipants = 20, CurrentParticipants = 13, StartDate = DateTime.UtcNow.AddDays(9) },
+                new Training { Id = 10, UserId = 4, Name = "Evening Cardio", MaxAmountOfParticipants = 18, CurrentParticipants = 15, StartDate = DateTime.UtcNow.AddDays(10) },
+                new Training { Id = 11, UserId = 5, Name = "Body Pump", MaxAmountOfParticipants = 17, CurrentParticipants = 10, StartDate = DateTime.UtcNow.AddDays(11) },
+                new Training { Id = 12, UserId = 6, Name = "Functional Training", MaxAmountOfParticipants = 14, CurrentParticipants = 8, StartDate = DateTime.UtcNow.AddDays(12) },
+                new Training { Id = 13, UserId = 3, Name = "Stretching", MaxAmountOfParticipants = 12, CurrentParticipants = 6, StartDate = DateTime.UtcNow.AddDays(13) },
+                new Training { Id = 14, UserId = 4, Name = "Bootcamp", MaxAmountOfParticipants = 20, CurrentParticipants = 18, StartDate = DateTime.UtcNow.AddDays(14) },
+                new Training { Id = 15, UserId = 5, Name = "Abs Workout", MaxAmountOfParticipants = 15, CurrentParticipants = 9, StartDate = DateTime.UtcNow.AddDays(15) },
+                new Training { Id = 16, UserId = 6, Name = "Powerlifting", MaxAmountOfParticipants = 10, CurrentParticipants = 5, StartDate = DateTime.UtcNow.AddDays(16) },
+                new Training { Id = 17, UserId = 3, Name = "Zumba", MaxAmountOfParticipants = 20, CurrentParticipants = 14, StartDate = DateTime.UtcNow.AddDays(17) },
+                new Training { Id = 18, UserId = 4, Name = "Aerobics", MaxAmountOfParticipants = 18, CurrentParticipants = 12, StartDate = DateTime.UtcNow.AddDays(18) },
+                new Training { Id = 19, UserId = 5, Name = "Circuit Training", MaxAmountOfParticipants = 16, CurrentParticipants = 11, StartDate = DateTime.UtcNow.AddDays(19) },
+                new Training { Id = 20, UserId = 6, Name = "Core Workout", MaxAmountOfParticipants = 15, CurrentParticipants = 10, StartDate = DateTime.UtcNow.AddDays(20) }
             );
         }
     }

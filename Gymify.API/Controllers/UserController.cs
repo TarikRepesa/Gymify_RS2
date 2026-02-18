@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gymify.API.Controllers
 {
-    public class UserController : BaseCRUDController<UserResponse, BaseSearchObject, UserInsertRequest, UserUpdateRequest>
+    public class UserController : BaseCRUDController<UserResponse, UserSearchObject, UserInsertRequest, UserUpdateRequest>
     {
         private readonly IUserService _userService;
         public UserController(IUserService service) : base(service)

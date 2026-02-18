@@ -12,7 +12,9 @@ class User {
   DateTime? dateOfBirth;
   String? userImage;
   final bool isActive;
-  final bool isVlasnik;
+  bool? isVlasnik;
+  bool? isRadnik;
+  bool? isTrener;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
   String? phoneNumber;
@@ -26,7 +28,9 @@ class User {
     this.dateOfBirth,
     this.userImage,
     required this.isActive,
-    required this.isVlasnik,
+    this.isVlasnik,
+    this.isRadnik,
+    this.isTrener,
     required this.createdAt,
     this.lastLoginAt,
     this.phoneNumber,

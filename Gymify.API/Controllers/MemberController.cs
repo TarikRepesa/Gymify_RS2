@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gymify.API.Controllers
 {
     
-    public class MemberController : BaseCRUDController<MemberResponse, BaseSearchObject, MemberUpsertRequest, MemberUpsertRequest>
+    public class MemberController : BaseCRUDController<MemberResponse, MemberSearchObject, MemberUpsertRequest, MemberUpsertRequest>
     {
         public MemberController(IMemberService service) : base(service)
         {
