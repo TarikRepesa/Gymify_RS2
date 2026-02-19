@@ -13,6 +13,7 @@ Training _$TrainingFromJson(Map<String, dynamic> json) => Training(
       ? null
       : User.fromJson(json['user'] as Map<String, dynamic>),
   name: json['name'] as String,
+  trainingImage: json['trainingImage'] as String?,
   maxAmountOfParticipants: (json['maxAmountOfParticipants'] as num).toInt(),
   currentParticipants: (json['currentParticipants'] as num).toInt(),
   startDate: DateTime.parse(json['startDate'] as String),
@@ -23,6 +24,7 @@ Map<String, dynamic> _$TrainingToJson(Training instance) => <String, dynamic>{
   'userId': instance.userId,
   'user': instance.user,
   'name': instance.name,
+  'trainingImage': instance.trainingImage,
   'maxAmountOfParticipants': instance.maxAmountOfParticipants,
   'currentParticipants': instance.currentParticipants,
   'startDate': instance.startDate.toIso8601String(),

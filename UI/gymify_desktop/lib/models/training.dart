@@ -9,6 +9,7 @@ class Training {
   final int userId;
   User? user;
   final String name;
+  String? trainingImage;
   final int maxAmountOfParticipants;
   final int currentParticipants;
   final DateTime startDate;
@@ -18,6 +19,7 @@ class Training {
     required this.userId,
     this.user,
     required this.name,
+    this.trainingImage,
     required this.maxAmountOfParticipants,
     required this.currentParticipants,
     required this.startDate,

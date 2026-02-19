@@ -19,10 +19,11 @@ namespace Gymify.Services.Database
 
        public string Name {get; set;}
 
+       public string? TrainingImage {get; set;}
+
        public int MaxAmountOfParticipants {get; set;}
 
        public int CurrentParticipants {get; set;}
-       
        // Posto start date ima i podatke u vremenu, tu cu izvlaciti vrijeme u klk trening pocinje
        //Imat cu posebne 2 metode u helperu koje ce ovo regulisati 
        public DateTime StartDate {get; set;}
