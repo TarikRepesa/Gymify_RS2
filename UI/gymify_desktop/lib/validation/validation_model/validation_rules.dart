@@ -71,4 +71,35 @@ class Rules {
       () => (selectedTags == null || selectedTags.isEmpty) ? message : null,
     );
   }
+
+  static FieldRule email(String field, String value, String message) {
+  return FieldRule(field, () {
+    final v = value.trim();
+    final regex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    return regex.hasMatch(v) ? null : message;
+  });
+}
+
+static FieldRule username(String field, String value, String message) {
+  return FieldRule(field, () {
+    final v = value.trim();
+
+    final regex = RegExp(r'^[a-zA-Z0-9._-]{3,20}$');
+    return regex.hasMatch(v) ? null : message;
+  });
+}
+
+static FieldRule strongPassword(String field, String value, String message) {
+  return FieldRule(field, () {
+    final v = value;
+
+    final hasMin = v.length >= 8;
+    final hasUpper = RegExp(r'[A-Z]').hasMatch(v);
+    final hasLower = RegExp(r'[a-z]').hasMatch(v);
+    final hasDigit = RegExp(r'\d').hasMatch(v);
+
+    return (hasMin && hasUpper && hasLower && hasDigit) ? null : message;
+  });
+}
+
 }

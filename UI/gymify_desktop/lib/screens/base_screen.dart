@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/config/api_config.dart';
-import 'package:gymify_desktop/dialogs/base_dialogs.dart';
+import 'package:gymify_desktop/dialogs/base_dialogs_frame.dart';
 import 'package:gymify_desktop/helper/image_helper.dart';
 import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
 import 'package:gymify_desktop/providers/image_provider.dart';
