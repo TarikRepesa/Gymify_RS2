@@ -13,8 +13,6 @@ class NotificationModel {
   final String title;
   final String content;
 
-  final bool isRead;
-
   final DateTime createdAt;
 
   NotificationModel({
@@ -23,7 +21,6 @@ class NotificationModel {
     this.user,
     required this.title,
     required this.content,
-    required this.isRead,
     required this.createdAt,
   });
 
