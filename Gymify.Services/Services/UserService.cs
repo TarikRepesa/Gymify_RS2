@@ -26,6 +26,12 @@ namespace Gymify.Services.Services
         {
             query = base.ApplyFilter(query, search);
 
+            if (!string.IsNullOrEmpty(search.fullNameSearch))
+            {
+                query = query.Where(x =>
+                    (x.FirstName + " " + x.LastName).ToLower().Contains(search.fullNameSearch.ToLower()));
+            }
+
             if (!string.IsNullOrEmpty(search.FTS))
             {
                 query = query.Where(x =>
