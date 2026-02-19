@@ -11,7 +11,7 @@ namespace Gymify.Model.ResponseObjects
         public string Username { get; set; } = string.Empty;
         public DateTime? DateOfBirth { get; set; }
         public bool IsActive { get; set; }
-        public bool? IsVlasnik { get; set; }
+        public bool? IsAdmin { get; set; }
         public bool? IsRadnik { get; set; }
         public bool? IsTrener { get; set; }
         public string? UserImage { get; set; }

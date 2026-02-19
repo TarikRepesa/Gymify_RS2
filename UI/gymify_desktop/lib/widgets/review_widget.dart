@@ -1,41 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-Widget ReviewWidget() {
-  final List<Map<String, dynamic>> reviews = [
-    {
-      "name": "Simeon Panda",
-      "comment": "Jako sam zadovoljan uslugom :)",
-      "stars": 5,
-    },
-    {
-      "name": "David Laid",
-      "comment": "Prevelike gužve. Higijena na nivou.",
-      "stars": 3,
-    },
-    {
-      "name": "Phil Heath",
-      "comment": "Velik izbor sprava i sadržaja.",
-      "stars": 4,
-    },
-  ];
+import 'package:gymify_desktop/helper/snackBar_helper.dart';
+import 'package:gymify_desktop/helper/univerzal_pagging_helper.dart';
 
-  Widget starRow(int count) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(
-        5,
-        (i) => Icon(
-          i < count ? Icons.star_rounded : Icons.star_border_rounded,
-          size: 18,
-          color: const Color(0xFFFFC107),
-        ),
-      ),
-    );
+import 'package:gymify_desktop/models/review.dart';
+import 'package:gymify_desktop/providers/review_provider.dart';
+
+class ReviewWidget extends StatefulWidget {
+  const ReviewWidget({super.key});
+
+  @override
+  State<ReviewWidget> createState() => _ReviewWidgetState();
+}
+
+class _ReviewWidgetState extends State<ReviewWidget> {
+  final TextEditingController _searchCtrl = TextEditingController();
+
+  int? _selectedStars; // dropdown filter (1-5)
+  // ako želiš: debounce za search, ali za sad je ok bez toga
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
   }
 
   InputDecoration _searchDecoration({
+    required TextEditingController controller,
     required String hint,
-    IconData? icon,
+    VoidCallback? onClear,
+    IconData? prefixIcon,
   }) {
     return InputDecoration(
       hintText: hint,
@@ -44,7 +39,14 @@ Widget ReviewWidget() {
         fontWeight: FontWeight.w600,
         color: Color(0xFF8A8A8A),
       ),
-      prefixIcon: icon != null ? Icon(icon, size: 18) : null,
+      prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 18) : null,
+      suffixIcon: (onClear == null || controller.text.trim().isEmpty)
+          ? null
+          : IconButton(
+              icon: const Icon(Icons.close_rounded, size: 18),
+              onPressed: onClear,
+              tooltip: "Očisti",
+            ),
       isDense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       filled: true,
@@ -64,7 +66,90 @@ Widget ReviewWidget() {
     );
   }
 
-  Widget reviewCard(Map<String, dynamic> r) {
+  String _reviewerName(Review r) {
+    final fn = r.user?.firstName?.trim() ?? "";
+    final ln = r.user?.lastName?.trim() ?? "";
+    final full = "$fn $ln".trim();
+    return full.isEmpty ? "Nepoznato" : full;
+  }
+
+  Widget _starRow(int count) {
+    final c = count.clamp(0, 5);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        5,
+        (i) => Icon(
+          i < c ? Icons.star_rounded : Icons.star_border_rounded,
+          size: 18,
+          color: const Color(0xFFFFC107),
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _confirmDelete(BuildContext context, Review r) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text("Brisanje recenzije"),
+        content: Text(
+          "Jesi li siguran da želiš obrisati recenziju od:\n\n"
+          "• ${_reviewerName(r)}\n"
+          "• ${r.starNumber} zvjezdica\n\n"
+          "Poruka:\n“${r.message}”",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text("Odustani"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text("Obriši"),
+          ),
+        ],
+      ),
+    );
+
+    return ok == true;
+  }
+
+  Future<void> _deleteReview({
+    required BuildContext context,
+    required UniversalPagingProvider<Review> paging,
+    required Review r,
+  }) async {
+    final id = r.id;
+    if (id == null) {
+      SnackbarHelper.showError(context, "Ne mogu obrisati – ID nedostaje.");
+      return;
+    }
+
+    final ok = await _confirmDelete(context, r);
+    if (!ok) return;
+
+    try {
+      await context.read<ReviewProvider>().delete(id);
+
+      // refresh: zadrži trenutni search + stars filter
+      await paging.search(_searchCtrl.text.trim());
+
+      if (mounted) {
+        SnackbarHelper.showUpdate(context, "Recenzija obrisana.");
+      }
+    } catch (e) {
+      if (mounted) SnackbarHelper.showError(context, e.toString());
+    }
+  }
+
+  Widget _reviewCard({
+    required BuildContext context,
+    required UniversalPagingProvider<Review> paging,
+    required Review r,
+  }) {
+    final name = _reviewerName(r);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -87,14 +172,14 @@ Widget ReviewWidget() {
 
           // ime
           SizedBox(
-            width: 150,
+            width: 170,
             child: Text(
-              r["name"] ?? "",
+              name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 13.5,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
                 color: Color(0xFF2F2F2F),
               ),
             ),
@@ -104,7 +189,7 @@ Widget ReviewWidget() {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 14),
             width: 1,
-            height: 26,
+            height: 28,
             color: Colors.black.withOpacity(0.18),
           ),
 
@@ -114,7 +199,7 @@ Widget ReviewWidget() {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              r["comment"] ?? "",
+              r.message,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
@@ -128,84 +213,193 @@ Widget ReviewWidget() {
           const SizedBox(width: 14),
 
           // zvjezdice
-          starRow((r["stars"] ?? 0) as int),
+          _starRow(r.starNumber),
 
           const SizedBox(width: 16),
 
           // delete
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.delete_outline_rounded),
-              iconSize: 20,
-              splashRadius: 18,
-              tooltip: "Obriši",
+          IconButton(
+            onPressed: paging.isLoading
+                ? null
+                : () => _deleteReview(context: context, paging: paging, r: r),
+            icon: Icon(
+              Icons.delete_outline_rounded,
+              color: Colors.red.withOpacity(0.85),
             ),
+            iconSize: 20,
+            splashRadius: 18,
+            tooltip: "Obriši",
           ),
         ],
       ),
     );
   }
 
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
-    child: Column(
+  Widget _pagingControls(UniversalPagingProvider<Review> paging) {
+    final totalPages =
+        (paging.totalCount + paging.pageSize - 1) ~/ paging.pageSize;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text(
-            "Recenzije",
-            style: const TextStyle(  
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
-            ),
-          ),
-
-        const SizedBox(height: 22),
-
-        // SEARCH ROW
-        Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: TextField(
-                decoration: _searchDecoration(
-                  hint: "Pretraga recenzija po članovima",
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              flex: 2,
-              child: DropdownButtonFormField<int>(
-                value: null,
-                decoration: _searchDecoration(
-                  hint: "Pretraga po broju zvjezdica",
-                ),
-                items: const [
-                  DropdownMenuItem(value: 5, child: Text("5 zvjezdica")),
-                  DropdownMenuItem(value: 4, child: Text("4 zvjezdice")),
-                  DropdownMenuItem(value: 3, child: Text("3 zvjezdice")),
-                  DropdownMenuItem(value: 2, child: Text("2 zvjezdice")),
-                  DropdownMenuItem(value: 1, child: Text("1 zvjezdica")),
-                ],
-                onChanged: (_) {},
-                icon: const Icon(Icons.keyboard_arrow_down_rounded),
-              ),
-            ),
-          ],
+        IconButton(
+          onPressed: paging.hasPreviousPage ? () => paging.previousPage() : null,
+          icon: const Icon(Icons.arrow_back),
         ),
-
-        const SizedBox(height: 22),
-
-        // LIST
-        Expanded(
-          child: ListView.builder(
-            itemCount: reviews.length,
-            itemBuilder: (context, i) => reviewCard(reviews[i]),
-          ),
+        Text(
+          totalPages == 0 ? "0 / 0" : "${paging.page + 1} / $totalPages",
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        IconButton(
+          onPressed: paging.hasNextPage ? () => paging.nextPage() : null,
+          icon: const Icon(Icons.arrow_forward),
         ),
       ],
-    ),
-  );
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<UniversalPagingProvider<Review>>(
+      create: (context) {
+        final paging = UniversalPagingProvider<Review>(
+          pageSize: 5,
+          fetcher: ({
+            required int page,
+            required int pageSize,
+            String? filter,
+            bool includeTotalCount = true,
+          }) {
+            return context.read<ReviewProvider>().get(
+              filter: {
+                "page": page,
+                "pageSize": pageSize,
+                "includeTotalCount": includeTotalCount,
+
+                if (filter != null && filter.trim().isNotEmpty)
+                  "FTS": filter.trim(),
+
+                if (_selectedStars != null) "StarNumber": _selectedStars,
+
+                "IncludeUser": true,
+              },
+            );
+          },
+        );
+
+        Future.microtask(() => paging.loadPage());
+        return paging;
+      },
+      child: Consumer<UniversalPagingProvider<Review>>(
+        builder: (context, paging, _) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
+            child: Column(
+              children: [
+                const Text(
+                  "Recenzije",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 22),
+
+                // SEARCH + STARS FILTER
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        controller: _searchCtrl,
+                        decoration: _searchDecoration(
+                          controller: _searchCtrl,
+                          hint: "Pretraga recenzija po članovima",
+                          prefixIcon: Icons.search_rounded,
+                          onClear: () {
+                            _searchCtrl.clear();
+                            setState(() {});
+                            paging.search("");
+                          },
+                        ),
+                        onChanged: (v) {
+                          setState(() {}); // da suffix reaguje
+                          paging.search(v);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      flex: 2,
+                      child: DropdownButtonFormField<int>(
+                        value: _selectedStars,
+                        decoration: _searchDecoration(
+                          controller: TextEditingController(text: ""),
+                          hint: "Pretraga po broju zvjezdica",
+                          prefixIcon: Icons.star_rounded,
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 5, child: Text("5 zvjezdica")),
+                          DropdownMenuItem(value: 4, child: Text("4 zvjezdice")),
+                          DropdownMenuItem(value: 3, child: Text("3 zvjezdice")),
+                          DropdownMenuItem(value: 2, child: Text("2 zvjezdice")),
+                          DropdownMenuItem(value: 1, child: Text("1 zvjezdica")),
+                        ],
+                        onChanged: (v) async {
+                          setState(() => _selectedStars = v);
+                          // zadrži trenutni search tekst
+                          await paging.search(_searchCtrl.text.trim());
+                        },
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                        isExpanded: true,
+                      ),
+                    ),
+
+                    // opcionalno dugme za "reset star filter"
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      height: 42,
+                      child: OutlinedButton(
+                        onPressed: () async {
+                          setState(() => _selectedStars = null);
+                          await paging.search(_searchCtrl.text.trim());
+                        },
+                        child: const Text("Reset"),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 22),
+
+                Expanded(
+                  child: (paging.isLoading && paging.items.isEmpty)
+                      ? const Center(child: CircularProgressIndicator())
+                      : paging.items.isEmpty
+                          ? const Center(
+                              child: Text(
+                                "Nema podataka.",
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: paging.items.length,
+                              itemBuilder: (context, i) => _reviewCard(
+                                context: context,
+                                paging: paging,
+                                r: paging.items[i],
+                              ),
+                            ),
+                ),
+
+                const SizedBox(height: 10),
+                _pagingControls(paging),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

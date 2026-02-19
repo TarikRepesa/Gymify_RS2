@@ -12,7 +12,7 @@ class User {
   DateTime? dateOfBirth;
   String? userImage;
   final bool isActive;
-  bool? isVlasnik;
+  bool? isAdmin;
   bool? isRadnik;
   bool? isTrener;
   final DateTime createdAt;
@@ -28,7 +28,7 @@ class User {
     this.dateOfBirth,
     this.userImage,
     required this.isActive,
-    this.isVlasnik,
+    this.isAdmin,
     this.isRadnik,
     this.isTrener,
     required this.createdAt,

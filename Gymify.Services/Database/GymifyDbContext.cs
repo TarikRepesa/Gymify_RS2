@@ -182,6 +182,137 @@ namespace Gymify.Services.Database
     new Training { Id = 20, UserId = 6, Name = "Core Workout", MaxAmountOfParticipants = 15, CurrentParticipants = 10, StartDate = new DateTime(2026, 6, 20), TrainingImage = "https://picsum.photos/seed/core/600/400" }
 );
 
+            // ============================
+            // NOTIFICATIONS (seed)
+            // Admini + Radnici najčešće dodaju obavijesti
+            // ============================
+            modelBuilder.Entity<Notification>().HasData(
+                new Notification
+                {
+                    Id = 1,
+                    UserId = 1, // Admin
+                    Title = "Obavijest",
+                    Content = "Funkcionalni trening planiran za večeras je otkazan.",
+                    CreatedAt = new DateTime(2026, 2, 10, 12, 0, 0)
+                },
+                new Notification
+                {
+                    Id = 2,
+                    UserId = 2, // Admin
+                    Title = "Obavijest",
+                    Content = "Termini pilatesa za sljedeću sedmicu su Uto-Sri-Pet 17:00.",
+                    CreatedAt = new DateTime(2026, 2, 12, 9, 30, 0)
+                },
+                new Notification
+                {
+                    Id = 3,
+                    UserId = 7, // Radnik
+                    Title = "Obavijest",
+                    Content = "Podsjetnik: članarine se mogu produžiti do 25. u mjesecu.",
+                    CreatedAt = new DateTime(2026, 2, 14, 15, 10, 0)
+                },
+                new Notification
+                {
+                    Id = 4,
+                    UserId = 8, // Radnik
+                    Title = "Obavijest",
+                    Content = "U subotu radimo skraćeno: 09:00–14:00.",
+                    CreatedAt = new DateTime(2026, 2, 15, 11, 0, 0)
+                },
+                new Notification
+                {
+                    Id = 5,
+                    UserId = 1, // Admin
+                    Title = "Obavijest",
+                    Content = "Uveden je novi VIP paket članarine. Pogledajte detalje na recepciji.",
+                    CreatedAt = new DateTime(2026, 2, 16, 10, 0, 0)
+                },
+                new Notification
+                {
+                    Id = 6,
+                    UserId = 9, // Radnik
+                    Title = "Obavijest",
+                    Content = "Molimo članove da nakon treninga vraćaju opremu na mjesto.",
+                    CreatedAt = new DateTime(2026, 2, 17, 18, 0, 0)
+                }
+            );
+
+            // ============================
+            // REVIEWS (seed)
+            // Tipično ih dodaju Useri (11–20), ali može i trener (3–6)
+            // ============================
+            modelBuilder.Entity<Review>().HasData(
+                new Review
+                {
+                    Id = 1,
+                    UserId = 11, // User
+                    Message = "Odlična teretana, čisto i uredno. Preporuka!",
+                    StarNumber = 5
+                },
+                new Review
+                {
+                    Id = 2,
+                    UserId = 12, // User
+                    Message = "Treninzi su super, ali bi volio više večernjih termina.",
+                    StarNumber = 4
+                },
+                new Review
+                {
+                    Id = 3,
+                    UserId = 13, // User
+                    Message = "Osoblje je ljubazno i uvijek spremno pomoći.",
+                    StarNumber = 5
+                },
+                new Review
+                {
+                    Id = 4,
+                    UserId = 14, // User
+                    Message = "Dobra oprema, ponekad gužva u špici.",
+                    StarNumber = 4
+                },
+                new Review
+                {
+                    Id = 5,
+                    UserId = 15, // User
+                    Message = "Zadovoljan sam. Treneri su stvarno profesionalni.",
+                    StarNumber = 5
+                },
+                new Review
+                {
+                    Id = 6,
+                    UserId = 16, // User
+                    Message = "Sve je top, jedino bi muzika mogla biti malo tiša.",
+                    StarNumber = 4
+                },
+                new Review
+                {
+                    Id = 7,
+                    UserId = 17, // User
+                    Message = "Najbolja teretana u gradu!",
+                    StarNumber = 5
+                },
+                new Review
+                {
+                    Id = 8,
+                    UserId = 18, // User
+                    Message = "Sviđa mi se što je uvijek čisto i uredno.",
+                    StarNumber = 5
+                },
+                new Review
+                {
+                    Id = 9,
+                    UserId = 19, // User
+                    Message = "Dobro iskustvo, ali bih volio više sprava za noge.",
+                    StarNumber = 4
+                },
+                new Review
+                {
+                    Id = 10,
+                    UserId = 20, // User
+                    Message = "Super atmosfera i odlična organizacija.",
+                    StarNumber = 5
+                }
+            );
         }
     }
 }

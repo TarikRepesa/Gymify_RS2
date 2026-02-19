@@ -5,7 +5,7 @@ import 'package:gymify_desktop/dialogs/base_dialogs_frame.dart';
 import 'package:gymify_desktop/models/user.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
 
-enum PickMode { user, trainer }
+enum PickMode { user, trainer, admin, radnik }
 
 Future<User?> showUserPickDialog({
   required BuildContext context,
@@ -20,6 +20,32 @@ Future<User?> showUserPickDialog({
   int totalCount = 0;
   List<User> results = [];
   bool loading = false;
+
+  String _titleByMode() {
+    switch (mode) {
+      case PickMode.user:
+        return "Odaberi korisnika";
+      case PickMode.trainer:
+        return "Odaberi trenera";
+      case PickMode.admin:
+        return "Odaberi admina";
+      case PickMode.radnik:
+        return "Odaberi radnika";
+    }
+  }
+
+  String _hintByMode() {
+    switch (mode) {
+      case PickMode.user:
+        return "Kucaj ime ili prezime korisnika...";
+      case PickMode.trainer:
+        return "Kucaj ime ili prezime trenera...";
+      case PickMode.admin:
+        return "Kucaj ime ili prezime admina...";
+      case PickMode.radnik:
+        return "Kucaj ime ili prezime radnika...";
+    }
+  }
 
   Future<void> loadPage(
     BuildContext dialogCtx,
@@ -39,9 +65,11 @@ Future<User?> showUserPickDialog({
         "includeTotalCount": true,
         if (q.isNotEmpty) "fullNameSearch": q,
 
-        // ✅ razlikuj user/trainer
+        // ✅ filteri po ulozi
         if (mode == PickMode.user) "isUser": true,
-        if (mode == PickMode.trainer) "isTrainer": true,
+        if (mode == PickMode.trainer) "isTrener": true,
+        if (mode == PickMode.admin) "isAdmin": true,
+        if (mode == PickMode.radnik) "isRadnik": true,
       };
 
       final res = await context.read<UserProvider>().get(filter: filter);
@@ -66,7 +94,6 @@ Future<User?> showUserPickDialog({
     barrierDismissible: false,
     builder: (dialogCtx) => StatefulBuilder(
       builder: (dialogCtx, setState) {
-        // ✅ auto-load prve stranice
         Future.microtask(() {
           if (results.isEmpty && !loading) {
             loadPage(dialogCtx, setState, newPage: 0);
@@ -78,7 +105,7 @@ Future<User?> showUserPickDialog({
         final hasNext = (page + 1) * pageSize < totalCount;
 
         return BaseDialog(
-          title: mode == PickMode.user ? "Odaberi korisnika" : "Odaberi trenera",
+          title: _titleByMode(),
           width: width,
           height: height,
           onClose: () => Navigator.pop(dialogCtx),
@@ -87,13 +114,10 @@ Future<User?> showUserPickDialog({
               TextField(
                 controller: ctrl,
                 decoration: InputDecoration(
-                  hintText: mode == PickMode.user
-                      ? "Kucaj ime ili prezime korisnika..."
-                      : "Kucaj ime ili prezime trenera...",
+                  hintText: _hintByMode(),
                   prefixIcon: const Icon(Icons.search),
                 ),
-                onChanged: (_) =>
-                    loadPage(dialogCtx, setState, newPage: 0), // reset paginga
+                onChanged: (_) => loadPage(dialogCtx, setState, newPage: 0),
               ),
               const SizedBox(height: 12),
 
@@ -104,7 +128,8 @@ Future<User?> showUserPickDialog({
                         ? const Center(child: Text("Nema rezultata."))
                         : ListView.separated(
                             itemCount: results.length,
-                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            separatorBuilder: (_, __) =>
+                                const Divider(height: 1),
                             itemBuilder: (_, i) {
                               final u = results[i];
                               final name =
@@ -115,7 +140,8 @@ Future<User?> showUserPickDialog({
                                 title: Text(name),
                                 subtitle: Text(u.email ?? ""),
                                 trailing: ElevatedButton(
-                                  onPressed: () => Navigator.pop(dialogCtx, u),
+                                  onPressed: () =>
+                                      Navigator.pop(dialogCtx, u),
                                   child: const Text("Odaberi"),
                                 ),
                               );
@@ -130,7 +156,11 @@ Future<User?> showUserPickDialog({
                 children: [
                   IconButton(
                     onPressed: (!loading && hasPrev)
-                        ? () => loadPage(dialogCtx, setState, newPage: page - 1)
+                        ? () => loadPage(
+                              dialogCtx,
+                              setState,
+                              newPage: page - 1,
+                            )
                         : null,
                     icon: const Icon(Icons.arrow_back),
                   ),
@@ -140,7 +170,11 @@ Future<User?> showUserPickDialog({
                   ),
                   IconButton(
                     onPressed: (!loading && hasNext)
-                        ? () => loadPage(dialogCtx, setState, newPage: page + 1)
+                        ? () => loadPage(
+                              dialogCtx,
+                              setState,
+                              newPage: page + 1,
+                            )
                         : null,
                     icon: const Icon(Icons.arrow_forward),
                   ),

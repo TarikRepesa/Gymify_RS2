@@ -33,6 +33,12 @@ namespace Gymify.Services.Services
                 query = query.Where(x => x.UserId == search.UserId.Value);
             }
 
+            if (!string.IsNullOrEmpty(search.FTS))
+            {
+                query = query.Where(x => x.Title.ToLower().Contains(search.FTS)
+                || x.Content.ToLower().Contains(search.FTS));
+            }
+
             return query;
         }
 
