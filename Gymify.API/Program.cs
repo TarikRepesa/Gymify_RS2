@@ -67,6 +67,7 @@ builder.Services.AddTransient<ITrainingService, TrainingService>();
 builder.Services.AddTransient<IWorkerTaskService, WorkerTaskService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IImageService, ImageService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
 
 
 builder.Services.AddJwtAuthentication(builder.Configuration);

@@ -6,6 +6,7 @@ namespace Gymify.Model.RequestObjects
     {
         public int UserId { get; set; }
         public string Name { get; set; }
+        public string? TrainingImage { get; set;}
         public int MaxAmountOfParticipants { get; set; }
         public int CurrentParticipants { get; set; }
         public DateTime StartDate { get; set; }

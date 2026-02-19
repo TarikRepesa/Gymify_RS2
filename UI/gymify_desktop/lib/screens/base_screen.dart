@@ -7,11 +7,9 @@ import 'package:gymify_desktop/helper/image_helper.dart';
 import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
 import 'package:gymify_desktop/providers/image_provider.dart';
 import 'package:provider/provider.dart';
-
 import 'package:gymify_desktop/models/user.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
 import 'package:gymify_desktop/utils/session.dart';
-
 import 'package:gymify_desktop/widgets/member_widget.dart';
 import 'package:gymify_desktop/widgets/membership_widget.dart';
 import 'package:gymify_desktop/widgets/notification_widget.dart';

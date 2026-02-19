@@ -16,6 +16,11 @@ namespace Gymify.Services.Services
 
         protected override IQueryable<Member> ApplyFilter(IQueryable<Member> query, MemberSearchObject search)
         {
+            if (search.UserId.HasValue)
+            {
+                query = query.Where(x => x.UserId == search.UserId);
+            }
+
             if (!string.IsNullOrEmpty(search.FTS))
             {
                 query = query.Where(x =>

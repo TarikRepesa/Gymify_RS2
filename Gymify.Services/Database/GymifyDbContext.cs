@@ -25,6 +25,7 @@ namespace Gymify.Services.Database
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<SpecialOffer> SpecialOffers { get; set; }
         public DbSet<WorkerTask> WorkerTasks { get; set; }
 
@@ -150,36 +151,37 @@ namespace Gymify.Services.Database
                 new Member { Id = 2, UserId = 12, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(90) },
                 new Member { Id = 3, UserId = 13, MembershipId = 3, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(180) },
                 new Member { Id = 4, UserId = 14, MembershipId = 4, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(365) },
-                new Member { Id = 5, UserId = 15, MembershipId = 1, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(30) },
+                new Member { Id = 5, UserId = 15, MembershipId = 1, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(-5) },
                 new Member { Id = 6, UserId = 16, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(90) },
-                new Member { Id = 7, UserId = 17, MembershipId = 3, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(180) },
-                new Member { Id = 8, UserId = 18, MembershipId = 4, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(365) },
+                new Member { Id = 7, UserId = 17, MembershipId = 3, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(-10) },
+                new Member { Id = 8, UserId = 18, MembershipId = 4, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(-5) },
                 new Member { Id = 9, UserId = 19, MembershipId = 1, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(30) },
-                new Member { Id = 10, UserId = 20, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(90) }
+                new Member { Id = 10, UserId = 20, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(-10) }
             );
 
             modelBuilder.Entity<Training>().HasData(
-                new Training { Id = 1, UserId = 3, Name = "HIIT", MaxAmountOfParticipants = 15, CurrentParticipants = 10, StartDate = DateTime.UtcNow.AddDays(1) },
-                new Training { Id = 2, UserId = 3, Name = "Cardio Blast", MaxAmountOfParticipants = 20, CurrentParticipants = 12, StartDate = DateTime.UtcNow.AddDays(2) },
-                new Training { Id = 3, UserId = 4, Name = "CrossFit", MaxAmountOfParticipants = 18, CurrentParticipants = 14, StartDate = DateTime.UtcNow.AddDays(3) },
-                new Training { Id = 4, UserId = 4, Name = "Yoga Flow", MaxAmountOfParticipants = 12, CurrentParticipants = 8, StartDate = DateTime.UtcNow.AddDays(4) },
-                new Training { Id = 5, UserId = 5, Name = "Pilates", MaxAmountOfParticipants = 10, CurrentParticipants = 6, StartDate = DateTime.UtcNow.AddDays(5) },
-                new Training { Id = 6, UserId = 5, Name = "Strength Training", MaxAmountOfParticipants = 16, CurrentParticipants = 11, StartDate = DateTime.UtcNow.AddDays(6) },
-                new Training { Id = 7, UserId = 6, Name = "Boxing", MaxAmountOfParticipants = 14, CurrentParticipants = 9, StartDate = DateTime.UtcNow.AddDays(7) },
-                new Training { Id = 8, UserId = 6, Name = "Kickboxing", MaxAmountOfParticipants = 15, CurrentParticipants = 7, StartDate = DateTime.UtcNow.AddDays(8) },
-                new Training { Id = 9, UserId = 3, Name = "Morning Fitness", MaxAmountOfParticipants = 20, CurrentParticipants = 13, StartDate = DateTime.UtcNow.AddDays(9) },
-                new Training { Id = 10, UserId = 4, Name = "Evening Cardio", MaxAmountOfParticipants = 18, CurrentParticipants = 15, StartDate = DateTime.UtcNow.AddDays(10) },
-                new Training { Id = 11, UserId = 5, Name = "Body Pump", MaxAmountOfParticipants = 17, CurrentParticipants = 10, StartDate = DateTime.UtcNow.AddDays(11) },
-                new Training { Id = 12, UserId = 6, Name = "Functional Training", MaxAmountOfParticipants = 14, CurrentParticipants = 8, StartDate = DateTime.UtcNow.AddDays(12) },
-                new Training { Id = 13, UserId = 3, Name = "Stretching", MaxAmountOfParticipants = 12, CurrentParticipants = 6, StartDate = DateTime.UtcNow.AddDays(13) },
-                new Training { Id = 14, UserId = 4, Name = "Bootcamp", MaxAmountOfParticipants = 20, CurrentParticipants = 18, StartDate = DateTime.UtcNow.AddDays(14) },
-                new Training { Id = 15, UserId = 5, Name = "Abs Workout", MaxAmountOfParticipants = 15, CurrentParticipants = 9, StartDate = DateTime.UtcNow.AddDays(15) },
-                new Training { Id = 16, UserId = 6, Name = "Powerlifting", MaxAmountOfParticipants = 10, CurrentParticipants = 5, StartDate = DateTime.UtcNow.AddDays(16) },
-                new Training { Id = 17, UserId = 3, Name = "Zumba", MaxAmountOfParticipants = 20, CurrentParticipants = 14, StartDate = DateTime.UtcNow.AddDays(17) },
-                new Training { Id = 18, UserId = 4, Name = "Aerobics", MaxAmountOfParticipants = 18, CurrentParticipants = 12, StartDate = DateTime.UtcNow.AddDays(18) },
-                new Training { Id = 19, UserId = 5, Name = "Circuit Training", MaxAmountOfParticipants = 16, CurrentParticipants = 11, StartDate = DateTime.UtcNow.AddDays(19) },
-                new Training { Id = 20, UserId = 6, Name = "Core Workout", MaxAmountOfParticipants = 15, CurrentParticipants = 10, StartDate = DateTime.UtcNow.AddDays(20) }
-            );
+    new Training { Id = 1, UserId = 3, Name = "HIIT", MaxAmountOfParticipants = 15, CurrentParticipants = 10, StartDate = new DateTime(2026, 6, 1), TrainingImage = "https://picsum.photos/seed/hiit/600/400" },
+    new Training { Id = 2, UserId = 3, Name = "Cardio Blast", MaxAmountOfParticipants = 20, CurrentParticipants = 12, StartDate = new DateTime(2026, 6, 2), TrainingImage = "https://picsum.photos/seed/cardioblast/600/400" },
+    new Training { Id = 3, UserId = 4, Name = "CrossFit", MaxAmountOfParticipants = 18, CurrentParticipants = 14, StartDate = new DateTime(2026, 6, 3), TrainingImage = "https://picsum.photos/seed/crossfit/600/400" },
+    new Training { Id = 4, UserId = 4, Name = "Yoga Flow", MaxAmountOfParticipants = 12, CurrentParticipants = 8, StartDate = new DateTime(2026, 6, 4), TrainingImage = "https://picsum.photos/seed/yogaflow/600/400" },
+    new Training { Id = 5, UserId = 5, Name = "Pilates", MaxAmountOfParticipants = 10, CurrentParticipants = 6, StartDate = new DateTime(2026, 6, 5), TrainingImage = "https://picsum.photos/seed/pilates/600/400" },
+    new Training { Id = 6, UserId = 5, Name = "Strength Training", MaxAmountOfParticipants = 16, CurrentParticipants = 11, StartDate = new DateTime(2026, 6, 6), TrainingImage = "https://picsum.photos/seed/strength/600/400" },
+    new Training { Id = 7, UserId = 6, Name = "Boxing", MaxAmountOfParticipants = 14, CurrentParticipants = 9, StartDate = new DateTime(2026, 6, 7), TrainingImage = "https://picsum.photos/seed/boxing/600/400" },
+    new Training { Id = 8, UserId = 6, Name = "Kickboxing", MaxAmountOfParticipants = 15, CurrentParticipants = 7, StartDate = new DateTime(2026, 6, 8), TrainingImage = "https://picsum.photos/seed/kickboxing/600/400" },
+    new Training { Id = 9, UserId = 3, Name = "Morning Fitness", MaxAmountOfParticipants = 20, CurrentParticipants = 13, StartDate = new DateTime(2026, 6, 9), TrainingImage = "https://picsum.photos/seed/morningfitness/600/400" },
+    new Training { Id = 10, UserId = 4, Name = "Evening Cardio", MaxAmountOfParticipants = 18, CurrentParticipants = 15, StartDate = new DateTime(2026, 6, 10), TrainingImage = "https://picsum.photos/seed/eveningcardio/600/400" },
+    new Training { Id = 11, UserId = 5, Name = "Body Pump", MaxAmountOfParticipants = 17, CurrentParticipants = 10, StartDate = new DateTime(2026, 6, 11), TrainingImage = "https://picsum.photos/seed/bodypump/600/400" },
+    new Training { Id = 12, UserId = 6, Name = "Functional Training", MaxAmountOfParticipants = 14, CurrentParticipants = 8, StartDate = new DateTime(2026, 6, 12), TrainingImage = "https://picsum.photos/seed/functional/600/400" },
+    new Training { Id = 13, UserId = 3, Name = "Stretching", MaxAmountOfParticipants = 12, CurrentParticipants = 6, StartDate = new DateTime(2026, 6, 13), TrainingImage = "https://picsum.photos/seed/stretching/600/400" },
+    new Training { Id = 14, UserId = 4, Name = "Bootcamp", MaxAmountOfParticipants = 20, CurrentParticipants = 18, StartDate = new DateTime(2026, 6, 14), TrainingImage = "https://picsum.photos/seed/bootcamp/600/400" },
+    new Training { Id = 15, UserId = 5, Name = "Abs Workout", MaxAmountOfParticipants = 15, CurrentParticipants = 9, StartDate = new DateTime(2026, 6, 15), TrainingImage = "https://picsum.photos/seed/absworkout/600/400" },
+    new Training { Id = 16, UserId = 6, Name = "Powerlifting", MaxAmountOfParticipants = 10, CurrentParticipants = 5, StartDate = new DateTime(2026, 6, 16), TrainingImage = "https://picsum.photos/seed/powerlifting/600/400" },
+    new Training { Id = 17, UserId = 3, Name = "Zumba", MaxAmountOfParticipants = 20, CurrentParticipants = 14, StartDate = new DateTime(2026, 6, 17), TrainingImage = "https://picsum.photos/seed/zumba/600/400" },
+    new Training { Id = 18, UserId = 4, Name = "Aerobics", MaxAmountOfParticipants = 18, CurrentParticipants = 12, StartDate = new DateTime(2026, 6, 18), TrainingImage = "https://picsum.photos/seed/aerobics/600/400" },
+    new Training { Id = 19, UserId = 5, Name = "Circuit Training", MaxAmountOfParticipants = 16, CurrentParticipants = 11, StartDate = new DateTime(2026, 6, 19), TrainingImage = "https://picsum.photos/seed/circuit/600/400" },
+    new Training { Id = 20, UserId = 6, Name = "Core Workout", MaxAmountOfParticipants = 15, CurrentParticipants = 10, StartDate = new DateTime(2026, 6, 20), TrainingImage = "https://picsum.photos/seed/core/600/400" }
+);
+
         }
     }
 }

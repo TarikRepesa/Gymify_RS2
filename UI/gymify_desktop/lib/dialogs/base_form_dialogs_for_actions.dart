@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/base_dialogs_frame.dart';
+import 'package:gymify_desktop/dialogs/user_picker_dialog.dart';
 import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
-import 'package:gymify_desktop/widgets/autocomplete_user_search_widget.dart';
+import 'package:gymify_desktop/widgets/member_widget.dart';
+import 'package:gymify_desktop/widgets/training_widget.dart' hide showUserPickDialog;
 import 'package:provider/provider.dart';
 
 enum BaseFieldType {
@@ -14,6 +16,7 @@ enum BaseFieldType {
   dropdown,
   password,
   userSearch,
+  trainerPick
 }
 
 class BaseFormFieldDef {
@@ -78,6 +81,9 @@ Future<void> showBaseFormDialog({
     }
   }
 
+  values.putIfAbsent("userId", () => "");
+  values.putIfAbsent("trainerId", () => "");
+
   void setValue(StateSetter setStateDialog, String name, dynamic value) {
     values[name] = value ?? "";
     fields.setText(name, (value ?? "").toString());
@@ -101,10 +107,14 @@ Future<void> showBaseFormDialog({
           final ok = formKey.currentState?.validate() ?? false;
           if (!ok) return;
 
-          final payload = <String, dynamic>{};
+          final payload = Map<String, dynamic>.from(values);
           for (final f in fieldsDef) {
             payload[f.name] = fields.text(f.name).trim();
           }
+
+          payload["trainerId"] = values["trainerId"];
+          payload["userId"] = values["userId"];
+
 
           await onSubmit(payload);
           if (ctx.mounted) Navigator.pop(ctx);
@@ -135,6 +145,55 @@ Future<void> showBaseFormDialog({
           }
 
           switch (def.type) {
+            case BaseFieldType.trainerPick:
+  final canPick = def.enabled ?? true;
+
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Expanded(
+        child: TextFormField(
+          controller: fields.controller(def.name),
+          enabled: false,
+          readOnly: true,
+          validator: validator,
+          decoration: InputDecoration(
+            labelText: def.label,
+            hintText: "Klikni 'Dodaj trenera' za odabir",
+            filled: true,
+            fillColor: const Color(0xFFF7F7F7),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(width: 10),
+      ElevatedButton(
+        onPressed: canPick
+            ? () async {
+                // ✅ OVDJE biraš trenera
+                final picked = await showTrainerPickDialog(context: context);
+                if (picked == null) return;
+
+                final display =
+                    "${picked.firstName ?? ""} ${picked.lastName ?? ""}".trim();
+
+                // prikaz u formi
+                fields.setText(def.name, display);
+                values[def.name] = display;
+
+                // ✅ pravi ID koji šalješ na backend
+                values["trainerId"] = picked.id;
+
+                setStateDialog(() {});
+              }
+            : null,
+        child: const Text("Dodaj trenera"),
+      ),
+    ],
+  );
+
             case BaseFieldType.dropdown:
               return DropdownButtonFormField<String>(
                 value: fields.text(def.name).isEmpty
@@ -167,28 +226,52 @@ Future<void> showBaseFormDialog({
               );
 
             case BaseFieldType.userSearch:
-              return UserAutocompleteField(
-                label: def.label,
-                controller: fields.controller(def.name),
-                searcher: (q) async {
-                  final res = await context.read<UserProvider>().get(
-                    filter: {
-                      "isUser": true,
-                      "fullNameSearch": q,
-                      "page": 0,
-                      "pageSize": 20,
-                      "includeTotalCount": false,
-                    },
-                  );
-                  return res.items;
-                },
-                onPicked: (u) {
-                  final display = "${u.firstName ?? ""} ${u.lastName ?? ""}"
-                      .trim();
-                  fields.setText(def.name, display);
-                  values["userId"] = u.id.toString();
-                  setStateDialog(() {});
-                },
+              final canPick = def.enabled ?? true;
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: fields.controller(def.name),
+                      enabled: false,
+                      readOnly: true,
+                      validator: validator,
+                      decoration: InputDecoration(
+                        labelText: def.label,
+                        hintText: "Klikni 'Dodaj korisnika' za odabir",
+                        filled: true,
+                        fillColor: const Color(0xFFF7F7F7),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: canPick
+                        ? () async {
+                            final picked = await showUserPickDialog(
+                              context: context,
+                            );
+                            if (picked == null) return;
+
+                            final display =
+                                "${picked.firstName ?? ""} ${picked.lastName ?? ""}"
+                                    .trim();
+
+                            fields.setText(def.name, display);
+                            values[def.name] = display;
+
+                            values["userId"] = picked.id; // ✅ int
+
+                            setStateDialog(() {});
+                          }
+                        : null,
+                    child: const Text("Dodaj korisnika"),
+                  ),
+                ],
               );
 
             case BaseFieldType.date:
@@ -207,15 +290,14 @@ Future<void> showBaseFormDialog({
                   ),
                 ),
                 onTap: () async {
-                  // ✅ ako nije enabled, ništa
                   if (!isEnabled) return;
 
                   final now = DateTime.now();
                   final picked = await showDatePicker(
                     context: context,
-                    initialDate: DateTime(now.year - 18),
+                    initialDate: now,
                     firstDate: DateTime(1900),
-                    lastDate: now,
+                    lastDate: DateTime(2100),
                   );
                   if (picked == null) return;
 

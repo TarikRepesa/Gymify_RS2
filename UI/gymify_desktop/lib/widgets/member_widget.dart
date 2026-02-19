@@ -1,104 +1,193 @@
 import 'package:flutter/material.dart';
+import 'package:gymify_desktop/dialogs/base_dialogs_frame.dart';
 import 'package:gymify_desktop/dialogs/base_form_dialogs_for_actions.dart';
 import 'package:gymify_desktop/helper/date_helper.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
 import 'package:gymify_desktop/models/member.dart';
-import 'package:gymify_desktop/models/membership.dart';
 import 'package:gymify_desktop/models/user.dart';
 import 'package:gymify_desktop/providers/member_provider.dart';
 import 'package:gymify_desktop/providers/membership_provider.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
 import 'package:gymify_desktop/widgets/base_search_and_list_widget.dart';
 import 'package:provider/provider.dart';
-
 import 'package:gymify_desktop/helper/univerzal_pagging_helper.dart';
 
-/// Popup dialog za pretragu i odabir USER-a (samo "isUser": true)
-Future<User?> showUserPickDialog({
+Future<bool> _memberExistsForUser({
   required BuildContext context,
+  required int userId,
 }) async {
-  final ctrl = TextEditingController();
-  List<User> results = [];
-  bool loading = false;
+  final res = await context.read<MemberProvider>().get(
+    filter: {
+      "userId": userId,
+      "page": 0,
+      "pageSize": 1,
+      "includeTotalCount": false,
+      "IncludeUser": true,
+      "IncludeMembership": true,
+    },
+  );
 
-  return showDialog<User>(
-    context: context,
-    builder: (c) => StatefulBuilder(
-      builder: (c, setState) {
-        Future<void> runSearch(String q) async {
-          final query = q.trim();
-          if (query.isEmpty) {
-            setState(() => results = []);
-            return;
-          }
+  return res.items.isNotEmpty;
+}
 
-          setState(() => loading = true);
-          try {
-            final res = await context.read<UserProvider>().get(
-              filter: {
-                "isUser": true,
-                "fullNameSearch": query,
-                "page": 0,
-                "pageSize": 20,
-                "includeTotalCount": false,
-              },
-            );
-            results = res.items;
-          } finally {
-            setState(() => loading = false);
-          }
-        }
+Future<List<DropdownMenuItem<String>>> _loadMembershipItems(
+  BuildContext context,
+) async {
+  final res = await context.read<MembershipProvider>().get(
+    filter: {"retrieveAll": true},
+  );
 
-        return AlertDialog(
-          title: const Text("Odaberi korisnika"),
-          content: SizedBox(
-            width: 520,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: ctrl,
-                  decoration: const InputDecoration(
-                    hintText: "Kucaj ime ili prezime...",
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                  onChanged: (v) => runSearch(v),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 320,
-                  child: loading
-                      ? const Center(child: CircularProgressIndicator())
-                      : results.isEmpty
-                          ? const Center(child: Text("Nema rezultata."))
-                          : ListView.builder(
-                              itemCount: results.length,
-                              itemBuilder: (_, i) {
-                                final u = results[i];
-                                final name =
-                                    "${u.firstName ?? ""} ${u.lastName ?? ""}"
-                                        .trim();
-                                return ListTile(
-                                  title: Text(name),
-                                  subtitle: Text(u.email ?? ""),
-                                  onTap: () => Navigator.pop(c, u),
-                                );
-                              },
-                            ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(c),
-              child: const Text("Zatvori"),
-            ),
-          ],
-        );
+  return res.items.map<DropdownMenuItem<String>>((m) {
+    return DropdownMenuItem<String>(
+      value: m.id.toString(),
+      child: Text(m.name ?? ""),
+    );
+  }).toList();
+}
+
+int _requireInt(Map<String, dynamic> payload, String key, String message) {
+  final v = int.tryParse((payload[key] ?? "").toString().trim());
+  if (v == null) throw Exception(message);
+  return v;
+}
+
+String _requireString(
+  Map<String, dynamic> payload,
+  String key,
+  String message,
+) {
+  final v = (payload[key] ?? "").toString().trim();
+  if (v.isEmpty) throw Exception(message);
+  return v;
+}
+
+Future<void> _submitAddMember({
+  required BuildContext context,
+  required UniversalPagingProvider<Member> paging,
+  required Map<String, dynamic> payload,
+}) async {
+  final userId = _requireInt(payload, "userId", "Nije odabran korisnik.");
+  final membershipId = _requireInt(
+    payload,
+    "membershipId",
+    "Nije odabrana članarina.",
+  );
+  final expiryUi = _requireString(
+    payload,
+    "expiryDate",
+    "Datum isteka je obavezan.",
+  );
+
+  final exists = await _memberExistsForUser(context: context, userId: userId);
+  if (exists) {
+    SnackbarHelper.showError(
+      context,
+      "Korisnik već ima pretplatu. Molimo uredite postojeću članarinu.",
+    );
+    return;
+  }
+
+  await context.read<MemberProvider>().insert({
+    "userId": userId,
+    "membershipId": membershipId,
+    "paymentDate": DateTime.now().toIso8601String(),
+    "expirationDate": DateHelper.toIsoFromUi(expiryUi),
+  });
+
+  await paging.loadPage();
+  SnackbarHelper.showSuccess(context, "Član uspješno dodan.");
+}
+
+/// 4) Submit EDIT
+Future<void> _submitEditMember({
+  required BuildContext context,
+  required UniversalPagingProvider<Member> paging,
+  required int memberId,
+  required Map<String, dynamic> payload,
+}) async {
+  final userId = _requireInt(payload, "userId", "Nije odabran korisnik.");
+  final membershipId = _requireInt(
+    payload,
+    "membershipId",
+    "Nije odabrana članarina.",
+  );
+  final expiryUi = _requireString(
+    payload,
+    "expiryDate",
+    "Datum isteka je obavezan.",
+  );
+
+  await context.read<MemberProvider>().update(memberId, {
+    "userId": userId, // ✅ možeš i promijeniti usera
+    "membershipId": membershipId,
+    "paymentDate": DateTime.now().toIso8601String(),
+    "expirationDate": DateHelper.toIsoFromUi(expiryUi),
+  });
+
+  await paging.loadPage();
+  SnackbarHelper.showUpdate(context, "Član uspješno ažuriran.");
+}
+
+/// 5) Jedna funkcija koja vraća fields listu za ADD/EDIT
+List<BaseFormFieldDef> _memberFields({
+  required List<DropdownMenuItem<String>> membershipItems,
+  bool allowUserPick = true,
+}) {
+  return [
+    BaseFormFieldDef(
+      name: "userDisplay",
+      label: "Korisnik",
+      type: BaseFieldType.userSearch,
+      requiredField: true,
+      readOnly: true,
+      validator: (v) {
+        final value = (v ?? "").trim();
+        if (value.isEmpty) return "Korisnik je obavezan.";
+        return null;
       },
     ),
-  );
+
+    BaseFormFieldDef(
+      name: "membershipId",
+      label: "Članarina",
+      type: BaseFieldType.dropdown,
+      requiredField: true,
+      items: membershipItems,
+      validator: (v) =>
+          (v ?? "").trim().isEmpty ? "Članarina je obavezna." : null,
+    ),
+
+    BaseFormFieldDef(
+      name: "expiryDate",
+      label: "Datum isteka",
+      type: BaseFieldType.date,
+      requiredField: true,
+      validator: (v) {
+        final value = (v ?? "").trim();
+
+        if (value.isEmpty) {
+          return "Datum isteka je obavezan.";
+        }
+
+        try {
+          final iso = DateHelper.toIsoFromUi(value);
+          final exp = DateTime.parse(iso);
+
+          final today = DateTime.now();
+          final todayOnly = DateTime(today.year, today.month, today.day);
+          final expOnly = DateTime(exp.year, exp.month, exp.day);
+
+          if (expOnly.isBefore(todayOnly)) {
+            return "Datum isteka ne može biti u prošlosti.";
+          }
+
+          return null;
+        } catch (_) {
+          return "Neispravan format datuma (dd.MM.yyyy).";
+        }
+      },
+    ),
+  ];
 }
 
 Widget MemberWidget() {
@@ -106,23 +195,25 @@ Widget MemberWidget() {
     create: (context) {
       final paging = UniversalPagingProvider<Member>(
         pageSize: 5,
-        fetcher: ({
-          required int page,
-          required int pageSize,
-          String? filter,
-          bool includeTotalCount = true,
-        }) {
-          return context.read<MemberProvider>().get(
-            filter: {
-              "page": page,
-              "pageSize": pageSize,
-              "includeTotalCount": includeTotalCount,
-              if (filter != null && filter.trim().isNotEmpty) "FTS": filter.trim(),
-              "IncludeUser": true,
-              "IncludeMembership": true,
+        fetcher:
+            ({
+              required int page,
+              required int pageSize,
+              String? filter,
+              bool includeTotalCount = true,
+            }) {
+              return context.read<MemberProvider>().get(
+                filter: {
+                  "page": page,
+                  "pageSize": pageSize,
+                  "includeTotalCount": includeTotalCount,
+                  if (filter != null && filter.trim().isNotEmpty)
+                    "FTS": filter.trim(),
+                  "IncludeUser": true,
+                  "IncludeMembership": true,
+                },
+              );
             },
-          );
-        },
       );
 
       Future.microtask(() => paging.loadPage());
@@ -134,23 +225,8 @@ Widget MemberWidget() {
           title: "Članovi",
           addButtonText: "Dodaj člana",
 
-          // ---------------- ADD ----------------
           onAdd: () async {
-            // ✅ Napuni membership dropdown
-            final memRes = await context.read<MembershipProvider>().get(
-              filter: {
-                "page": 0,
-                "pageSize": 1000,
-                "includeTotalCount": false,
-              },
-            );
-            final membershipItems =
-                memRes.items.map<DropdownMenuItem<String>>((mm) {
-              return DropdownMenuItem(
-                value: mm.id.toString(),
-                child: Text(mm.name ?? ""),
-              );
-            }).toList();
+            final membershipItems = await _loadMembershipItems(context);
 
             await showBaseFormDialog(
               context: context,
@@ -161,110 +237,14 @@ Widget MemberWidget() {
                 "membershipId": "",
                 "expiryDate": "",
               },
-              fieldsDef: [
-                BaseFormFieldDef(
-                  name: "userDisplay",
-                  label: "Korisnik",
-                  type: BaseFieldType.text, 
-                  requiredField: true,
-                  validator: (v) {
-                    final value = (v ?? "").trim();
-                    if (value.isEmpty) return "Korisnik je obavezan.";
-                    return null;
-                  },
-                ),
-
-                BaseFormFieldDef(
-                  name: "membershipId",
-                  label: "Članarina",
-                  type: BaseFieldType.dropdown,
-                  requiredField: true,
-                  items: membershipItems,
-                  validator: (v) {
-                    final value = (v ?? "").trim();
-                    if (value.isEmpty) return "Članarina je obavezna.";
-                    return null;
-                  },
-                ),
-
-                BaseFormFieldDef(
-                  name: "expiryDate",
-                  label: "Datum isteka",
-                  type: BaseFieldType.date,
-                  requiredField: true,
-                  validator: (v) {
-                    final value = (v ?? "").trim();
-                    if (value.isEmpty) return "Datum isteka je obavezan.";
-                    try {
-                      final iso = DateHelper.toIsoFromUi(value);
-                      final exp = DateTime.tryParse(iso);
-                      if (exp != null) {
-                        final now = DateTime.now();
-                        final today = DateTime(now.year, now.month, now.day);
-                        final expDay = DateTime(exp.year, exp.month, exp.day);
-                        if (expDay.isBefore(today)) {
-                          return "Datum isteka ne može biti u prošlosti.";
-                        }
-                      }
-                      return null;
-                    } catch (_) {
-                      return "Neispravan format datuma (dd.MM.yyyy).";
-                    }
-                  },
-                ),
-              ],
-
-              onFieldChanged: (name, values, setValue) async {
-              },
-
+              fieldsDef: _memberFields(membershipItems: membershipItems),
               onSubmit: (payload) async {
                 try {
-                
-                  final currentUserId = (payload["userId"] ?? "").toString().trim();
-                  if (currentUserId.isEmpty) {
-                    final picked = await showUserPickDialog(context: context);
-                    if (picked == null) {
-                      throw Exception("Nije odabran korisnik.");
-                    }
-                    final display =
-                        "${picked.firstName ?? ""} ${picked.lastName ?? ""}"
-                            .trim();
-
-                    await context.read<MemberProvider>().insert({
-                      "userId": picked.id,
-                      "membershipId": int.parse(payload["membershipId"]),
-                      "paymentDate": DateTime.now().toIso8601String(),
-                      "expirationDate":
-                          DateHelper.toIsoFromUi(payload["expiryDate"]),
-                    });
-
-                    await paging.loadPage();
-                    SnackbarHelper.showSuccess(
-                      context,
-                      "Član '$display' uspješno dodan.",
-                    );
-                    return;
-                  }
-
-                  final userId = int.tryParse(currentUserId);
-                  final membershipId =
-                      int.tryParse((payload["membershipId"] ?? "").toString());
-
-                  if (userId == null) throw Exception("Neispravan userId.");
-                  if (membershipId == null) {
-                    throw Exception("Nije odabrana članarina.");
-                  }
-
-                  await context.read<MemberProvider>().insert({
-                    "userId": userId,
-                    "membershipId": membershipId,
-                    "paymentDate": DateTime.now().toIso8601String(),
-                    "expirationDate":
-                        DateHelper.toIsoFromUi(payload["expiryDate"]),
-                  });
-
-                  await paging.loadPage();
-                  SnackbarHelper.showSuccess(context, "Član uspješno dodan.");
+                  await _submitAddMember(
+                    context: context,
+                    paging: paging,
+                    payload: payload,
+                  );
                 } catch (e) {
                   SnackbarHelper.showError(context, e.toString());
                   rethrow;
@@ -273,6 +253,7 @@ Widget MemberWidget() {
             );
           },
 
+          // ---------------- SEARCH ----------------
           onSearchChanged: (value) => paging.search(value),
           onClearSearch: () => paging.search(""),
 
@@ -283,9 +264,9 @@ Widget MemberWidget() {
             BaseColumn<Member>(
               title: "Ime i prezime",
               flex: 3,
-              cell: (m) =>
-                  Text("${m.user?.firstName ?? ""} ${m.user?.lastName ?? ""}"
-                      .trim()),
+              cell: (m) => Text(
+                "${m.user?.firstName ?? ""} ${m.user?.lastName ?? ""}".trim(),
+              ),
             ),
             BaseColumn<Member>(
               title: "Članarina",
@@ -300,26 +281,56 @@ Widget MemberWidget() {
             BaseColumn<Member>(
               title: "Datum isteka",
               flex: 2,
-              cell: (m) => Text(DateHelper.format(m.expirationDate)),
+              cell: (m) {
+                final now = DateTime.now();
+                final today = DateTime(now.year, now.month, now.day);
+
+                final exp = DateTime(
+                  m.expirationDate.year,
+                  m.expirationDate.month,
+                  m.expirationDate.day,
+                );
+
+                final isExpired = exp.isBefore(today);
+
+                return Row(
+                  children: [
+                    Text(
+                      DateHelper.format(m.expirationDate),
+                      style: TextStyle(
+                        color: isExpired ? Colors.red : null,
+                        fontWeight: isExpired ? FontWeight.w600 : null,
+                      ),
+                    ),
+                    if (isExpired) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          "ISTEKLO",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                );
+              },
             ),
           ],
 
-          // ---------------- EDIT ----------------
           onEdit: (m) async {
-            final memRes = await context.read<MembershipProvider>().get(
-              filter: {
-                "page": 0,
-                "pageSize": 1000,
-                "includeTotalCount": false,
-              },
-            );
-            final membershipItems =
-                memRes.items.map<DropdownMenuItem<String>>((mm) {
-              return DropdownMenuItem(
-                value: mm.id.toString(),
-                child: Text(mm.name ?? ""),
-              );
-            }).toList();
+            final membershipItems = await _loadMembershipItems(context);
 
             final userDisplay =
                 "${m.user?.firstName ?? ""} ${m.user?.lastName ?? ""}".trim();
@@ -333,61 +344,15 @@ Widget MemberWidget() {
                 "membershipId": m.membershipId.toString(),
                 "expiryDate": DateHelper.format(m.expirationDate),
               },
-              fieldsDef: [
-                BaseFormFieldDef(
-                  name: "userDisplay",
-                  label: "Korisnik",
-                  requiredField: true,
-                  validator: (v) {
-                    final value = (v ?? "").trim();
-                    if (value.isEmpty) return "Korisnik je obavezan.";
-                    return null;
-                  },
-                ),
-                BaseFormFieldDef(
-                  name: "membershipId",
-                  label: "Članarina",
-                  type: BaseFieldType.dropdown,
-                  requiredField: true,
-                  items: membershipItems,
-                  validator: (v) =>
-                      (v ?? "").trim().isEmpty ? "Članarina je obavezna." : null,
-                ),
-                BaseFormFieldDef(
-                  name: "expiryDate",
-                  label: "Datum isteka",
-                  type: BaseFieldType.date,
-                  requiredField: true,
-                  validator: (v) {
-                    final value = (v ?? "").trim();
-                    if (value.isEmpty) return "Datum isteka je obavezan.";
-                    try {
-                      DateHelper.toIsoFromUi(value);
-                      return null;
-                    } catch (_) {
-                      return "Neispravan format datuma (dd.MM.yyyy).";
-                    }
-                  },
-                ),
-              ],
+              fieldsDef: _memberFields(membershipItems: membershipItems),
               onSubmit: (payload) async {
                 try {
-                  final membershipId =
-                      int.tryParse((payload["membershipId"] ?? "").toString());
-                  if (membershipId == null) {
-                    throw Exception("Nije odabrana članarina.");
-                  }
-
-                  await context.read<MemberProvider>().update(m.id, {
-                    "userId": m.userId, // user ne mijenjamo ovdje
-                    "membershipId": membershipId,
-                    "paymentDate": DateTime.now().toIso8601String(),
-                    "expirationDate":
-                        DateHelper.toIsoFromUi(payload["expiryDate"]),
-                  });
-
-                  await paging.loadPage();
-                  SnackbarHelper.showUpdate(context, "Član uspješno ažuriran.");
+                  await _submitEditMember(
+                    context: context,
+                    paging: paging,
+                    memberId: m.id,
+                    payload: payload,
+                  );
                 } catch (e) {
                   SnackbarHelper.showError(context, e.toString());
                   rethrow;
@@ -438,7 +403,8 @@ Widget MemberWidget() {
 }
 
 Widget _pagingControls<T>(UniversalPagingProvider<T> paging) {
-  final totalPages = (paging.totalCount + paging.pageSize - 1) ~/ paging.pageSize;
+  final totalPages =
+      (paging.totalCount + paging.pageSize - 1) ~/ paging.pageSize;
 
   return Row(
     mainAxisAlignment: MainAxisAlignment.end,
