@@ -1,0 +1,100 @@
+networks:
+  gymifynet:
+    driver: bridge
+
+services:
+  gymify-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: gymify-sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    networks:
+      - gymifynet
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q \"SELECT 1\" -C || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 25s
+
+  gymify-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: gymify-rabbitmq
+    hostname: gymify-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "8080:15672"
+      - "15692:15692"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    networks:
+      - gymifynet
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  gymify-api:
+    container_name: gymify-api
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Gymify.API/DockerFile.api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=gymify-sqlserver,1433;Database=${MSSQL_DB};User Id=${MSSQL_USER};Password=${MSSQL_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=True"
+      RABBITMQ_HOST: gymify-rabbitmq
+      RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VIRTUALHOST: /
+      RABBITMQ_PORT: 5672
+    ports:
+      - "${API_PORT}:8080"
+    depends_on:
+      gymify-sqlserver:
+        condition: service_healthy
+      gymify-rabbitmq:
+        condition: service_healthy
+    networks:
+      - gymifynet
+    volumes:
+      - ./Gymify.API/data/wwwroot:/app/wwwroot
+
+  gymify-emailconsumer:
+    container_name: gymify-emailconsumer
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Gymify.EmailConsumer/DockerFile.emailconsumer
+    environment:
+      RABBITMQ_HOST: gymify-rabbitmq
+      RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VIRTUALHOST: /
+      RABBITMQ_PORT: 5672
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_SSL: ${SMTP_SSL}
+      FROM_EMAIL: ${FROM_EMAIL}
+      FROM_NAME: ${FROM_NAME}
+    depends_on:
+      gymify-rabbitmq:
+        condition: service_healthy
+    networks:
+      - gymifynet
+
+volumes:
+  sqlserver_data:
