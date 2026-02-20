@@ -1,9 +1,12 @@
 
 namespace Gymify.Model.SearchObjects
 {
-    public class TrainingSearchObject : BaseSearchObject
+    public class WorkerTaskSearchObject : BaseSearchObject
     {
+        //Search
         public int? UserId {get; set;}
+
+        // Include
         public bool? IncludeUser {get; set;}
     }
 }

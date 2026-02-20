@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/base_dialogs_frame.dart';
 import 'package:gymify_desktop/dialogs/base_form_dialogs_for_actions.dart';
+import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:gymify_desktop/helper/date_helper.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
 import 'package:gymify_desktop/models/member.dart';
@@ -361,35 +362,25 @@ Widget MemberWidget() {
             );
           },
 
-          // ---------------- DELETE ----------------
           onDelete: (m) async {
             final fullName =
                 "${m.user?.firstName ?? ""} ${m.user?.lastName ?? ""}".trim();
 
-            final ok = await showDialog<bool>(
-              context: context,
-              builder: (c) => AlertDialog(
-                title: const Text("Brisanje člana"),
-                content: Text("Jesi li siguran da želiš obrisati $fullName?"),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(c, false),
-                    child: const Text("Odustani"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(c, true),
-                    child: const Text("Obriši"),
-                  ),
-                ],
-              ),
+            final ok = await ConfirmDialogs.badGoodConfirmation(
+              context,
+              title: "Brisanje člana",
+              question:
+                  "Da li ste sigurni da želite obrisati člana:\n\n$fullName ?",
+              badText: "Odustani",
+              goodText: "Obriši",
             );
 
-            if (ok != true) return;
+            if (!ok) return;
 
             try {
               await context.read<MemberProvider>().delete(m.id);
               await paging.loadPage();
-              SnackbarHelper.showInfo(context, "Član obrisan.");
+              SnackbarHelper.showSuccess(context, "Član uspješno obrisan.");
             } catch (e) {
               SnackbarHelper.showError(context, e.toString());
             }

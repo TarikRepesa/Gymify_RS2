@@ -4,7 +4,7 @@ using Gymify.Model.SearchObjects;
 
 namespace Gymify.Services.Interfaces
 {
-    public interface IWorkerTaskService : ICRUDService<WorkerTaskResponse, BaseSearchObject, WorkerTaskUpsertRequest, WorkerTaskUpsertRequest>
+    public interface IWorkerTaskService : ICRUDService<WorkerTaskResponse, WorkerTaskSearchObject, WorkerTaskUpsertRequest, WorkerTaskUpsertRequest>
     {
     }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
@@ -93,27 +94,16 @@ class _NotificationWidgetState extends State<NotificationWidget> {
   }
 
   Future<bool> _confirmDelete(BuildContext context, NotificationModel n) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: const Text("Brisanje obavijesti"),
-        content: Text(
-          "Jesi li siguran da želiš obrisati obavijest:\n\n“${n.title}” ?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: const Text("Odustani"),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text("Obriši"),
-          ),
-        ],
-      ),
+    final ok = await ConfirmDialogs.badGoodConfirmation(
+      context,
+      title: "Brisanje obavijesti",
+      question:
+          "Da li ste sigurni da želite obrisati obavijest:\n\n„${n.title ?? ""}“ ?",
+      badText: "Odustani",
+      goodText: "Obriši",
     );
 
-    return ok == true;
+    return ok;
   }
 
   Future<void> _deleteNotification({
@@ -162,13 +152,19 @@ class _NotificationWidgetState extends State<NotificationWidget> {
       final t = titleCtrl.text.trim();
       final m = messageCtrl.text.trim();
 
-      if (t.isEmpty) errTitle = "Naslov je obavezan.";
-      else if (t.length < 3) errTitle = "Naslov mora imati bar 3 znaka.";
-      else if (t.length > 60) errTitle = "Naslov može imati max 60 znakova.";
+      if (t.isEmpty)
+        errTitle = "Naslov je obavezan.";
+      else if (t.length < 3)
+        errTitle = "Naslov mora imati bar 3 znaka.";
+      else if (t.length > 60)
+        errTitle = "Naslov može imati max 60 znakova.";
 
-      if (m.isEmpty) errMessage = "Poruka je obavezna.";
-      else if (m.length < 5) errMessage = "Poruka mora imati bar 5 znakova.";
-      else if (m.length > 400) errMessage = "Poruka može imati max 400 znakova.";
+      if (m.isEmpty)
+        errMessage = "Poruka je obavezna.";
+      else if (m.length < 5)
+        errMessage = "Poruka mora imati bar 5 znakova.";
+      else if (m.length > 400)
+        errMessage = "Poruka može imati max 400 znakova.";
 
       return errTitle == null && errMessage == null;
     }
@@ -298,8 +294,9 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         OutlinedButton(
-                          onPressed:
-                              saving ? null : () => Navigator.pop(dialogCtx),
+                          onPressed: saving
+                              ? null
+                              : () => Navigator.pop(dialogCtx),
                           child: const Text("Odustani"),
                         ),
                         const SizedBox(width: 10),
@@ -422,10 +419,10 @@ class _NotificationWidgetState extends State<NotificationWidget> {
             onPressed: paging.isLoading
                 ? null
                 : () => _deleteNotification(
-                      context: context,
-                      paging: paging,
-                      n: n,
-                    ),
+                    context: context,
+                    paging: paging,
+                    n: n,
+                  ),
             icon: Icon(
               Icons.delete_outline_rounded,
               size: 22,
@@ -445,7 +442,9 @@ class _NotificationWidgetState extends State<NotificationWidget> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         IconButton(
-          onPressed: paging.hasPreviousPage ? () => paging.previousPage() : null,
+          onPressed: paging.hasPreviousPage
+              ? () => paging.previousPage()
+              : null,
           icon: const Icon(Icons.arrow_back),
         ),
         Text(
@@ -466,23 +465,24 @@ class _NotificationWidgetState extends State<NotificationWidget> {
       create: (context) {
         final paging = UniversalPagingProvider<NotificationModel>(
           pageSize: 5,
-          fetcher: ({
-            required int page,
-            required int pageSize,
-            String? filter,
-            bool includeTotalCount = true,
-          }) {
-            return context.read<NotificationProvider>().get(
-              filter: {
-                "page": page,
-                "pageSize": pageSize,
-                "includeTotalCount": includeTotalCount,
-                if (filter != null && filter.trim().isNotEmpty)
-                  "FTS": filter.trim(),
-                "IncludeUser": true,
+          fetcher:
+              ({
+                required int page,
+                required int pageSize,
+                String? filter,
+                bool includeTotalCount = true,
+              }) {
+                return context.read<NotificationProvider>().get(
+                  filter: {
+                    "page": page,
+                    "pageSize": pageSize,
+                    "includeTotalCount": includeTotalCount,
+                    if (filter != null && filter.trim().isNotEmpty)
+                      "FTS": filter.trim(),
+                    "IncludeUser": true,
+                  },
+                );
               },
-            );
-          },
         );
 
         Future.microtask(() => paging.loadPage());
@@ -580,44 +580,46 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                   child: (paging.isLoading && paging.items.isEmpty)
                       ? const Center(child: CircularProgressIndicator())
                       : paging.items.isEmpty
-                          ? const Center(
-                              child: Text(
-                                "Nema podataka.",
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                            )
-                          : ListView.builder(
-                              itemCount: dates.length,
-                              itemBuilder: (context, i) {
-                                final date = dates[i];
-                                final list = grouped[date]!;
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 10,
-                                        bottom: 8,
-                                        top: 8,
-                                      ),
-                                      child: Text(
-                                        date,
-                                        style: const TextStyle(
-                                          fontSize: 12.5,
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xFF6B6B6B),
-                                        ),
-                                      ),
+                      ? const Center(
+                          child: Text(
+                            "Nema podataka.",
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: dates.length,
+                          itemBuilder: (context, i) {
+                            final date = dates[i];
+                            final list = grouped[date]!;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 10,
+                                    bottom: 8,
+                                    top: 8,
+                                  ),
+                                  child: Text(
+                                    date,
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF6B6B6B),
                                     ),
-                                    ...list.map((n) => _notificationRow(
-                                          context: context,
-                                          paging: paging,
-                                          n: n,
-                                        )),
-                                  ],
-                                );
-                              },
-                            ),
+                                  ),
+                                ),
+                                ...list.map(
+                                  (n) => _notificationRow(
+                                    context: context,
+                                    paging: paging,
+                                    n: n,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                 ),
                 const SizedBox(height: 10),
                 _pagingControls(paging),

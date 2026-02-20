@@ -16,8 +16,8 @@ class BaseSearchAndTable<T> extends StatelessWidget {
   final void Function(String value)? onSearchChanged;
   final VoidCallback? onClearSearch;
 
-  final String addButtonText;
-  final VoidCallback onAdd;
+  final String? addButtonText;
+  final VoidCallback? onAdd;
 
   /// Table
   final List<BaseColumn<T>> columns;
@@ -30,11 +30,14 @@ class BaseSearchAndTable<T> extends StatelessWidget {
 
   final Widget? footer;
 
+  final bool? isStatusMode;
+  final String? editLabel;
+
   const BaseSearchAndTable({
     super.key,
     required this.title,
     required this.addButtonText,
-    required this.onAdd,
+    this.onAdd,
     required this.columns,
     required this.items,
     this.searchHint = "Pretraga",
@@ -45,6 +48,8 @@ class BaseSearchAndTable<T> extends StatelessWidget {
     this.footer,
     this.padding = const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
     bool? isLoading,
+    this.isStatusMode,
+    this.editLabel,
   });
 
   bool get _hasActions => onEdit != null || onDelete != null;
@@ -92,7 +97,7 @@ class BaseSearchAndTable<T> extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: Text(
-                    addButtonText.toUpperCase(),
+                    addButtonText?.toUpperCase() ?? "",
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -123,7 +128,12 @@ class BaseSearchAndTable<T> extends StatelessWidget {
                   ),
                 ),
                 if (_hasActions) ...[
-                  const Expanded(flex: 1, child: Text("Uredi")),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      isStatusMode == true ? "Završiti" : "Uredi",
+                    ),
+                  ),
                   const Expanded(flex: 1, child: Text("Obriši")),
                 ],
               ],
@@ -158,9 +168,14 @@ class BaseSearchAndTable<T> extends StatelessWidget {
                                   onTap: onEdit == null
                                       ? null
                                       : () => onEdit!(item),
-                                  child: const Align(
+                                  child: Align(
                                     alignment: Alignment.centerLeft,
-                                    child: Icon(Icons.edit_outlined, size: 20),
+                                    child: Icon(
+                                      isStatusMode == true
+                                          ? Icons.sync_alt
+                                          : Icons.edit_outlined,
+                                      size: 20,
+                                    ),
                                   ),
                                 ),
                               ),

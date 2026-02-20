@@ -89,23 +89,6 @@ namespace Gymify.Services.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkerTasks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedTaskDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExparationTaskDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsFinished = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkerTasks", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "LoyaltyPointHistories",
                 columns: table => new
                 {
@@ -298,6 +281,30 @@ namespace Gymify.Services.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WorkerTasks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedTaskDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExparationTaskDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsFinished = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkerTasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkerTasks_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Reservations",
                 columns: table => new
                 {
@@ -340,10 +347,10 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "CreatedAt", "Description", "IsActive", "Name" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 2, 19, 16, 17, 23, 369, DateTimeKind.Utc).AddTicks(6557), "", true, "Korisnik" },
-                    { 2, new DateTime(2026, 2, 19, 16, 17, 23, 369, DateTimeKind.Utc).AddTicks(7366), "", true, "Admin" },
-                    { 3, new DateTime(2026, 2, 19, 16, 17, 23, 369, DateTimeKind.Utc).AddTicks(7369), "", true, "Trener" },
-                    { 4, new DateTime(2026, 2, 19, 16, 17, 23, 369, DateTimeKind.Utc).AddTicks(7370), "", true, "Radnik" }
+                    { 1, new DateTime(2026, 2, 19, 22, 42, 25, 640, DateTimeKind.Utc).AddTicks(8021), "", true, "Korisnik" },
+                    { 2, new DateTime(2026, 2, 19, 22, 42, 25, 640, DateTimeKind.Utc).AddTicks(8770), "", true, "Admin" },
+                    { 3, new DateTime(2026, 2, 19, 22, 42, 25, 640, DateTimeKind.Utc).AddTicks(8773), "", true, "Trener" },
+                    { 4, new DateTime(2026, 2, 19, 22, 42, 25, 640, DateTimeKind.Utc).AddTicks(8774), "", true, "Radnik" }
                 });
 
             migrationBuilder.InsertData(
@@ -351,26 +358,26 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "CreatedAt", "DateOfBirth", "Email", "FirstName", "IsActive", "IsAdmin", "IsRadnik", "IsTrener", "IsUser", "LastLoginAt", "LastName", "PasswordHash", "PasswordSalt", "PhoneNumber", "UserImage", "Username" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(7709), null, "ajdin@example.com", "Tarik", true, true, null, null, null, null, "Malic", "PuXluh9c9jsWjrvnP4YxZB9TZ1RWO+8d5NFl35KDKgxnhgWfV1DfOmLaZmrSRoEyTT5zDwICIHMT00kWROVPMQ==", "BLRdNNo1Y5emxG7B7U5Zga+HBidYqGM0WOnbgoQwZIQyu5psMqbkLXx1GG3UfwfqYKj1EdcHVyF858fLHqJkAG5c/2Ro958g2K3WgeSh+V/CtqYGjSbgsqPhGani9zaa3+4TKAwJRecMIXCyhGT/PmHNrY0eZf2zJD9vMPZxbhs=", null, null, "tare45" },
-                    { 2, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(8544), null, "amir@example.com", "Amir", true, true, null, null, null, null, "Ibrahimovic", "PuXluh9c9jsWjrvnP4YxZB9TZ1RWO+8d5NFl35KDKgxnhgWfV1DfOmLaZmrSRoEyTT5zDwICIHMT00kWROVPMQ==", "BLRdNNo1Y5emxG7B7U5Zga+HBidYqGM0WOnbgoQwZIQyu5psMqbkLXx1GG3UfwfqYKj1EdcHVyF858fLHqJkAG5c/2Ro958g2K3WgeSh+V/CtqYGjSbgsqPhGani9zaa3+4TKAwJRecMIXCyhGT/PmHNrY0eZf2zJD9vMPZxbhs=", null, null, "amir56" },
-                    { 3, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(8834), null, "marko@example.com", "Marko", true, null, null, true, null, null, "Markovic", "pOXYkwNciQ2MOHbyndoDLQSWPNYpIKze+wBqgIsreT3wAchs+Svi/kAwIInYUZXsUVp2HVOIca/JI5g2xP0EWQ==", "35lV2C333my6/5tQlP7FEmb4O72IP8wCQiqpUlMGQv5gN4KLE61OEfggsIiOmI6ulI2HGVUYnAZLxBIeI9HDaAf9TI7F1qZAGZs907QOD3/IZuHnnyBiKudBCFlaiJyz+Iik9bp6GH+eVpwwoSF3iF9A/gua5G4Aq0tgqBqM2pA=", null, null, "marko78" },
-                    { 4, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(8840), null, "ivan@example.com", "Ivan", true, null, null, true, null, null, "Ivic", "pOXYkwNciQ2MOHbyndoDLQSWPNYpIKze+wBqgIsreT3wAchs+Svi/kAwIInYUZXsUVp2HVOIca/JI5g2xP0EWQ==", "35lV2C333my6/5tQlP7FEmb4O72IP8wCQiqpUlMGQv5gN4KLE61OEfggsIiOmI6ulI2HGVUYnAZLxBIeI9HDaAf9TI7F1qZAGZs907QOD3/IZuHnnyBiKudBCFlaiJyz+Iik9bp6GH+eVpwwoSF3iF9A/gua5G4Aq0tgqBqM2pA=", null, null, "ivan11" },
-                    { 5, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(8873), null, "petar@example.com", "Petar", true, null, null, true, null, null, "Petrovic", "pOXYkwNciQ2MOHbyndoDLQSWPNYpIKze+wBqgIsreT3wAchs+Svi/kAwIInYUZXsUVp2HVOIca/JI5g2xP0EWQ==", "35lV2C333my6/5tQlP7FEmb4O72IP8wCQiqpUlMGQv5gN4KLE61OEfggsIiOmI6ulI2HGVUYnAZLxBIeI9HDaAf9TI7F1qZAGZs907QOD3/IZuHnnyBiKudBCFlaiJyz+Iik9bp6GH+eVpwwoSF3iF9A/gua5G4Aq0tgqBqM2pA=", null, null, "petar21" },
-                    { 6, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(8876), null, "luka@example.com", "Luka", true, null, null, true, null, null, "Lukic", "pOXYkwNciQ2MOHbyndoDLQSWPNYpIKze+wBqgIsreT3wAchs+Svi/kAwIInYUZXsUVp2HVOIca/JI5g2xP0EWQ==", "35lV2C333my6/5tQlP7FEmb4O72IP8wCQiqpUlMGQv5gN4KLE61OEfggsIiOmI6ulI2HGVUYnAZLxBIeI9HDaAf9TI7F1qZAGZs907QOD3/IZuHnnyBiKudBCFlaiJyz+Iik9bp6GH+eVpwwoSF3iF9A/gua5G4Aq0tgqBqM2pA=", null, null, "luka34" },
-                    { 7, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9158), null, "nedim@example.com", "Nedim", true, null, true, null, null, null, "Nedimovic", "z3owkiHneigORbOZ7JiKJWDV4VY1/ThdRAmADNjKnTiZcnE4obUFr+u9/M6cdNVTo0r1WzVuv+k8NSFUk/o3+w==", "WlWEg0WtlBUbH+kuV206mZRGqoLhOlaC+uNB3ci+ONwxbaqUMQnFCv0tlwezNKzkKxl5Hzi5iC+7m4LwjMcdxJzywIbmWv+PkkwvZyM48WYaFS93gXaqvm6exEDt8jkDbn50XvD/Dm68dC5k/VS5E2p/K15HScZlSPc6FtMDnSA=", null, null, "nedim89" },
-                    { 8, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9164), null, "amela@example.com", "Amela", true, null, true, null, null, null, "Amelovic", "z3owkiHneigORbOZ7JiKJWDV4VY1/ThdRAmADNjKnTiZcnE4obUFr+u9/M6cdNVTo0r1WzVuv+k8NSFUk/o3+w==", "WlWEg0WtlBUbH+kuV206mZRGqoLhOlaC+uNB3ci+ONwxbaqUMQnFCv0tlwezNKzkKxl5Hzi5iC+7m4LwjMcdxJzywIbmWv+PkkwvZyM48WYaFS93gXaqvm6exEDt8jkDbn50XvD/Dm68dC5k/VS5E2p/K15HScZlSPc6FtMDnSA=", null, null, "amela900" },
-                    { 9, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9168), null, "tarik@example.com", "Tarik", true, null, true, null, null, null, "Tarikovic", "z3owkiHneigORbOZ7JiKJWDV4VY1/ThdRAmADNjKnTiZcnE4obUFr+u9/M6cdNVTo0r1WzVuv+k8NSFUk/o3+w==", "WlWEg0WtlBUbH+kuV206mZRGqoLhOlaC+uNB3ci+ONwxbaqUMQnFCv0tlwezNKzkKxl5Hzi5iC+7m4LwjMcdxJzywIbmWv+PkkwvZyM48WYaFS93gXaqvm6exEDt8jkDbn50XvD/Dm68dC5k/VS5E2p/K15HScZlSPc6FtMDnSA=", null, null, "tarik345" },
-                    { 10, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9248), null, "emina@example.com", "Emina", true, null, true, null, null, null, "Eminovic", "z3owkiHneigORbOZ7JiKJWDV4VY1/ThdRAmADNjKnTiZcnE4obUFr+u9/M6cdNVTo0r1WzVuv+k8NSFUk/o3+w==", "WlWEg0WtlBUbH+kuV206mZRGqoLhOlaC+uNB3ci+ONwxbaqUMQnFCv0tlwezNKzkKxl5Hzi5iC+7m4LwjMcdxJzywIbmWv+PkkwvZyM48WYaFS93gXaqvm6exEDt8jkDbn50XvD/Dm68dC5k/VS5E2p/K15HScZlSPc6FtMDnSA=", null, null, "emina112" },
-                    { 11, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9506), null, "haris1@example.com", "Haris", true, null, null, null, true, null, "Hasic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "haris1" },
-                    { 12, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9511), null, "denis2@example.com", "Denis", true, null, null, null, true, null, "Denisovic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "denis2" },
-                    { 13, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9514), null, "alen3@example.com", "Alen", true, null, null, null, true, null, "Alenovic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "alen3" },
-                    { 14, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9516), null, "kenan4@example.com", "Kenan", true, null, null, null, true, null, "Kenanovic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "kenan4" },
-                    { 15, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9546), null, "jasmin5@example.com", "Jasmin", true, null, null, null, true, null, "Jasminovic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "jasmin5" },
-                    { 16, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9549), null, "lejla6@example.com", "Lejla", true, null, null, null, true, null, "Lejlovic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "lejla6" },
-                    { 17, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9551), null, "sara7@example.com", "Sara", true, null, null, null, true, null, "Saric", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "sara7" },
-                    { 18, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9554), null, "amina8@example.com", "Amina", true, null, null, null, true, null, "Aminovic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "amina8" },
-                    { 19, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9557), null, "emir9@example.com", "Emir", true, null, null, null, true, null, "Emirovic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "emir9" },
-                    { 20, new DateTime(2026, 2, 19, 16, 17, 23, 381, DateTimeKind.Utc).AddTicks(9560), null, "nermin10@example.com", "Nermin", true, null, null, null, true, null, "Nerminovic", "xf05uZRJqul4Qldwhqj5gvA6DvcSeHbKKczLYDM6yo5q5sIFpbuA9wnGdOZURs9S6jrhERwMSOQJaGnBkJqmKQ==", "rZEV3LhH91xw0XDAb4Hbe9XMxfWPeIc3vERzmfnOfn/UQcIPDbqZ5PBGCitZFSUS0V75wL4hEl1Bvmpvqc+oaKBgOr9fXbLkMxxIz6my1rXp1xf9F9GcH3LhMha5vv6gtS0eSDV5hjDp7+Y4tgANjO1P0C42Jur8lD7t4Dm8L7c=", null, null, "nermin10" }
+                    { 1, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(8793), null, "ajdin@example.com", "Tarik", true, true, null, null, null, null, "Malic", "gZG89uoAWnr/1a7xS/dum0tZwgRGuhgDMrcfmykmHsEReTWmhlwq8dk5EIlzrfFEYpjNBOAPdyjXWFTkNYItug==", "yOUA8Z6giV5/rz2M2V3TQcd1CULqSglnNG0B9ZVs8ZQUTDijSKJyYM7dHfithv1pGtyfahqOc+feFiCokr0dH3g0U/cIEjqHrBPIVQNzAWAcXKKyzpzfEesWoKvgoRbpzldgDGg95R3xJqVkmsQNLIZ1kJVo+HWzLYMu3PIcOzk=", null, null, "tare45" },
+                    { 2, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9287), null, "amir@example.com", "Amir", true, true, null, null, null, null, "Ibrahimovic", "gZG89uoAWnr/1a7xS/dum0tZwgRGuhgDMrcfmykmHsEReTWmhlwq8dk5EIlzrfFEYpjNBOAPdyjXWFTkNYItug==", "yOUA8Z6giV5/rz2M2V3TQcd1CULqSglnNG0B9ZVs8ZQUTDijSKJyYM7dHfithv1pGtyfahqOc+feFiCokr0dH3g0U/cIEjqHrBPIVQNzAWAcXKKyzpzfEesWoKvgoRbpzldgDGg95R3xJqVkmsQNLIZ1kJVo+HWzLYMu3PIcOzk=", null, null, "amir56" },
+                    { 3, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9442), null, "marko@example.com", "Marko", true, null, null, true, null, null, "Markovic", "TU72NqxpEJsSbhpOaYhTJ511zkrVtIq1qJZvl4GY8eNNLS6Zn4zpN78jgq/BId4l+IGl4DnyDTWxMqdPIvya/Q==", "mK/PFxjiPuWXf7FrUhbwK8UCb7cP6UaruPYcqjJvhXOHTYHUBM26O0s3Mebt7cfYw3R6gppIn7ZrI95lIYYoXjVmmsb3ParPb/MXCzh4gIE4W/rIVBxizwy5MWYmQZOPJqdM1DZXDqEowut1Yz4uDppGwAMoaiRLw2FSjy4v+6Y=", null, null, "marko78" },
+                    { 4, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9447), null, "ivan@example.com", "Ivan", true, null, null, true, null, null, "Ivic", "TU72NqxpEJsSbhpOaYhTJ511zkrVtIq1qJZvl4GY8eNNLS6Zn4zpN78jgq/BId4l+IGl4DnyDTWxMqdPIvya/Q==", "mK/PFxjiPuWXf7FrUhbwK8UCb7cP6UaruPYcqjJvhXOHTYHUBM26O0s3Mebt7cfYw3R6gppIn7ZrI95lIYYoXjVmmsb3ParPb/MXCzh4gIE4W/rIVBxizwy5MWYmQZOPJqdM1DZXDqEowut1Yz4uDppGwAMoaiRLw2FSjy4v+6Y=", null, null, "ivan11" },
+                    { 5, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9470), null, "petar@example.com", "Petar", true, null, null, true, null, null, "Petrovic", "TU72NqxpEJsSbhpOaYhTJ511zkrVtIq1qJZvl4GY8eNNLS6Zn4zpN78jgq/BId4l+IGl4DnyDTWxMqdPIvya/Q==", "mK/PFxjiPuWXf7FrUhbwK8UCb7cP6UaruPYcqjJvhXOHTYHUBM26O0s3Mebt7cfYw3R6gppIn7ZrI95lIYYoXjVmmsb3ParPb/MXCzh4gIE4W/rIVBxizwy5MWYmQZOPJqdM1DZXDqEowut1Yz4uDppGwAMoaiRLw2FSjy4v+6Y=", null, null, "petar21" },
+                    { 6, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9472), null, "luka@example.com", "Luka", true, null, null, true, null, null, "Lukic", "TU72NqxpEJsSbhpOaYhTJ511zkrVtIq1qJZvl4GY8eNNLS6Zn4zpN78jgq/BId4l+IGl4DnyDTWxMqdPIvya/Q==", "mK/PFxjiPuWXf7FrUhbwK8UCb7cP6UaruPYcqjJvhXOHTYHUBM26O0s3Mebt7cfYw3R6gppIn7ZrI95lIYYoXjVmmsb3ParPb/MXCzh4gIE4W/rIVBxizwy5MWYmQZOPJqdM1DZXDqEowut1Yz4uDppGwAMoaiRLw2FSjy4v+6Y=", null, null, "luka34" },
+                    { 7, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9633), null, "nedim@example.com", "Nedim", true, null, true, null, null, null, "Nedimovic", "biIYFFUPr+7Wo5ooUQ44ip8Xr2Z3Y+++bNsYeTQZxL7cJ/mKnJn0bNBp1sv1BwiXk2RYmOLohs2/LlOTAc+/SQ==", "ikLR2zFl8PwR+1c7OIiy2Zgvv9/reDnGYa5/otiNt6WQHAmXzFURPXQJZBV7Ckq+FBerCSk7kXAKZ+SjuuIFzCAuEXk3cl6iYjPR3Jh2NAWbZnk4OIJ2aYraO42A2OMbFQpnzUqRvbDvYgIZYabqi0+WwNTAFEmaovqcK+eOfsI=", null, null, "nedim89" },
+                    { 8, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9637), null, "amela@example.com", "Amela", true, null, true, null, null, null, "Amelovic", "biIYFFUPr+7Wo5ooUQ44ip8Xr2Z3Y+++bNsYeTQZxL7cJ/mKnJn0bNBp1sv1BwiXk2RYmOLohs2/LlOTAc+/SQ==", "ikLR2zFl8PwR+1c7OIiy2Zgvv9/reDnGYa5/otiNt6WQHAmXzFURPXQJZBV7Ckq+FBerCSk7kXAKZ+SjuuIFzCAuEXk3cl6iYjPR3Jh2NAWbZnk4OIJ2aYraO42A2OMbFQpnzUqRvbDvYgIZYabqi0+WwNTAFEmaovqcK+eOfsI=", null, null, "amela900" },
+                    { 9, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9639), null, "tarik@example.com", "Tarik", true, null, true, null, null, null, "Tarikovic", "biIYFFUPr+7Wo5ooUQ44ip8Xr2Z3Y+++bNsYeTQZxL7cJ/mKnJn0bNBp1sv1BwiXk2RYmOLohs2/LlOTAc+/SQ==", "ikLR2zFl8PwR+1c7OIiy2Zgvv9/reDnGYa5/otiNt6WQHAmXzFURPXQJZBV7Ckq+FBerCSk7kXAKZ+SjuuIFzCAuEXk3cl6iYjPR3Jh2NAWbZnk4OIJ2aYraO42A2OMbFQpnzUqRvbDvYgIZYabqi0+WwNTAFEmaovqcK+eOfsI=", null, null, "tarik345" },
+                    { 10, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9642), null, "emina@example.com", "Emina", true, null, true, null, null, null, "Eminovic", "biIYFFUPr+7Wo5ooUQ44ip8Xr2Z3Y+++bNsYeTQZxL7cJ/mKnJn0bNBp1sv1BwiXk2RYmOLohs2/LlOTAc+/SQ==", "ikLR2zFl8PwR+1c7OIiy2Zgvv9/reDnGYa5/otiNt6WQHAmXzFURPXQJZBV7Ckq+FBerCSk7kXAKZ+SjuuIFzCAuEXk3cl6iYjPR3Jh2NAWbZnk4OIJ2aYraO42A2OMbFQpnzUqRvbDvYgIZYabqi0+WwNTAFEmaovqcK+eOfsI=", null, null, "emina112" },
+                    { 11, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9790), null, "haris1@example.com", "Haris", true, null, null, null, true, null, "Hasic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "haris1" },
+                    { 12, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9794), null, "denis2@example.com", "Denis", true, null, null, null, true, null, "Denisovic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "denis2" },
+                    { 13, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9796), null, "alen3@example.com", "Alen", true, null, null, null, true, null, "Alenovic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "alen3" },
+                    { 14, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9799), null, "kenan4@example.com", "Kenan", true, null, null, null, true, null, "Kenanovic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "kenan4" },
+                    { 15, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9817), null, "jasmin5@example.com", "Jasmin", true, null, null, null, true, null, "Jasminovic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "jasmin5" },
+                    { 16, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9820), null, "lejla6@example.com", "Lejla", true, null, null, null, true, null, "Lejlovic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "lejla6" },
+                    { 17, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9822), null, "sara7@example.com", "Sara", true, null, null, null, true, null, "Saric", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "sara7" },
+                    { 18, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9824), null, "amina8@example.com", "Amina", true, null, null, null, true, null, "Aminovic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "amina8" },
+                    { 19, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9827), null, "emir9@example.com", "Emir", true, null, null, null, true, null, "Emirovic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "emir9" },
+                    { 20, new DateTime(2026, 2, 19, 22, 42, 25, 648, DateTimeKind.Utc).AddTicks(9830), null, "nermin10@example.com", "Nermin", true, null, null, null, true, null, "Nerminovic", "t9ZbmKS3vavfM5KUYLtHGv2S8dnFY3O/+/L5tqS/P7Y4OoAdOH+7zcv4IBoSNXi8v4xLNegi2qlVQUhzfYO7fg==", "Lw2d/jLp/lCTRyfpn3cNg2N9L1x2yuhAZV2KIjbZYz4+CnyVQ332tvibEZhSRffWz7eDv4oqpgJ8PvoQbGFrboO36HBha6Jz0CF4uuSmWolYOz6T71dgljk0e8jtEpPPnbmFYBm5Cn8ljFjKBE/yVkkFAAAGnrLt2JSTgog+qzI=", null, null, "nermin10" }
                 });
 
             migrationBuilder.InsertData(
@@ -378,16 +385,16 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "ExpirationDate", "MembershipId", "PaymentDate", "UserId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 3, 21, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5604), 1, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5375), 11 },
-                    { 2, new DateTime(2026, 5, 20, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5981), 2, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5980), 12 },
-                    { 3, new DateTime(2026, 8, 18, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5987), 3, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5987), 13 },
-                    { 4, new DateTime(2027, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5989), 4, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5989), 14 },
-                    { 5, new DateTime(2026, 2, 14, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5992), 1, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5991), 15 },
-                    { 6, new DateTime(2026, 5, 20, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5994), 2, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5993), 16 },
-                    { 7, new DateTime(2026, 2, 9, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5996), 3, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5995), 17 },
-                    { 8, new DateTime(2026, 2, 14, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5998), 4, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5997), 18 },
-                    { 9, new DateTime(2026, 3, 21, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(6000), 1, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(5999), 19 },
-                    { 10, new DateTime(2026, 2, 9, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(6002), 2, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(6001), 20 }
+                    { 1, new DateTime(2026, 3, 21, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(3888), 1, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(3728), 11 },
+                    { 2, new DateTime(2026, 5, 20, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4103), 2, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4103), 12 },
+                    { 3, new DateTime(2026, 8, 18, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4181), 3, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4181), 13 },
+                    { 4, new DateTime(2027, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4183), 4, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4183), 14 },
+                    { 5, new DateTime(2026, 2, 14, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4185), 1, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4184), 15 },
+                    { 6, new DateTime(2026, 5, 20, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4186), 2, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4186), 16 },
+                    { 7, new DateTime(2026, 2, 9, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4188), 3, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4188), 17 },
+                    { 8, new DateTime(2026, 2, 14, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4190), 4, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4189), 18 },
+                    { 9, new DateTime(2026, 3, 21, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4191), 1, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4191), 19 },
+                    { 10, new DateTime(2026, 2, 9, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4193), 2, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(4192), 20 }
                 });
 
             migrationBuilder.InsertData(
@@ -452,16 +459,31 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "DateAssigned", "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(947), 2, 1 },
-                    { 2, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1691), 2, 2 },
-                    { 3, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1692), 3, 3 },
-                    { 4, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1693), 3, 4 },
-                    { 5, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1694), 3, 5 },
-                    { 6, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1694), 3, 6 },
-                    { 7, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1695), 4, 7 },
-                    { 8, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1696), 4, 8 },
-                    { 9, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1697), 4, 9 },
-                    { 10, new DateTime(2026, 2, 19, 16, 17, 23, 382, DateTimeKind.Utc).AddTicks(1698), 4, 10 }
+                    { 1, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(668), 2, 1 },
+                    { 2, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1136), 2, 2 },
+                    { 3, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1137), 3, 3 },
+                    { 4, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1138), 3, 4 },
+                    { 5, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1139), 3, 5 },
+                    { 6, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1140), 3, 6 },
+                    { 7, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1140), 4, 7 },
+                    { 8, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1141), 4, 8 },
+                    { 9, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1142), 4, 9 },
+                    { 10, new DateTime(2026, 2, 19, 22, 42, 25, 649, DateTimeKind.Utc).AddTicks(1143), 4, 10 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "WorkerTasks",
+                columns: new[] { "Id", "CreatedTaskDate", "Details", "ExparationTaskDate", "IsFinished", "Name", "UserId" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Izvršiti dnevnu provjeru sprava u sali 1.", new DateTime(2026, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Provjera opreme", 7 },
+                    { 2, new DateTime(2026, 2, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), "Detaljno čišćenje muške svlačionice.", new DateTime(2026, 2, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), true, "Čišćenje svlačionice", 7 },
+                    { 3, new DateTime(2026, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "Provjeriti stanje proteinskih napitaka.", new DateTime(2026, 2, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Inventura šanka", 8 },
+                    { 4, new DateTime(2026, 2, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), "Rasporediti termine za nove članove.", new DateTime(2026, 2, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Organizacija termina", 8 },
+                    { 5, new DateTime(2026, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "Provjeriti članarine koje ističu ove sedmice.", new DateTime(2026, 2, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), true, "Ažuriranje članova", 9 },
+                    { 6, new DateTime(2026, 2, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "Pripremiti salu za večernji grupni trening.", new DateTime(2026, 2, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Priprema sale", 9 },
+                    { 7, new DateTime(2026, 2, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "Objaviti promociju na društvenim mrežama.", new DateTime(2026, 2, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Marketing objava", 10 },
+                    { 8, new DateTime(2026, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "Provjeriti rezervacije za vikend termine.", new DateTime(2026, 2, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), true, "Pregled rezervacija", 10 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -527,6 +549,11 @@ namespace Gymify.Services.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_UserId",
                 table: "UserRoles",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkerTasks_UserId",
+                table: "WorkerTasks",
                 column: "UserId");
         }
 

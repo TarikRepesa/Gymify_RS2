@@ -313,6 +313,98 @@ namespace Gymify.Services.Database
                     StarNumber = 5
                 }
             );
+
+            modelBuilder.Entity<WorkerTask>().HasData(
+
+// Nedim (7)
+new WorkerTask
+{
+    Id = 1,
+    Name = "Provjera opreme",
+    Details = "Izvršiti dnevnu provjeru sprava u sali 1.",
+    CreatedTaskDate = new DateTime(2026, 2, 1),
+    ExparationTaskDate = new DateTime(2026, 2, 2),
+    IsFinished = false,
+    UserId = 7
+},
+new WorkerTask
+{
+    Id = 2,
+    Name = "Čišćenje svlačionice",
+    Details = "Detaljno čišćenje muške svlačionice.",
+    CreatedTaskDate = new DateTime(2026, 2, 3),
+    ExparationTaskDate = new DateTime(2026, 2, 3),
+    IsFinished = true,
+    UserId = 7
+},
+
+// Amela (8)
+new WorkerTask
+{
+    Id = 3,
+    Name = "Inventura šanka",
+    Details = "Provjeriti stanje proteinskih napitaka.",
+    CreatedTaskDate = new DateTime(2026, 2, 5),
+    ExparationTaskDate = new DateTime(2026, 2, 6),
+    IsFinished = false,
+    UserId = 8
+},
+new WorkerTask
+{
+    Id = 4,
+    Name = "Organizacija termina",
+    Details = "Rasporediti termine za nove članove.",
+    CreatedTaskDate = new DateTime(2026, 2, 7),
+    ExparationTaskDate = new DateTime(2026, 2, 8),
+    IsFinished = false,
+    UserId = 8
+},
+
+// Tarik (9)
+new WorkerTask
+{
+    Id = 5,
+    Name = "Ažuriranje članova",
+    Details = "Provjeriti članarine koje ističu ove sedmice.",
+    CreatedTaskDate = new DateTime(2026, 2, 10),
+    ExparationTaskDate = new DateTime(2026, 2, 12),
+    IsFinished = true,
+    UserId = 9
+},
+new WorkerTask
+{
+    Id = 6,
+    Name = "Priprema sale",
+    Details = "Pripremiti salu za večernji grupni trening.",
+    CreatedTaskDate = new DateTime(2026, 2, 11),
+    ExparationTaskDate = new DateTime(2026, 2, 11),
+    IsFinished = false,
+    UserId = 9
+},
+
+// Emina (10)
+new WorkerTask
+{
+    Id = 7,
+    Name = "Marketing objava",
+    Details = "Objaviti promociju na društvenim mrežama.",
+    CreatedTaskDate = new DateTime(2026, 2, 13),
+    ExparationTaskDate = new DateTime(2026, 2, 14),
+    IsFinished = false,
+    UserId = 10
+},
+new WorkerTask
+{
+    Id = 8,
+    Name = "Pregled rezervacija",
+    Details = "Provjeriti rezervacije za vikend termine.",
+    CreatedTaskDate = new DateTime(2026, 2, 15),
+    ExparationTaskDate = new DateTime(2026, 2, 16),
+    IsFinished = true,
+    UserId = 10
+}
+);
+
         }
     }
 }
