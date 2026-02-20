@@ -81,6 +81,16 @@ Future<void> showBaseFormDialog({
     }
   }
 
+  if (initialValues != null) {
+  if (initialValues.containsKey("userId")) {
+    values["userId"] = initialValues["userId"];
+  }
+
+  if (initialValues.containsKey("trainerId")) {
+    values["trainerId"] = initialValues["trainerId"];
+  }
+}
+
   values.putIfAbsent("userId", () => "");
   values.putIfAbsent("trainerId", () => "");
 

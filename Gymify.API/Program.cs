@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<GymifyDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("Gymify.API")
+        b => b.MigrationsAssembly("Gymify.Services")
     ));
 
 builder.Services.AddControllers();
@@ -102,7 +102,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<GymifyDbContext>();
+    db.Database.Migrate();
+}
+
+
 app.UseStaticFiles();
 
 app.UseAuthentication();
