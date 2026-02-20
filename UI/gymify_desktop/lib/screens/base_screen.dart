@@ -3,9 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/config/api_config.dart';
 import 'package:gymify_desktop/dialogs/base_dialogs_frame.dart';
+import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:gymify_desktop/helper/image_helper.dart';
 import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
 import 'package:gymify_desktop/providers/image_provider.dart';
+import 'package:gymify_desktop/routes/app_routes.dart';
+import 'package:gymify_desktop/widgets/trainer_task_widget.dart';
+import 'package:gymify_desktop/widgets/worker_task_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:gymify_desktop/models/user.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
@@ -27,7 +31,8 @@ class BaseScreen extends StatefulWidget {
 }
 
 class _BaseScreenState extends State<BaseScreen> {
-  String _activeItem = 'Osoblje';
+  // NOTE: _activeItem se sada postavlja po roli (u initState)
+  String _activeItem = 'Obavijesti';
   late Widget _bodyWidget;
 
   late UserProvider _userProvider;
@@ -42,10 +47,67 @@ class _BaseScreenState extends State<BaseScreen> {
   final _formKey = GlobalKey<FormState>();
   late Fields fields;
 
+  // ---------------- ROLE HELPERS ----------------
+  bool _hasRole(String role) =>
+      Session.roles.any((r) => r.toLowerCase() == role.toLowerCase());
+
+  bool get _isAdmin => _hasRole("Admin");
+  bool get _isWorker => _hasRole("Radnik");
+  bool get _isTrainer => _hasRole("Trener");
+
+  List<String> _allowedMenus() {
+    if (_isAdmin) {
+      return [
+        "Osoblje",
+        "Članovi",
+        "Treninzi",
+        "Članarine",
+        "Obavijesti",
+        "Recenzije",
+        "Izvještaj",
+      ];
+    }
+
+    if (_isWorker) {
+      return [
+        "Moji zadaci",
+        "Članovi",
+        "Treninzi",
+        "Članarine",
+        "Obavijesti",
+        "Recenzije",
+        "Izvještaj",
+      ];
+    }
+
+    if (_isTrainer) {
+      return ["Moji treninzi", "Obavijesti", "Izvještaj"];
+    }
+
+    return [];
+  }
+
+  void _ensureActiveMenuAllowed() {
+    final menus = _allowedMenus();
+    if (menus.isEmpty) return;
+
+    if (!menus.contains(_activeItem)) {
+      setState(() {
+        _activeItem = menus.first;
+        _bodyWidget = _getWidgetForMenu(_activeItem);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    // Postavi početni meni po roli
+    final menus = _allowedMenus();
+    _activeItem = menus.isNotEmpty ? menus.first : "Obavijesti";
     _bodyWidget = _getWidgetForMenu(_activeItem);
+
     fields = Fields.fromNames([
       'firstName',
       'lastName',
@@ -66,7 +128,7 @@ class _BaseScreenState extends State<BaseScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // da se ne učitava više puta (didChangeDependencies se može pozvati više puta)
+    // didChangeDependencies može više puta
     if (!_loadedOnce) {
       _loadedOnce = true;
       _userProvider = context.read<UserProvider>();
@@ -88,6 +150,9 @@ class _BaseScreenState extends State<BaseScreen> {
         _loggedUser = user;
         _isLoadingUser = false;
       });
+
+      // ako se role/meni promijene, osiguraj active
+      _ensureActiveMenuAllowed();
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -112,12 +177,22 @@ class _BaseScreenState extends State<BaseScreen> {
         return ReviewWidget();
       case 'Izvještaj':
         return ReportWidget();
+
+      // NOVO:
+      case 'Moji zadaci':
+        return WorkerTaskWidget();
+      case 'Moji treninzi':
+        return TrainerTaskWidget();
+
       default:
         return const Center(child: Text('Nije pronađen menu'));
     }
   }
 
   void _onMenuTap(String menu) {
+    final allowed = _allowedMenus();
+    if (!allowed.contains(menu)) return;
+
     setState(() {
       _activeItem = menu;
       _bodyWidget = _getWidgetForMenu(menu);
@@ -193,14 +268,12 @@ class _BaseScreenState extends State<BaseScreen> {
   }
 
   Future<void> _showUserSettingsDialog() async {
-    // Učitaj svježeg usera (ako želiš)
     await _loadLoggedUser();
     if (!mounted) return;
 
     _pickedImage = null;
     _isImageChanged = false;
 
-    // Popuni fields iz _loggedUser
     final user = _loggedUser;
     if (user != null) {
       fields.setText('firstName', user.firstName);
@@ -309,7 +382,6 @@ class _BaseScreenState extends State<BaseScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // header card
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
@@ -385,10 +457,7 @@ class _BaseScreenState extends State<BaseScreen> {
             ],
           ),
         ),
-
         const SizedBox(height: 14),
-
-        // form card
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
@@ -453,7 +522,6 @@ class _BaseScreenState extends State<BaseScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-
                 _datePickerField(
                   context: context,
                   label: "Datum rođenja",
@@ -474,12 +542,49 @@ class _BaseScreenState extends State<BaseScreen> {
             ),
           ),
         ),
-
         const Spacer(),
-
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            /// 🔴 LOGOUT BUTTON
+            OutlinedButton.icon(
+              onPressed: () async {
+                final confirmed = await ConfirmDialogs.yesNoConfirmation(
+                  context,
+                  title: "Odjava",
+                  question: "Da li ste sigurni da se želite odjaviti?",
+                  yesText: "Da, odjavi me",
+                  noText: "Otkaži",
+                );
+
+                if (!confirmed) return;
+
+                Session.odjava();
+
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+              },
+              icon: const Icon(Icons.logout, color: Colors.red),
+              label: const Text(
+                "Odjava",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.red),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
             ElevatedButton(
               onPressed: isSaveEnabled ? () => onSave() : null,
               style: ElevatedButton.styleFrom(
@@ -547,7 +652,9 @@ class _BaseScreenState extends State<BaseScreen> {
       avatar = CircleAvatar(
         radius: 24,
         backgroundColor: Colors.white.withOpacity(0.25),
-        child: ImageHelper.userPlaceholder(fullName),
+        child: ImageHelper.userPlaceholder(
+          fullName.isEmpty ? "Korisnik" : fullName,
+        ),
       );
     }
 
@@ -608,6 +715,8 @@ class _BaseScreenState extends State<BaseScreen> {
   }
 
   Widget _buildSidebar() {
+    final menus = _allowedMenus();
+
     return Container(
       width: 250,
       height: double.infinity,
@@ -615,7 +724,6 @@ class _BaseScreenState extends State<BaseScreen> {
       child: Column(
         children: [
           const SizedBox(height: 40),
-
           SizedBox(
             height: 120,
             child: Image.asset(
@@ -623,27 +731,26 @@ class _BaseScreenState extends State<BaseScreen> {
               fit: BoxFit.contain,
             ),
           ),
-
           const SizedBox(height: 30),
 
-          // menu u sredini (da user tile ostane dole)
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _menuItem("Osoblje"),
-                  _menuItem("Članovi"),
-                  _menuItem("Treninzi"),
-                  _menuItem("Članarine"),
-                  _menuItem("Obavijesti"),
-                  _menuItem("Recenzije"),
-                  _menuItem("Izvještaj"),
-                ],
-              ),
-            ),
+            child: menus.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text(
+                      "Nemate privilegije za pristup aplikaciji.",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : SingleChildScrollView(
+                    child: Column(children: menus.map(_menuItem).toList()),
+                  ),
           ),
 
-          // user na dnu
           _userTile(),
         ],
       ),
@@ -652,11 +759,16 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final menus = _allowedMenus();
+    final body = menus.isEmpty
+        ? const Center(child: Text("Nemate privilegije za pristup."))
+        : _bodyWidget;
+
     return Scaffold(
       body: Row(
         children: [
           _buildSidebar(),
-          Expanded(child: _bodyWidget),
+          Expanded(child: body),
         ],
       ),
     );

@@ -25,6 +25,490 @@ Future<User?> showTrainerPickDialog({required BuildContext context}) {
   );
 }
 
+String? _trainingImageToUrl(String? trainingImage) {
+  if (!ImageHelper.hasValidImage(trainingImage)) return null;
+
+  if (ImageHelper.isHttp(trainingImage!)) {
+    return trainingImage;
+  }
+
+  return "${ApiConfig.apiBase}/images/training/$trainingImage";
+}
+
+Future<void> _openEditTrainingDialog({
+  required BuildContext context,
+  required UniversalPagingProvider<Training> paging,
+  required Training training,
+}) async {
+  final nameCtrl = TextEditingController(text: training.name ?? "");
+  final maxCtrl = TextEditingController(
+    text: training.maxAmountOfParticipants.toString(),
+  );
+  final currentCtrl = TextEditingController(
+    text: training.currentParticipants.toString(),
+  );
+  final startDateCtrl = TextEditingController(
+    text: DateHelper.format(training.startDate),
+  );
+  final trainerDisplayCtrl = TextEditingController(
+    text: "${training.user?.firstName ?? ""} ${training.user?.lastName ?? ""}"
+        .trim(),
+  );
+
+  int? trainerId = training.userId; // postojeći trener
+  File? pickedImage;
+  bool saving = false;
+
+  String? errTrainer;
+  String? errName;
+  String? errMax;
+  String? errCurrent;
+  String? errStartDate;
+
+  bool validate() {
+    errTrainer = null;
+    errName = null;
+    errMax = null;
+    errCurrent = null;
+    errStartDate = null;
+
+    if (trainerId == null) errTrainer = "Trener je obavezan.";
+    if (nameCtrl.text.trim().isEmpty) errName = "Naziv je obavezan.";
+
+    final maxText = maxCtrl.text.trim();
+    final maxVal = int.tryParse(maxText);
+    if (maxText.isEmpty) {
+      errMax = "Max broj učesnika je obavezan.";
+    } else if (maxVal == null || maxVal <= 0) {
+      errMax = "Unesite validan broj (min 1).";
+    }
+
+    final curText = currentCtrl.text.trim();
+    final curVal = int.tryParse(curText);
+    if (curText.isEmpty) {
+      errCurrent = "Trenutni broj učesnika je obavezan.";
+    } else if (curVal == null || curVal < 0) {
+      errCurrent = "Unesite validan broj (min 0).";
+    }
+
+    if (maxVal != null && curVal != null && curVal > maxVal) {
+      errCurrent = "Trenutni broj ne može biti veći od max broja.";
+    }
+
+    final startUi = startDateCtrl.text.trim();
+    if (startUi.isEmpty) {
+      errStartDate = "Datum početka je obavezan.";
+    } else {
+      try {
+        DateHelper.toIsoFromUi(startUi);
+      } catch (_) {
+        errStartDate = "Neispravan format datuma (dd.MM.yyyy).";
+      }
+    }
+
+    return errTrainer == null &&
+        errName == null &&
+        errMax == null &&
+        errCurrent == null &&
+        errStartDate == null;
+  }
+
+  bool hasChanges({required bool imageChanged, required int? newTrainerId}) {
+    if (imageChanged) return true;
+
+    final newName = nameCtrl.text.trim();
+    final newMax = int.tryParse(maxCtrl.text.trim());
+    final newCur = int.tryParse(currentCtrl.text.trim());
+    final newStart = startDateCtrl.text.trim();
+
+    if ((newTrainerId ?? training.userId) != training.userId) return true;
+    if (newName != (training.name ?? "")) return true;
+    if ((newMax ?? training.maxAmountOfParticipants) !=
+        training.maxAmountOfParticipants)
+      return true;
+    if ((newCur ?? training.currentParticipants) !=
+        training.currentParticipants)
+      return true;
+
+    // poredi UI datum sa formatom originalnog
+    if (newStart != DateHelper.format(training.startDate)) return true;
+
+    return false;
+  }
+
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (dialogCtx) => StatefulBuilder(
+      builder: (dialogCtx, setStateDialog) {
+        bool imageChanged = false;
+
+        Future<void> pickTrainer() async {
+          final picked = await showTrainerPickDialog(context: dialogCtx);
+          if (picked == null) return;
+
+          trainerId = picked.id;
+          trainerDisplayCtrl.text =
+              "${picked.firstName ?? ""} ${picked.lastName ?? ""}".trim();
+
+          setStateDialog(() {});
+        }
+
+        Future<void> pickImage() async {
+          final file = await ImageHelper.openImagePicker();
+          if (file == null) return;
+
+          pickedImage = file;
+          imageChanged = true;
+          setStateDialog(() {});
+        }
+
+        Future<void> pickStartDate() async {
+          final now = DateTime.now();
+          final picked = await showDatePicker(
+            context: dialogCtx,
+            initialDate: training.startDate,
+            firstDate: DateTime(1900),
+            lastDate: DateTime(2100),
+          );
+          if (picked == null) return;
+
+          startDateCtrl.text =
+              "${picked.day.toString().padLeft(2, '0')}.${picked.month.toString().padLeft(2, '0')}.${picked.year}";
+          setStateDialog(() {});
+        }
+
+        Future<void> save() async {
+          if (saving) return;
+
+          final ok = validate();
+          setStateDialog(() {});
+          if (!ok) return;
+
+          setStateDialog(() => saving = true);
+
+          try {
+            String? trainingImageFileName = training.trainingImage;
+
+            if (pickedImage != null) {
+              trainingImageFileName = await ImageAppProvider.upload(
+                file: pickedImage!,
+                folder: "training",
+              );
+            }
+
+            final maxP = int.parse(maxCtrl.text.trim());
+            final curP = int.parse(currentCtrl.text.trim());
+            final startIso = DateHelper.toIsoFromUi(startDateCtrl.text.trim());
+
+            await dialogCtx.read<TrainingProvider>().update(training.id, {
+              "id": training.id,
+              "userId": trainerId,
+              "name": nameCtrl.text.trim(),
+              "maxAmountOfParticipants": maxP,
+              "currentParticipants": curP,
+              "startDate": startIso,
+              "trainingImage": trainingImageFileName,
+            });
+
+            await paging.loadPage();
+            if (dialogCtx.mounted) {
+              SnackbarHelper.showUpdate(
+                dialogCtx,
+                "Trening uspješno ažuriran.",
+              );
+              Navigator.pop(dialogCtx);
+            }
+          } catch (e) {
+            if (dialogCtx.mounted) {
+              SnackbarHelper.showError(dialogCtx, e.toString());
+            }
+          } finally {
+            if (dialogCtx.mounted) setStateDialog(() => saving = false);
+          }
+        }
+
+        final canSave = hasChanges(
+          imageChanged: imageChanged,
+          newTrainerId: trainerId,
+        );
+
+        return BaseDialog(
+          title: "Detalji treninga",
+          width: 640,
+          height: 680,
+          onClose: () => Navigator.pop(dialogCtx),
+          child: Builder(
+            builder: (_) {
+              final scrollCtrl = ScrollController();
+              return PrimaryScrollController(
+                controller: scrollCtrl,
+                child: Scrollbar(
+                  controller: scrollCtrl,
+                  thumbVisibility: true,
+                  child: SingleChildScrollView(
+                    primary: true,
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Slika (opcionalno)
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          margin: const EdgeInsets.only(bottom: 20),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9FAFB),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.black.withOpacity(0.08),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: Container(
+                                  width: 170,
+                                  height: 130,
+                                  color: const Color(0xFFD0D6DD),
+                                  child: pickedImage != null
+                                      ? Image.file(
+                                          pickedImage!,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : (ImageHelper.hasValidImage(
+                                              training.trainingImage,
+                                            )
+                                            ? Image.network(
+                                                _trainingImageToUrl(
+                                                      training.trainingImage,
+                                                    ) ??
+                                                    "",
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (_, __, ___) =>
+                                                    const Center(
+                                                      child: Icon(
+                                                        Icons
+                                                            .image_not_supported,
+                                                        color: Colors.white,
+                                                        size: 46,
+                                                      ),
+                                                    ),
+                                              )
+                                            : const Center(
+                                                child: Icon(
+                                                  Icons.image_outlined,
+                                                  size: 55,
+                                                  color: Colors.white,
+                                                ),
+                                              )),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Slika treninga (opcionalno)",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      pickedImage != null
+                                          ? pickedImage!.path
+                                                .split(Platform.pathSeparator)
+                                                .last
+                                          : (training.trainingImage ?? "Nema"),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.black.withOpacity(0.65),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    OutlinedButton.icon(
+                                      onPressed: saving ? null : pickImage,
+                                      icon: const Icon(
+                                        Icons.photo_camera_outlined,
+                                        size: 18,
+                                      ),
+                                      label: const Text("Promijeni sliku"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Trener
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: trainerDisplayCtrl,
+                                readOnly: true,
+                                decoration: InputDecoration(
+                                  labelText: "Trener",
+                                  filled: true,
+                                  fillColor: const Color(0xFFF7F7F7),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  errorText: errTrainer,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            SizedBox(
+                              height: 46,
+                              child: ElevatedButton(
+                                onPressed: saving ? null : pickTrainer,
+                                child: const Text("Promijeni trenera"),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Naziv
+                        TextField(
+                          controller: nameCtrl,
+                          decoration: InputDecoration(
+                            labelText: "Naziv treninga",
+                            filled: true,
+                            fillColor: const Color(0xFFF7F7F7),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorText: errName,
+                          ),
+                          onChanged: (_) => setStateDialog(() {}),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Max
+                        TextField(
+                          controller: maxCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: "Max broj učesnika",
+                            filled: true,
+                            fillColor: const Color(0xFFF7F7F7),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorText: errMax,
+                          ),
+                          onChanged: (_) => setStateDialog(() {}),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Current
+                        TextField(
+                          controller: currentCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: "Trenutni broj učesnika",
+                            filled: true,
+                            fillColor: const Color(0xFFF7F7F7),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorText: errCurrent,
+                          ),
+                          onChanged: (_) => setStateDialog(() {}),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Start date
+                        TextField(
+                          controller: startDateCtrl,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            labelText: "Datum početka",
+                            filled: true,
+                            fillColor: const Color(0xFFF7F7F7),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.calendar_month_outlined),
+                              onPressed: saving ? null : pickStartDate,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorText: errStartDate,
+                          ),
+                          onTap: saving ? null : pickStartDate,
+                        ),
+
+                        const SizedBox(height: 22),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            OutlinedButton(
+                              onPressed: saving
+                                  ? null
+                                  : () => Navigator.pop(dialogCtx),
+                              child: const Text("Zatvori"),
+                            ),
+                            const SizedBox(width: 10),
+                            ElevatedButton(
+                              onPressed: (!canSave || saving) ? null : save,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF387EFF),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: saving
+                                  ? const SizedBox(
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      "Sačuvaj",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    ),
+  );
+}
+
 Widget TrainingWidget() {
   InputDecoration _searchDecoration() {
     return InputDecoration(
@@ -510,7 +994,11 @@ Widget TrainingWidget() {
     );
   }
 
-  Widget _card(Training t) {
+  Widget _card({
+    required BuildContext context,
+    required UniversalPagingProvider<Training> paging,
+    required Training t,
+  }) {
     final title = t.name;
     final trainerName = "${t.user?.firstName ?? ""} ${t.user?.lastName ?? ""}"
         .trim();
@@ -649,7 +1137,11 @@ Widget TrainingWidget() {
           SizedBox(
             height: 34,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () => _openEditTrainingDialog(
+                context: context,
+                paging: paging,
+                training: t,
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF387EFF),
                 foregroundColor: Colors.white,
@@ -796,7 +1288,15 @@ Widget TrainingWidget() {
                             child: Wrap(
                               spacing: 60,
                               runSpacing: 30,
-                              children: paging.items.map(_card).toList(),
+                              children: paging.items
+                                  .map(
+                                    (t) => _card(
+                                      context: context,
+                                      paging: paging,
+                                      t: t,
+                                    ),
+                                  )
+                                  .toList(),
                             ),
                           ),
                         ),

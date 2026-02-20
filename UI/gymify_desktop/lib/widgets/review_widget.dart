@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
@@ -89,30 +90,19 @@ class _ReviewWidgetState extends State<ReviewWidget> {
   }
 
   Future<bool> _confirmDelete(BuildContext context, Review r) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: const Text("Brisanje recenzije"),
-        content: Text(
-          "Jesi li siguran da želiš obrisati recenziju od:\n\n"
-          "• ${_reviewerName(r)}\n"
-          "• ${r.starNumber} zvjezdica\n\n"
-          "Poruka:\n“${r.message}”",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: const Text("Odustani"),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text("Obriši"),
-          ),
-        ],
-      ),
+    final ok = await ConfirmDialogs.badGoodConfirmation(
+      context,
+      title: "Brisanje recenzije",
+      question:
+          "Da li ste sigurni da želite obrisati recenziju:\n\n"
+          "Autor: ${_reviewerName(r)}\n"
+          "Ocjena: ${r.starNumber} zvjezdica\n\n"
+          "Poruka:\n„${r.message ?? ""}“",
+      badText: "Odustani",
+      goodText: "Obriši",
     );
 
-    return ok == true;
+    return ok;
   }
 
   Future<void> _deleteReview({
@@ -194,8 +184,11 @@ class _ReviewWidgetState extends State<ReviewWidget> {
           ),
 
           // komentar
-          const Icon(Icons.chat_bubble_outline_rounded,
-              size: 18, color: Colors.black87),
+          const Icon(
+            Icons.chat_bubble_outline_rounded,
+            size: 18,
+            color: Colors.black87,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -243,7 +236,9 @@ class _ReviewWidgetState extends State<ReviewWidget> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         IconButton(
-          onPressed: paging.hasPreviousPage ? () => paging.previousPage() : null,
+          onPressed: paging.hasPreviousPage
+              ? () => paging.previousPage()
+              : null,
           icon: const Icon(Icons.arrow_back),
         ),
         Text(
@@ -264,27 +259,28 @@ class _ReviewWidgetState extends State<ReviewWidget> {
       create: (context) {
         final paging = UniversalPagingProvider<Review>(
           pageSize: 5,
-          fetcher: ({
-            required int page,
-            required int pageSize,
-            String? filter,
-            bool includeTotalCount = true,
-          }) {
-            return context.read<ReviewProvider>().get(
-              filter: {
-                "page": page,
-                "pageSize": pageSize,
-                "includeTotalCount": includeTotalCount,
+          fetcher:
+              ({
+                required int page,
+                required int pageSize,
+                String? filter,
+                bool includeTotalCount = true,
+              }) {
+                return context.read<ReviewProvider>().get(
+                  filter: {
+                    "page": page,
+                    "pageSize": pageSize,
+                    "includeTotalCount": includeTotalCount,
 
-                if (filter != null && filter.trim().isNotEmpty)
-                  "FTS": filter.trim(),
+                    if (filter != null && filter.trim().isNotEmpty)
+                      "FTS": filter.trim(),
 
-                if (_selectedStars != null) "StarNumber": _selectedStars,
+                    if (_selectedStars != null) "StarNumber": _selectedStars,
 
-                "IncludeUser": true,
+                    "IncludeUser": true,
+                  },
+                );
               },
-            );
-          },
         );
 
         Future.microtask(() => paging.loadPage());
@@ -340,11 +336,26 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                           prefixIcon: Icons.star_rounded,
                         ),
                         items: const [
-                          DropdownMenuItem(value: 5, child: Text("5 zvjezdica")),
-                          DropdownMenuItem(value: 4, child: Text("4 zvjezdice")),
-                          DropdownMenuItem(value: 3, child: Text("3 zvjezdice")),
-                          DropdownMenuItem(value: 2, child: Text("2 zvjezdice")),
-                          DropdownMenuItem(value: 1, child: Text("1 zvjezdica")),
+                          DropdownMenuItem(
+                            value: 5,
+                            child: Text("5 zvjezdica"),
+                          ),
+                          DropdownMenuItem(
+                            value: 4,
+                            child: Text("4 zvjezdice"),
+                          ),
+                          DropdownMenuItem(
+                            value: 3,
+                            child: Text("3 zvjezdice"),
+                          ),
+                          DropdownMenuItem(
+                            value: 2,
+                            child: Text("2 zvjezdice"),
+                          ),
+                          DropdownMenuItem(
+                            value: 1,
+                            child: Text("1 zvjezdica"),
+                          ),
                         ],
                         onChanged: (v) async {
                           setState(() => _selectedStars = v);
@@ -377,20 +388,20 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                   child: (paging.isLoading && paging.items.isEmpty)
                       ? const Center(child: CircularProgressIndicator())
                       : paging.items.isEmpty
-                          ? const Center(
-                              child: Text(
-                                "Nema podataka.",
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                            )
-                          : ListView.builder(
-                              itemCount: paging.items.length,
-                              itemBuilder: (context, i) => _reviewCard(
-                                context: context,
-                                paging: paging,
-                                r: paging.items[i],
-                              ),
-                            ),
+                      ? const Center(
+                          child: Text(
+                            "Nema podataka.",
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: paging.items.length,
+                          itemBuilder: (context, i) => _reviewCard(
+                            context: context,
+                            paging: paging,
+                            r: paging.items[i],
+                          ),
+                        ),
                 ),
 
                 const SizedBox(height: 10),

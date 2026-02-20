@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymify_desktop/utils/session.dart';
 import 'package:provider/provider.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
 import 'package:gymify_desktop/models/login_request.dart';
@@ -39,18 +40,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _forgotPasswordOrUsername() async {
-    SnackbarHelper.showError(
-      context,
-      "Kontaktirajte administratora sistema.",
-    );
+    SnackbarHelper.showError(context, "Kontaktirajte administratora sistema.");
   }
 
   Future<void> login() async {
     final result = await _authProvider.prijava(
-      LoginRequest(
-        username: _username.text.trim(),
-        password: _password.text,
-      ),
+      LoginRequest(username: _username.text.trim(), password: _password.text),
     );
 
     if (result == "ZABRANJENO") {
@@ -62,14 +57,30 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (result != "OK") {
-      SnackbarHelper.showError(
-        context,
-        'Pogrešno korisničko ime ili lozinka',
-      );
+      SnackbarHelper.showError(context, 'Pogrešno korisničko ime ili lozinka');
       return;
     }
 
-    Navigator.pushReplacementNamed(context, AppRoutes.base);
+    if (result == "OK") {
+      final allowed = Session.roles.any(
+        (r) => [
+          "Admin",
+          "Radnik",
+          "Trener",
+        ].any((x) => x.toLowerCase() == r.toLowerCase()),
+      );
+
+      if (!allowed) {
+        Session.odjava();
+        SnackbarHelper.showError(
+          context,
+          'Nemate privilegije za pristup aplikaciji',
+        );
+        return;
+      }
+
+      Navigator.pushReplacementNamed(context, AppRoutes.base);
+    }
   }
 
   @override
@@ -81,10 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              LoginScreen.gymLightBlue,
-              LoginScreen.gymBlue,
-            ],
+            colors: [LoginScreen.gymLightBlue, LoginScreen.gymBlue],
           ),
         ),
         child: Center(
@@ -225,26 +233,26 @@ class _LoginScreenState extends State<LoginScreen> {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: hintText,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 16,
+          ),
           prefixIcon: Icon(icon, color: LoginScreen.gymBlue),
           filled: true,
           fillColor: Colors.white,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide:
-                const BorderSide(color: Colors.white, width: 1.4),
+            borderSide: const BorderSide(color: Colors.white, width: 1.4),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(
-                color: LoginScreen.gymBlueDark, width: 2),
+              color: LoginScreen.gymBlueDark,
+              width: 2,
+            ),
           ),
         ),
       ),

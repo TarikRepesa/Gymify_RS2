@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/base_form_dialogs_for_actions.dart';
+import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:gymify_desktop/helper/date_helper.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
 import 'package:gymify_desktop/models/membership.dart';
@@ -25,21 +26,23 @@ Widget MembershipWidget() {
     create: (context) {
       final paging = UniversalPagingProvider<Membership>(
         pageSize: 5,
-        fetcher: ({
-          required int page,
-          required int pageSize,
-          String? filter,
-          bool includeTotalCount = true,
-        }) {
-          return context.read<MembershipProvider>().get(
-            filter: {
-              "page": page,
-              "pageSize": pageSize,
-              "includeTotalCount": includeTotalCount,
-              if (filter != null && filter.trim().isNotEmpty) "FTS": filter.trim(),
+        fetcher:
+            ({
+              required int page,
+              required int pageSize,
+              String? filter,
+              bool includeTotalCount = true,
+            }) {
+              return context.read<MembershipProvider>().get(
+                filter: {
+                  "page": page,
+                  "pageSize": pageSize,
+                  "includeTotalCount": includeTotalCount,
+                  if (filter != null && filter.trim().isNotEmpty)
+                    "FTS": filter.trim(),
+                },
+              );
             },
-          );
-        },
       );
 
       Future.microtask(() => paging.loadPage());
@@ -115,13 +118,20 @@ Widget MembershipWidget() {
                 try {
                   await context.read<MembershipProvider>().insert({
                     "name": (payload["name"] ?? "").toString().trim(),
-                    "monthlyPrice": _parsePrice(payload["monthlyPrice"]?.toString()),
+                    "monthlyPrice": _parsePrice(
+                      payload["monthlyPrice"]?.toString(),
+                    ),
                     "yearPrice": _parsePrice(payload["yearPrice"]?.toString()),
-                    "createdAt": DateHelper.toIsoFromUi((payload["createdAt"] ?? "").toString()),
+                    "createdAt": DateHelper.toIsoFromUi(
+                      (payload["createdAt"] ?? "").toString(),
+                    ),
                   });
 
                   await paging.loadPage();
-                  SnackbarHelper.showSuccess(context, "Članarina uspješno dodana.");
+                  SnackbarHelper.showSuccess(
+                    context,
+                    "Članarina uspješno dodana.",
+                  );
                 } catch (e) {
                   SnackbarHelper.showError(context, e.toString());
                   rethrow;
@@ -145,7 +155,8 @@ Widget MembershipWidget() {
             BaseColumn<Membership>(
               title: "Mjesečna cijena",
               flex: 2,
-              cell: (m) => Text("${(m.monthlyPrice ?? 0).toStringAsFixed(2)} KM"),
+              cell: (m) =>
+                  Text("${(m.monthlyPrice ?? 0).toStringAsFixed(2)} KM"),
             ),
             BaseColumn<Membership>(
               title: "Godišnja cijena",
@@ -231,13 +242,20 @@ Widget MembershipWidget() {
                 try {
                   await context.read<MembershipProvider>().update(m.id!, {
                     "name": (payload["name"] ?? "").toString().trim(),
-                    "monthlyPrice": _parsePrice(payload["monthlyPrice"]?.toString()),
+                    "monthlyPrice": _parsePrice(
+                      payload["monthlyPrice"]?.toString(),
+                    ),
                     "yearPrice": _parsePrice(payload["yearPrice"]?.toString()),
-                    "createdAt": DateHelper.toIsoFromUi((payload["createdAt"] ?? "").toString()),
+                    "createdAt": DateHelper.toIsoFromUi(
+                      (payload["createdAt"] ?? "").toString(),
+                    ),
                   });
 
                   await paging.loadPage();
-                  SnackbarHelper.showUpdate(context, "Članarina uspješno ažurirana.");
+                  SnackbarHelper.showUpdate(
+                    context,
+                    "Članarina uspješno ažurirana.",
+                  );
                 } catch (e) {
                   SnackbarHelper.showError(context, e.toString());
                   rethrow;
@@ -248,30 +266,21 @@ Widget MembershipWidget() {
 
           // ---------------- DELETE ----------------
           onDelete: (m) async {
-            final ok = await showDialog<bool>(
-              context: context,
-              builder: (c) => AlertDialog(
-                title: const Text("Brisanje članarine"),
-                content: Text("Jesi li siguran da želiš obrisati '${m.name ?? ""}'?"),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(c, false),
-                    child: const Text("Odustani"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(c, true),
-                    child: const Text("Obriši"),
-                  ),
-                ],
-              ),
+            final ok = await ConfirmDialogs.badGoodConfirmation(
+              context,
+              title: "Brisanje članarine",
+              question:
+                  "Da li ste sigurni da želite obrisati članarinu:\n\n'${m.name ?? ""}' ?",
+              badText: "Odustani",
+              goodText: "Obriši",
             );
 
-            if (ok != true) return;
+            if (!ok) return;
 
             try {
               await context.read<MembershipProvider>().delete(m.id!);
               await paging.loadPage();
-              SnackbarHelper.showInfo(context, "Članarina obrisana.");
+              SnackbarHelper.showSuccess(context, "Članarina obrisana.");
             } catch (e) {
               SnackbarHelper.showError(context, e.toString());
             }
@@ -285,7 +294,8 @@ Widget MembershipWidget() {
 }
 
 Widget _pagingControls<T>(UniversalPagingProvider<T> paging) {
-  final totalPages = (paging.totalCount + paging.pageSize - 1) ~/ paging.pageSize;
+  final totalPages =
+      (paging.totalCount + paging.pageSize - 1) ~/ paging.pageSize;
 
   return Row(
     mainAxisAlignment: MainAxisAlignment.end,
