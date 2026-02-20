@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gymify.Model\Gymify.Model.csproj" />
+    <ProjectReference Include="..\Gymify.EmailConsumer\Gymify.EmailConsumer.csproj" ExcludeAssets="contentFiles" />
   </ItemGroup>
 
 </Project>

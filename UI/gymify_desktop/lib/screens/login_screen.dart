@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymify_desktop/dialogs/forgot_password_dialog.dart';
 import 'package:gymify_desktop/utils/session.dart';
 import 'package:provider/provider.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
@@ -39,9 +40,15 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+
+
   Future<void> _forgotPasswordOrUsername() async {
-    SnackbarHelper.showError(context, "Kontaktirajte administratora sistema.");
-  }
+  await showDialog(
+    context: context,
+    barrierDismissible: false, 
+    builder: (_) => const ForgotPasswordDialog(),
+  );
+}
 
   Future<void> login() async {
     final result = await _authProvider.prijava(

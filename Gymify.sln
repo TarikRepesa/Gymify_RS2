@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gymify.Model", "Gymify.Mode
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gymify.Services", "Gymify.Services\Gymify.Services.csproj", "{F521118C-DE53-40E5-9439-BD55F8195B15}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gymify.EmailConsumer", "Gymify.EmailConsumer\Gymify.EmailConsumer.csproj", "{BE73DD9E-4FD3-4401-A68C-32813529E527}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F521118C-DE53-40E5-9439-BD55F8195B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F521118C-DE53-40E5-9439-BD55F8195B15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F521118C-DE53-40E5-9439-BD55F8195B15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE73DD9E-4FD3-4401-A68C-32813529E527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE73DD9E-4FD3-4401-A68C-32813529E527}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE73DD9E-4FD3-4401-A68C-32813529E527}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE73DD9E-4FD3-4401-A68C-32813529E527}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
