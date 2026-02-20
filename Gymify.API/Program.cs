@@ -8,6 +8,7 @@ using Microsoft.OpenApi;
 using Gymify.WebAPI.Authentication;
 using Gymify.Services.Interfaces;
 using Gymify.Services.Services;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,25 @@ builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
 
+builder.Services.AddSingleton<IConnection>(_ =>
+{
+    var host = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
+    var port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ_PORT") ?? "5672");
+    var user = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest";
+    var pass = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest";
+    var vhost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST") ?? "/";
+
+    var factory = new ConnectionFactory
+    {
+        HostName = host,
+        Port = port,
+        UserName = user,
+        Password = pass,
+        VirtualHost = vhost
+    };
+
+    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+});
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();

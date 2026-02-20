@@ -70,7 +70,7 @@ namespace Gymify.Services.Database
 
 
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, FirstName = "Tarik", LastName = "Malic", Username = "tare45", Email = "ajdin@example.com", IsActive = true, IsAdmin = true, CreatedAt = DateTime.UtcNow, PasswordHash = adminHash, PasswordSalt = adminSalt },
+                new User { Id = 1, FirstName = "Tarik", LastName = "Malic", Username = "tare45", Email = "healthcaretest190@gmail.com", IsActive = true, IsAdmin = true, CreatedAt = DateTime.UtcNow, PasswordHash = adminHash, PasswordSalt = adminSalt },
                 new User { Id = 2, FirstName = "Amir", LastName = "Ibrahimovic", Username = "amir56", Email = "amir@example.com", IsActive = true, IsAdmin = true, CreatedAt = DateTime.UtcNow, PasswordHash = adminHash, PasswordSalt = adminSalt },
 
                 new User { Id = 3, FirstName = "Marko", LastName = "Markovic", Username = "marko78", Email = "marko@example.com", IsActive = true, IsTrener = true, CreatedAt = DateTime.UtcNow, PasswordHash = trenerHash, PasswordSalt = trenerSalt },
