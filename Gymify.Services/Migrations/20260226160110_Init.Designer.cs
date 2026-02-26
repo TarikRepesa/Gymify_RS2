@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gymify.Services.Migrations
 {
     [DbContext(typeof(GymifyDbContext))]
-    [Migration("20260220150256_Init")]
+    [Migration("20260226160110_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -106,81 +106,81 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 1,
-                            ExpirationDate = new DateTime(2026, 3, 22, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5155),
+                            ExpirationDate = new DateTime(2026, 3, 28, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2297),
                             MembershipId = 1,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(4916),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2115),
                             UserId = 11
                         },
                         new
                         {
                             Id = 2,
-                            ExpirationDate = new DateTime(2026, 5, 21, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5467),
+                            ExpirationDate = new DateTime(2026, 5, 27, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2537),
                             MembershipId = 2,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5466),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2536),
                             UserId = 12
                         },
                         new
                         {
                             Id = 3,
-                            ExpirationDate = new DateTime(2026, 8, 19, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5473),
+                            ExpirationDate = new DateTime(2026, 8, 25, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2545),
                             MembershipId = 3,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5472),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2544),
                             UserId = 13
                         },
                         new
                         {
                             Id = 4,
-                            ExpirationDate = new DateTime(2027, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5476),
+                            ExpirationDate = new DateTime(2027, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2547),
                             MembershipId = 4,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5475),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2546),
                             UserId = 14
                         },
                         new
                         {
                             Id = 5,
-                            ExpirationDate = new DateTime(2026, 2, 15, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5478),
+                            ExpirationDate = new DateTime(2026, 2, 21, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2549),
                             MembershipId = 1,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5477),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2549),
                             UserId = 15
                         },
                         new
                         {
                             Id = 6,
-                            ExpirationDate = new DateTime(2026, 5, 21, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5480),
+                            ExpirationDate = new DateTime(2026, 5, 27, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2551),
                             MembershipId = 2,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5479),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2551),
                             UserId = 16
                         },
                         new
                         {
                             Id = 7,
-                            ExpirationDate = new DateTime(2026, 2, 10, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5506),
+                            ExpirationDate = new DateTime(2026, 2, 16, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2554),
                             MembershipId = 3,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5505),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2553),
                             UserId = 17
                         },
                         new
                         {
                             Id = 8,
-                            ExpirationDate = new DateTime(2026, 2, 15, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5508),
+                            ExpirationDate = new DateTime(2026, 2, 21, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2556),
                             MembershipId = 4,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5508),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2555),
                             UserId = 18
                         },
                         new
                         {
                             Id = 9,
-                            ExpirationDate = new DateTime(2026, 3, 22, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5511),
+                            ExpirationDate = new DateTime(2026, 3, 28, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2558),
                             MembershipId = 1,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5510),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2557),
                             UserId = 19
                         },
                         new
                         {
                             Id = 10,
-                            ExpirationDate = new DateTime(2026, 2, 10, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5513),
+                            ExpirationDate = new DateTime(2026, 2, 16, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2560),
                             MembershipId = 2,
-                            PaymentDate = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(5513),
+                            PaymentDate = new DateTime(2026, 2, 26, 16, 1, 9, 231, DateTimeKind.Utc).AddTicks(2560),
                             UserId = 20
                         });
                 });
@@ -508,7 +508,7 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 391, DateTimeKind.Utc).AddTicks(2097),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 221, DateTimeKind.Utc).AddTicks(4140),
                             Description = "",
                             IsActive = true,
                             Name = "Korisnik"
@@ -516,7 +516,7 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 391, DateTimeKind.Utc).AddTicks(3111),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 221, DateTimeKind.Utc).AddTicks(4984),
                             Description = "",
                             IsActive = true,
                             Name = "Admin"
@@ -524,7 +524,7 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 391, DateTimeKind.Utc).AddTicks(3118),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 221, DateTimeKind.Utc).AddTicks(4988),
                             Description = "",
                             IsActive = true,
                             Name = "Trener"
@@ -532,7 +532,7 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 391, DateTimeKind.Utc).AddTicks(3120),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 221, DateTimeKind.Utc).AddTicks(5023),
                             Description = "",
                             IsActive = true,
                             Name = "Radnik"
@@ -874,261 +874,261 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(8144),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(4949),
                             Email = "healthcaretest190@gmail.com",
                             FirstName = "Tarik",
                             IsActive = true,
                             IsAdmin = true,
                             LastName = "Malic",
-                            PasswordHash = "T2YHF5dga1Lh3nqL4A8VFoLW7L4xyxPYcoy550mhAXx6Nx8RkaaH5KbpHN+2KSsG/PEddxiz7PTRGp1cSNjNpA==",
-                            PasswordSalt = "5mXr8qGfakvYmrU/Aavs1TzelskCcIF2F7a1Ke3l5NaJOYN9elcUdVwvIby7Z5wPxpx88Nnc14+TrNL0HZeY8tje62KMwDaBpzIlor7bmeFdtqq4GMb189skR/Sm1E+DyM5fxfK+WQe5PbqXESheD2PGICfrzuowfBXMBqTyjIc=",
+                            PasswordHash = "Jbqxn5SQNUfsjmzhzJjpvmWQSr40z0X72rz2uQzC2KfGa7xWmhbQbE4/iHU0igWp5lqFQ1dKpwm6payVuvVo0g==",
+                            PasswordSalt = "4xum4lE0JOpZuiLI/43ZW8RWN77Ymvj7IdMAMqCSuePB01CHjtHFpg78dsHlq7KT0EUeVGj0H6Et6rQr3Sznvot4YBcfjH5NvTqPziHzBHNCvb/d9N4A2m2we07dkPbBArPjAcPcO5l+Pmw2bFWgornkqmrutO/6pGTPcqFHBks=",
                             Username = "tare45"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(8863),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(5707),
                             Email = "amir@example.com",
                             FirstName = "Amir",
                             IsActive = true,
                             IsAdmin = true,
                             LastName = "Ibrahimovic",
-                            PasswordHash = "T2YHF5dga1Lh3nqL4A8VFoLW7L4xyxPYcoy550mhAXx6Nx8RkaaH5KbpHN+2KSsG/PEddxiz7PTRGp1cSNjNpA==",
-                            PasswordSalt = "5mXr8qGfakvYmrU/Aavs1TzelskCcIF2F7a1Ke3l5NaJOYN9elcUdVwvIby7Z5wPxpx88Nnc14+TrNL0HZeY8tje62KMwDaBpzIlor7bmeFdtqq4GMb189skR/Sm1E+DyM5fxfK+WQe5PbqXESheD2PGICfrzuowfBXMBqTyjIc=",
+                            PasswordHash = "Jbqxn5SQNUfsjmzhzJjpvmWQSr40z0X72rz2uQzC2KfGa7xWmhbQbE4/iHU0igWp5lqFQ1dKpwm6payVuvVo0g==",
+                            PasswordSalt = "4xum4lE0JOpZuiLI/43ZW8RWN77Ymvj7IdMAMqCSuePB01CHjtHFpg78dsHlq7KT0EUeVGj0H6Et6rQr3Sznvot4YBcfjH5NvTqPziHzBHNCvb/d9N4A2m2we07dkPbBArPjAcPcO5l+Pmw2bFWgornkqmrutO/6pGTPcqFHBks=",
                             Username = "amir56"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9088),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(5904),
                             Email = "marko@example.com",
                             FirstName = "Marko",
                             IsActive = true,
                             IsTrener = true,
                             LastName = "Markovic",
-                            PasswordHash = "snBEB71i+yKYqEzkXw4Ls7+SmQfdAtaamFCGCZOFqnGXoralcMpJgLeS2PWqgtqapxC8+Bq+967nT5Pl1Spkcw==",
-                            PasswordSalt = "sZyXAPOZo7wvyQqrCJkeZz09kzqyV1KCJBbSI/iqMhCGtpZqU/bMiCE5xgWA2daaMu+xy7SrXDOu9330LxjoNT5XhgSxciX3Yy7LauutzsNHBT1YKSDO1Rz31EnR0KM+kVMGXvS+jqP3f3BmmhnUYX1NTRt6sAbI18BjIuUCbes=",
+                            PasswordHash = "vRF5LcZY5/MJkxBvfQGg8hYJ74MY+cjznPCYb6Hnl83aaooG6WZ6FojQlGCJ7o4WgbWCPpZjuSDtRBVfZyz8iw==",
+                            PasswordSalt = "Ox2tQuicN+RyB2MWx+lnVWMB6SmfQUHQh6WKZJscanAPN94omcMe+ndbZheFWvkZbvUXnVjXgW9ZS7855J7ULWVKZ61FD+9jx5ONWHoE+U7bGRc/ZpMuQ4y9bzIcXsLWkrFh95fgmt3jZwTugyOOLLoUatVGUAIx3uvnvyDzdlQ=",
                             Username = "marko78"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9093),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(5908),
                             Email = "ivan@example.com",
                             FirstName = "Ivan",
                             IsActive = true,
                             IsTrener = true,
                             LastName = "Ivic",
-                            PasswordHash = "snBEB71i+yKYqEzkXw4Ls7+SmQfdAtaamFCGCZOFqnGXoralcMpJgLeS2PWqgtqapxC8+Bq+967nT5Pl1Spkcw==",
-                            PasswordSalt = "sZyXAPOZo7wvyQqrCJkeZz09kzqyV1KCJBbSI/iqMhCGtpZqU/bMiCE5xgWA2daaMu+xy7SrXDOu9330LxjoNT5XhgSxciX3Yy7LauutzsNHBT1YKSDO1Rz31EnR0KM+kVMGXvS+jqP3f3BmmhnUYX1NTRt6sAbI18BjIuUCbes=",
+                            PasswordHash = "vRF5LcZY5/MJkxBvfQGg8hYJ74MY+cjznPCYb6Hnl83aaooG6WZ6FojQlGCJ7o4WgbWCPpZjuSDtRBVfZyz8iw==",
+                            PasswordSalt = "Ox2tQuicN+RyB2MWx+lnVWMB6SmfQUHQh6WKZJscanAPN94omcMe+ndbZheFWvkZbvUXnVjXgW9ZS7855J7ULWVKZ61FD+9jx5ONWHoE+U7bGRc/ZpMuQ4y9bzIcXsLWkrFh95fgmt3jZwTugyOOLLoUatVGUAIx3uvnvyDzdlQ=",
                             Username = "ivan11"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9098),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(5911),
                             Email = "petar@example.com",
                             FirstName = "Petar",
                             IsActive = true,
                             IsTrener = true,
                             LastName = "Petrovic",
-                            PasswordHash = "snBEB71i+yKYqEzkXw4Ls7+SmQfdAtaamFCGCZOFqnGXoralcMpJgLeS2PWqgtqapxC8+Bq+967nT5Pl1Spkcw==",
-                            PasswordSalt = "sZyXAPOZo7wvyQqrCJkeZz09kzqyV1KCJBbSI/iqMhCGtpZqU/bMiCE5xgWA2daaMu+xy7SrXDOu9330LxjoNT5XhgSxciX3Yy7LauutzsNHBT1YKSDO1Rz31EnR0KM+kVMGXvS+jqP3f3BmmhnUYX1NTRt6sAbI18BjIuUCbes=",
+                            PasswordHash = "vRF5LcZY5/MJkxBvfQGg8hYJ74MY+cjznPCYb6Hnl83aaooG6WZ6FojQlGCJ7o4WgbWCPpZjuSDtRBVfZyz8iw==",
+                            PasswordSalt = "Ox2tQuicN+RyB2MWx+lnVWMB6SmfQUHQh6WKZJscanAPN94omcMe+ndbZheFWvkZbvUXnVjXgW9ZS7855J7ULWVKZ61FD+9jx5ONWHoE+U7bGRc/ZpMuQ4y9bzIcXsLWkrFh95fgmt3jZwTugyOOLLoUatVGUAIx3uvnvyDzdlQ=",
                             Username = "petar21"
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9102),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(5915),
                             Email = "luka@example.com",
                             FirstName = "Luka",
                             IsActive = true,
                             IsTrener = true,
                             LastName = "Lukic",
-                            PasswordHash = "snBEB71i+yKYqEzkXw4Ls7+SmQfdAtaamFCGCZOFqnGXoralcMpJgLeS2PWqgtqapxC8+Bq+967nT5Pl1Spkcw==",
-                            PasswordSalt = "sZyXAPOZo7wvyQqrCJkeZz09kzqyV1KCJBbSI/iqMhCGtpZqU/bMiCE5xgWA2daaMu+xy7SrXDOu9330LxjoNT5XhgSxciX3Yy7LauutzsNHBT1YKSDO1Rz31EnR0KM+kVMGXvS+jqP3f3BmmhnUYX1NTRt6sAbI18BjIuUCbes=",
+                            PasswordHash = "vRF5LcZY5/MJkxBvfQGg8hYJ74MY+cjznPCYb6Hnl83aaooG6WZ6FojQlGCJ7o4WgbWCPpZjuSDtRBVfZyz8iw==",
+                            PasswordSalt = "Ox2tQuicN+RyB2MWx+lnVWMB6SmfQUHQh6WKZJscanAPN94omcMe+ndbZheFWvkZbvUXnVjXgW9ZS7855J7ULWVKZ61FD+9jx5ONWHoE+U7bGRc/ZpMuQ4y9bzIcXsLWkrFh95fgmt3jZwTugyOOLLoUatVGUAIx3uvnvyDzdlQ=",
                             Username = "luka34"
                         },
                         new
                         {
                             Id = 7,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9332),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6086),
                             Email = "nedim@example.com",
                             FirstName = "Nedim",
                             IsActive = true,
                             IsRadnik = true,
                             LastName = "Nedimovic",
-                            PasswordHash = "PR25VGU3jfRNyVeUmtZtMXWGw614GTWBjnFuR2tmuGrBE3ju/iMcGndM+Njo4eYUOK70EFaww4wLYMTJ4Z5YTg==",
-                            PasswordSalt = "Xfpn/6glD6dtscU8CqGlKqeWoCAbfNmVR3QTe2DcZUOZk+BzG8v3w8cdkkv2pP5peMkuljCaXzycCQrDcAt6RcpZqbLaYs6MOV0M5k2V5LtX51Cl5r9YBHU3SJU5niAKp8YR5Ps3RMDo0PsQTJUWTYXAE9YMP9tWtUEkDhEZM3M=",
+                            PasswordHash = "01eAF+sdBcba7qKG1T8+vvF5ZlChTuh9peH3A+RD9wWQxuqjQueK9b/wmp3vc9bBlDCHHTwQAA0kgIUIN6vicw==",
+                            PasswordSalt = "TEqIvPrUJCQNb3PBDqYu13MyMGYT3Q/g0O9iyYwjaZnXw2C32Eb7vttcWquItGg8ZORgJVWD+aSibkPf8L7c4Qpgls1ZC76ENhqmnuYQxf5PIUIt2mFOdPGosxw9N0Bcdwwk0L5/5Utt5Z5moMIq0CMsRE4n80tMzDx+pai7DLk=",
                             Username = "nedim89"
                         },
                         new
                         {
                             Id = 8,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9338),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6091),
                             Email = "amela@example.com",
                             FirstName = "Amela",
                             IsActive = true,
                             IsRadnik = true,
                             LastName = "Amelovic",
-                            PasswordHash = "PR25VGU3jfRNyVeUmtZtMXWGw614GTWBjnFuR2tmuGrBE3ju/iMcGndM+Njo4eYUOK70EFaww4wLYMTJ4Z5YTg==",
-                            PasswordSalt = "Xfpn/6glD6dtscU8CqGlKqeWoCAbfNmVR3QTe2DcZUOZk+BzG8v3w8cdkkv2pP5peMkuljCaXzycCQrDcAt6RcpZqbLaYs6MOV0M5k2V5LtX51Cl5r9YBHU3SJU5niAKp8YR5Ps3RMDo0PsQTJUWTYXAE9YMP9tWtUEkDhEZM3M=",
+                            PasswordHash = "01eAF+sdBcba7qKG1T8+vvF5ZlChTuh9peH3A+RD9wWQxuqjQueK9b/wmp3vc9bBlDCHHTwQAA0kgIUIN6vicw==",
+                            PasswordSalt = "TEqIvPrUJCQNb3PBDqYu13MyMGYT3Q/g0O9iyYwjaZnXw2C32Eb7vttcWquItGg8ZORgJVWD+aSibkPf8L7c4Qpgls1ZC76ENhqmnuYQxf5PIUIt2mFOdPGosxw9N0Bcdwwk0L5/5Utt5Z5moMIq0CMsRE4n80tMzDx+pai7DLk=",
                             Username = "amela900"
                         },
                         new
                         {
                             Id = 9,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9341),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6094),
                             Email = "tarik@example.com",
                             FirstName = "Tarik",
                             IsActive = true,
                             IsRadnik = true,
                             LastName = "Tarikovic",
-                            PasswordHash = "PR25VGU3jfRNyVeUmtZtMXWGw614GTWBjnFuR2tmuGrBE3ju/iMcGndM+Njo4eYUOK70EFaww4wLYMTJ4Z5YTg==",
-                            PasswordSalt = "Xfpn/6glD6dtscU8CqGlKqeWoCAbfNmVR3QTe2DcZUOZk+BzG8v3w8cdkkv2pP5peMkuljCaXzycCQrDcAt6RcpZqbLaYs6MOV0M5k2V5LtX51Cl5r9YBHU3SJU5niAKp8YR5Ps3RMDo0PsQTJUWTYXAE9YMP9tWtUEkDhEZM3M=",
+                            PasswordHash = "01eAF+sdBcba7qKG1T8+vvF5ZlChTuh9peH3A+RD9wWQxuqjQueK9b/wmp3vc9bBlDCHHTwQAA0kgIUIN6vicw==",
+                            PasswordSalt = "TEqIvPrUJCQNb3PBDqYu13MyMGYT3Q/g0O9iyYwjaZnXw2C32Eb7vttcWquItGg8ZORgJVWD+aSibkPf8L7c4Qpgls1ZC76ENhqmnuYQxf5PIUIt2mFOdPGosxw9N0Bcdwwk0L5/5Utt5Z5moMIq0CMsRE4n80tMzDx+pai7DLk=",
                             Username = "tarik345"
                         },
                         new
                         {
                             Id = 10,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9345),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6126),
                             Email = "emina@example.com",
                             FirstName = "Emina",
                             IsActive = true,
                             IsRadnik = true,
                             LastName = "Eminovic",
-                            PasswordHash = "PR25VGU3jfRNyVeUmtZtMXWGw614GTWBjnFuR2tmuGrBE3ju/iMcGndM+Njo4eYUOK70EFaww4wLYMTJ4Z5YTg==",
-                            PasswordSalt = "Xfpn/6glD6dtscU8CqGlKqeWoCAbfNmVR3QTe2DcZUOZk+BzG8v3w8cdkkv2pP5peMkuljCaXzycCQrDcAt6RcpZqbLaYs6MOV0M5k2V5LtX51Cl5r9YBHU3SJU5niAKp8YR5Ps3RMDo0PsQTJUWTYXAE9YMP9tWtUEkDhEZM3M=",
+                            PasswordHash = "01eAF+sdBcba7qKG1T8+vvF5ZlChTuh9peH3A+RD9wWQxuqjQueK9b/wmp3vc9bBlDCHHTwQAA0kgIUIN6vicw==",
+                            PasswordSalt = "TEqIvPrUJCQNb3PBDqYu13MyMGYT3Q/g0O9iyYwjaZnXw2C32Eb7vttcWquItGg8ZORgJVWD+aSibkPf8L7c4Qpgls1ZC76ENhqmnuYQxf5PIUIt2mFOdPGosxw9N0Bcdwwk0L5/5Utt5Z5moMIq0CMsRE4n80tMzDx+pai7DLk=",
                             Username = "emina112"
                         },
                         new
                         {
                             Id = 11,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9592),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6304),
                             Email = "haris1@example.com",
                             FirstName = "Haris",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Hasic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "haris1"
                         },
                         new
                         {
                             Id = 12,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9598),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6309),
                             Email = "denis2@example.com",
                             FirstName = "Denis",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Denisovic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "denis2"
                         },
                         new
                         {
                             Id = 13,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9602),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6312),
                             Email = "alen3@example.com",
                             FirstName = "Alen",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Alenovic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "alen3"
                         },
                         new
                         {
                             Id = 14,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9605),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6315),
                             Email = "kenan4@example.com",
                             FirstName = "Kenan",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Kenanovic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "kenan4"
                         },
                         new
                         {
                             Id = 15,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9608),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6318),
                             Email = "jasmin5@example.com",
                             FirstName = "Jasmin",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Jasminovic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "jasmin5"
                         },
                         new
                         {
                             Id = 16,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9612),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6321),
                             Email = "lejla6@example.com",
                             FirstName = "Lejla",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Lejlovic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "lejla6"
                         },
                         new
                         {
                             Id = 17,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9615),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6391),
                             Email = "sara7@example.com",
                             FirstName = "Sara",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Saric",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "sara7"
                         },
                         new
                         {
                             Id = 18,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9618),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6394),
                             Email = "amina8@example.com",
                             FirstName = "Amina",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Aminovic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "amina8"
                         },
                         new
                         {
                             Id = 19,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9692),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6397),
                             Email = "emir9@example.com",
                             FirstName = "Emir",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Emirovic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "emir9"
                         },
                         new
                         {
                             Id = 20,
-                            CreatedAt = new DateTime(2026, 2, 20, 15, 2, 55, 401, DateTimeKind.Utc).AddTicks(9694),
+                            CreatedAt = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(6400),
                             Email = "nermin10@example.com",
                             FirstName = "Nermin",
                             IsActive = true,
                             IsUser = true,
                             LastName = "Nerminovic",
-                            PasswordHash = "wUdd1YlbFIIr/No5oCr16Gl/96B1Uv/TGtIb6auhNiTzZ4hQDCFZxqGIq9xPDMxKr9yWOjCGJneAguGP+c2FuA==",
-                            PasswordSalt = "fTn+Z23UKSZmJjRC4v4BBZeLv7A50mr/MMkGCSowhDaOX+owCsTgoZugwfnFDzqJSv2TV9Rzrg1V908lY5uG2mhAceN27qN1uWIQevz0lxJSBLGIoy1kPisUWA2XK/amg38acZZjYk/WGYW1BLKt9ICEU9m3CQWO+SUBwVPMXV8=",
+                            PasswordHash = "MeDFFNv7hPEiX7hM68LsuxAkI5SOI9LpwhhtCgxVPiVYEpjLzrn6nfeTY+umGnL2Kwz7ajZ8H4REECT/LjHSOQ==",
+                            PasswordSalt = "8UUy1FMaDKGVm9C9k8ES4gaX26k8O6qIsaIjnoVlZeQcLLnE5pVV4zJoP5hKE2dc0OGM6fZ/1wbAYmTb0hOKE3rITVxnieMRUxVqkJ/KTKhwEwXpuvsHWMATGDOd4daQ9LdaR6zIMOc8KTyo7cyXIiYYkRfJfuTaAgf2QeamcV4=",
                             Username = "nermin10"
                         });
                 });
@@ -1162,72 +1162,142 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 1,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1012),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(7937),
                             RoleId = 2,
                             UserId = 1
                         },
                         new
                         {
                             Id = 2,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1705),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8789),
                             RoleId = 2,
                             UserId = 2
                         },
                         new
                         {
                             Id = 3,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1706),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8792),
                             RoleId = 3,
                             UserId = 3
                         },
                         new
                         {
                             Id = 4,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1707),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8793),
                             RoleId = 3,
                             UserId = 4
                         },
                         new
                         {
                             Id = 5,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1708),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8794),
                             RoleId = 3,
                             UserId = 5
                         },
                         new
                         {
                             Id = 6,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1709),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8795),
                             RoleId = 3,
                             UserId = 6
                         },
                         new
                         {
                             Id = 7,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1710),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8796),
                             RoleId = 4,
                             UserId = 7
                         },
                         new
                         {
                             Id = 8,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1712),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8797),
                             RoleId = 4,
                             UserId = 8
                         },
                         new
                         {
                             Id = 9,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1713),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8798),
                             RoleId = 4,
                             UserId = 9
                         },
                         new
                         {
                             Id = 10,
-                            DateAssigned = new DateTime(2026, 2, 20, 15, 2, 55, 402, DateTimeKind.Utc).AddTicks(1714),
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8799),
                             RoleId = 4,
                             UserId = 10
+                        },
+                        new
+                        {
+                            Id = 11,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8799),
+                            RoleId = 1,
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 12,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8800),
+                            RoleId = 1,
+                            UserId = 12
+                        },
+                        new
+                        {
+                            Id = 13,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8801),
+                            RoleId = 1,
+                            UserId = 13
+                        },
+                        new
+                        {
+                            Id = 14,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8802),
+                            RoleId = 1,
+                            UserId = 14
+                        },
+                        new
+                        {
+                            Id = 15,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8803),
+                            RoleId = 1,
+                            UserId = 15
+                        },
+                        new
+                        {
+                            Id = 16,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8804),
+                            RoleId = 1,
+                            UserId = 16
+                        },
+                        new
+                        {
+                            Id = 17,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8805),
+                            RoleId = 1,
+                            UserId = 17
+                        },
+                        new
+                        {
+                            Id = 18,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8806),
+                            RoleId = 1,
+                            UserId = 18
+                        },
+                        new
+                        {
+                            Id = 19,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8807),
+                            RoleId = 1,
+                            UserId = 19
+                        },
+                        new
+                        {
+                            Id = 20,
+                            DateAssigned = new DateTime(2026, 2, 26, 16, 1, 9, 230, DateTimeKind.Utc).AddTicks(8808),
+                            RoleId = 1,
+                            UserId = 20
                         });
                 });
 
