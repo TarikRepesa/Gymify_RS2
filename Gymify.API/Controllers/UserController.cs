@@ -32,5 +32,12 @@ namespace Gymify.API.Controllers
 
             return Ok("Ako email postoji, poslan je link za reset lozinke.");
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public override Task<UserResponse> Create([FromBody] UserInsertRequest request)
+        {
+            return base.Create(request);
+        }
     }
 }

@@ -107,7 +107,18 @@ namespace Gymify.Services.Database
                 new UserRole { Id = 7, UserId = 7, RoleId = 4 },
                 new UserRole { Id = 8, UserId = 8, RoleId = 4 },
                 new UserRole { Id = 9, UserId = 9, RoleId = 4 },
-                new UserRole { Id = 10, UserId = 10, RoleId = 4 }
+                new UserRole { Id = 10, UserId = 10, RoleId = 4 },
+
+                new UserRole { Id = 11, UserId = 11, RoleId = 1 },
+                new UserRole { Id = 12, UserId = 12, RoleId = 1 },
+                new UserRole { Id = 13, UserId = 13, RoleId = 1 },
+                new UserRole { Id = 14, UserId = 14, RoleId = 1 },
+                new UserRole { Id = 15, UserId = 15, RoleId = 1 },
+                new UserRole { Id = 16, UserId = 16, RoleId = 1 },
+                new UserRole { Id = 17, UserId = 17, RoleId = 1 },
+                new UserRole { Id = 18, UserId = 18, RoleId = 1 },
+                new UserRole { Id = 19, UserId = 19, RoleId = 1 },
+                new UserRole { Id = 20, UserId = 20, RoleId = 1 }
             );
 
             modelBuilder.Entity<Membership>().HasData(
