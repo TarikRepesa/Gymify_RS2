@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gymify_mobile/providers/image_provider.dart';
+import 'package:gymify_mobile/providers/notification_provider.dart';
+import 'package:gymify_mobile/providers/review_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:gymify_mobile/routes/app_routes.dart';
@@ -15,9 +16,8 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
-
-        // kasnije dodaj:
-        // ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => ReviewProvider()),
         // ChangeNotifierProvider(create: (_) => TrainingProvider()),
         // ChangeNotifierProvider(create: (_) => MembershipProvider()),
       ],

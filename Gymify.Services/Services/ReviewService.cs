@@ -53,11 +53,10 @@ namespace Gymify.Services.Services
         {
             query = base.AddInclude(query, search);
 
-            if (search?.IncludeUser == true)
+            if (search.IncludeUser.HasValue)
             {
                 query = query.Include(x => x.User);
             }
-
             return query;
         }
     }

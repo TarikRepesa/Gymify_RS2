@@ -9,13 +9,15 @@ class User {
   final String lastName;
   final String email;
   final String username;
-  DateTime? dateOfBirth;
-  String? userImage;
+  final DateTime? dateOfBirth;
   final bool isActive;
-  final bool isVlasnik;
+  final bool? isAdmin;
+  final bool? isRadnik;
+  final bool? isTrener;
+  final String? userImage;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
-  String? phoneNumber;
+  final String? phoneNumber;
 
   User({
     required this.id,
@@ -24,16 +26,23 @@ class User {
     required this.email,
     required this.username,
     this.dateOfBirth,
-    this.userImage,
     required this.isActive,
-    required this.isVlasnik,
+    this.isAdmin,
+    this.isRadnik,
+    this.isTrener,
+    this.userImage,
     required this.createdAt,
     this.lastLoginAt,
     this.phoneNumber,
   });
 
+  /// fromJson
   factory User.fromJson(Map<String, dynamic> json) =>
       _$UserFromJson(json);
 
+  /// toJson
   Map<String, dynamic> toJson() => _$UserToJson(this);
+
+  /// Helper (nije obavezno, ali korisno)
+  String get fullName => "$firstName $lastName";
 }
