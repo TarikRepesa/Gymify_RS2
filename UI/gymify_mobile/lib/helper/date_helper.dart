@@ -1,5 +1,3 @@
-
-
 import 'package:intl/intl.dart';
 
 class DateHelper {
@@ -38,5 +36,14 @@ class DateHelper {
     final lastDay = DateTime(year, month + 1, 0).day;
     final safeDay = day > lastDay ? lastDay : day;
     return DateTime(year, month, safeDay);
+  }
+
+  static final _timeFormat = DateFormat('HH:mm');
+
+  static String formatTime(DateTime date) => _timeFormat.format(date.toLocal());
+
+  static String? formatTimeNullable(DateTime? date) {
+    if (date == null) return null;
+    return formatTime(date);
   }
 }

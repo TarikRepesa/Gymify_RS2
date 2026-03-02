@@ -40,7 +40,7 @@ class UniversalPagingProvider<T> with ChangeNotifier {
   Map<String, dynamic> _extra = {};
   Map<String, dynamic> get extra => _extra;
 
-  Future<void> loadPage({int? pageNumber, String? filter}) async {
+  Future<void> loadPage({int? pageNumber, String? filter,}) async {
     if (_isLoading) return;
 
     _isLoading = true;

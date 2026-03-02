@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_mobile/widgets/home_widget.dart';
+import 'package:gymify_mobile/widgets/training_widget.dart';
 
 class BaseMobileScreen extends StatefulWidget {
   const BaseMobileScreen({super.key});
@@ -22,16 +23,28 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
       body: const HomeWidget(),
     ),
     _TabItem(
+      label: "Osoblje",
+      icon: Icons.person_3_outlined,
+      activeIcon: Icons.person_3_outlined,
+      body: const Center(child: Text("Osoblje")),
+    ),
+    _TabItem(
       label: "Treninzi",
       icon: Icons.fitness_center_outlined,
       activeIcon: Icons.fitness_center,
-      body: const Center(child: Text("Treninzi")),
+      body: const TrainingWidget(),
     ),
     _TabItem(
       label: "Članarine",
       icon: Icons.card_membership_outlined,
       activeIcon: Icons.card_membership,
       body: const Center(child: Text("Članarine")),
+    ),
+    _TabItem(
+      label: "Rezervacije",
+      icon: Icons.note_alt,
+      activeIcon: Icons.note_alt,
+      body: const Center(child: Text("Rezervacije")),
     ),
     _TabItem(
       label: "Profil",
@@ -60,7 +73,7 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
         ),
         child: BottomNavigationBar(
           currentIndex: _index,
-          type: BottomNavigationBarType.fixed,
+          type: BottomNavigationBarType.shifting,
           selectedItemColor: BaseMobileScreen.gymBlueDark,
           unselectedItemColor: const Color(0xFF8A8A8A),
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w800),

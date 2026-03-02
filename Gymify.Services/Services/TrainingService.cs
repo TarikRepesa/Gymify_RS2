@@ -25,6 +25,12 @@ namespace Gymify.Services.Services
             {
                 query = query.Where(x => x.Name.ToLower().Contains(search.FTS));
             }
+
+            if (search.StartDate.HasValue)
+            {
+                query = query.Where(x =>
+                    x.StartDate.Date == search.StartDate.Value.Date);
+            }
             return base.ApplyFilter(query, search);
         }
 
