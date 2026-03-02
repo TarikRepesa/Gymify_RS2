@@ -48,6 +48,8 @@ namespace Gymify.Services.Database
         [MaxLength(20)]
         public string? PhoneNumber { get; set; }
 
+        public string? AboutMe {get; set;}
+
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

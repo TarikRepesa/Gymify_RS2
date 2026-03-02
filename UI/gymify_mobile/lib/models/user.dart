@@ -18,6 +18,7 @@ class User {
   final DateTime createdAt;
   final DateTime? lastLoginAt;
   final String? phoneNumber;
+  final String? aboutMe;
 
   User({
     required this.id,
@@ -34,6 +35,7 @@ class User {
     required this.createdAt,
     this.lastLoginAt,
     this.phoneNumber,
+    this.aboutMe
   });
 
   /// fromJson

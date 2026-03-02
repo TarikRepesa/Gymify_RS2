@@ -18,5 +18,6 @@ namespace Gymify.Model.ResponseObjects
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLoginAt { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? AboutMe {get; set;}
     }
 }

@@ -27,6 +27,8 @@ namespace Gymify.Model.RequestObjects
         public string? PhoneNumber { get; set; }
         public string? UserImage { get; set; }
 
+        public string? AboutMe {get; set;}
+
         public bool IsActive { get; set; } = true;
         public bool? IsUser { get; set; }
         public bool? IsAdmin { get; set; }

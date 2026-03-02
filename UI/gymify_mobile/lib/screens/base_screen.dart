@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_mobile/widgets/home_widget.dart';
+import 'package:gymify_mobile/widgets/staff_widget.dart';
 import 'package:gymify_mobile/widgets/training_widget.dart';
 
 class BaseMobileScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
       label: "Osoblje",
       icon: Icons.person_3_outlined,
       activeIcon: Icons.person_3_outlined,
-      body: const Center(child: Text("Osoblje")),
+      body: const StaffWidget(),
     ),
     _TabItem(
       label: "Treninzi",

@@ -29,6 +29,8 @@ namespace Gymify.Model.RequestObjects
 
         public bool IsActive { get; set; } = true;
 
+        public string? AboutMe {get; set;}
+
         public List<int>? RoleIds { get; set; }
     }
 }
