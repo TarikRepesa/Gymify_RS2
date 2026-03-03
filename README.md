@@ -51,7 +51,7 @@ EnviormentalPostavke.7z
 
 🔐 **Šifra arhive:** `FIT`
 
-1. Otvoriti šifrirani fajl `EnviormentalPostavke.7z`
+1. Otvoriti šifrirani fajl `ENV.7z`
 2. Iz njega izvaditi fajl **`.env`**
 3. **Prije pokretanja Dockera**, `.env` fajl ubaciti u **root folder projekta**  
    (folder gdje je urađen `git clone`)
@@ -80,6 +80,7 @@ FIT-RS2-IB180019-DesktopApp.7z
 
 Unutar arhive se nalaze:
 - **Release/** – `.exe` fajl za pokretanje **desktop aplikacije**
+- **flutter-apk/** – `.apk` fajl za pokretanje **mobilne aplikacije**
 
 Ovo je **najbrži način** za testiranje aplikacije bez dodatne konfiguracije.
 
@@ -102,6 +103,12 @@ Ovo je **najbrži način** za testiranje aplikacije bez dodatne konfiguracije.
 - Username: `nedim89`
 - Password: `Radnik123!`
 
+###  Mobilna aplikacija
+
+**User**
+- Username: `haris1`
+- Password: `User123!`
+
 ## Email testiranje
 
 Za testiranje dolaska maila na email dummy korisnika
@@ -109,6 +116,12 @@ Za testiranje dolaska maila na email dummy korisnika
 
 - **Email:** `healthcaretest190@gmail.com`
 - **Password:** 
+
+Za testiranje dolaska maila na email dummy korisnika
+"Haris Hasic (haris1)" koristite:
+
+- **Email:** `korisniktestiranje264@gmail.com`
+- **Password:** `Korisniktestiranje246`
 
 NAPOMENA 
 

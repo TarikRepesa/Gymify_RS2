@@ -27,6 +27,9 @@ void main() {
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider(create: (_) => WorkerTaskProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => WorkerTaskProvider()),
+        ChangeNotifierProvider(create: (_) => TrainingProvider())
       ],
       child: const RentifyApp(),
     ),

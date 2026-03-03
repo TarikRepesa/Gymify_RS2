@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gymify_mobile/models/loyalty_point.dart';
+import 'package:gymify_mobile/providers/loyalty_point_history_provider.dart';
 import 'package:gymify_mobile/providers/loyalty_point_provider.dart';
 import 'package:gymify_mobile/providers/member_provider.dart';
 import 'package:gymify_mobile/providers/membership_provider.dart';
@@ -37,6 +38,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MemberProvider()),
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
         ChangeNotifierProvider(create: (_) => LoyaltyPointProvider()),
+        ChangeNotifierProvider(create: (_) => LoyaltyPointHistoryProvider()),
         ChangeNotifierProvider(create: (_) => RewardProvider()),
         ChangeNotifierProvider(create: (_) => UserRewardProvider()),
       ],

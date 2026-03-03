@@ -5,6 +5,8 @@ import 'package:gymify_desktop/helper/password_helper.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
 import 'package:gymify_desktop/models/user.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
+import 'package:gymify_desktop/providers/work_task_provider.dart';
+import 'package:gymify_desktop/providers/training_provider.dart';
 import 'package:gymify_desktop/widgets/base_search_and_list_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -16,20 +18,19 @@ Widget StaffWidget() {
     create: (context) {
       final provider = UniversalPagingProvider<User>(
         pageSize: 5,
-        fetcher:
-            ({
-              required int page,
-              required int pageSize,
-              String? filter,
-              bool includeTotalCount = true,
-            }) {
-              return context.read<UserProvider>().getStaffPaged(
+        fetcher: ({
+          required int page,
+          required int pageSize,
+          String? filter,
+          bool includeTotalCount = true,
+        }) {
+          return context.read<UserProvider>().getStaffPaged(
                 page: page,
                 pageSize: pageSize,
                 search: filter,
                 includeTotalCount: includeTotalCount,
               );
-            },
+        },
       );
 
       // auto-load prvu stranicu
@@ -47,9 +48,7 @@ Widget StaffWidget() {
             await showBaseFormDialog(
               context: context,
               title: "Dodaj osoblje",
-
               initialValues: {"password": generatedPass, "username": ""},
-
               fieldsDef: [
                 const BaseFormFieldDef(
                   name: "firstName",
@@ -61,7 +60,6 @@ Widget StaffWidget() {
                   label: "Prezime",
                   requiredField: true,
                 ),
-
                 BaseFormFieldDef(
                   name: "username",
                   label: "Username",
@@ -81,7 +79,6 @@ Widget StaffWidget() {
                     return null;
                   },
                 ),
-
                 BaseFormFieldDef(
                   name: "password",
                   label: "Password",
@@ -106,7 +103,6 @@ Widget StaffWidget() {
                     return null;
                   },
                 ),
-
                 BaseFormFieldDef(
                   name: "role",
                   label: "Uloga",
@@ -136,7 +132,6 @@ Widget StaffWidget() {
                   requiredField: true,
                 ),
               ],
-
               onFieldChanged: (name, values, setValue) {
                 if (name == "firstName" || name == "lastName") {
                   final fn = (values["firstName"] ?? "").toString();
@@ -156,7 +151,6 @@ Widget StaffWidget() {
                   }
                 }
               },
-
               onSubmit: (payload) async {
                 try {
                   await context.read<UserProvider>().insert({
@@ -187,13 +181,10 @@ Widget StaffWidget() {
               },
             );
           },
-
           onSearchChanged: (value) => paging.search(value),
           onClearSearch: () => paging.search(""),
-
           isLoading: paging.isLoading,
           items: paging.items,
-
           columns: [
             BaseColumn<User>(
               title: "Ime i prezime",
@@ -222,8 +213,51 @@ Widget StaffWidget() {
                 style: const TextStyle(decoration: TextDecoration.underline),
               ),
             ),
-          ],
 
+            // ✅ NOVO: AKCIJA
+            BaseColumn<User>(
+              title: "Akcija",
+              flex: 2,
+              cell: (u) {
+                final isTrainer = u.isTrener == true;
+                final isWorker = u.isRadnik == true;
+
+                if (!isTrainer && !isWorker) return const SizedBox.shrink();
+
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: ElevatedButton.icon(
+                    icon: Icon(
+                      isTrainer ? Icons.fitness_center : Icons.task_alt,
+                      size: 18,
+                    ),
+                    label: Text(isTrainer ? "Dodaj trening" : "Dodaj zadatak"),
+                    onPressed: () async {
+                      if (isTrainer) {
+                        await _openAddTrainingDialog(context, u);
+                      } else {
+                        await _openAddWorkerTaskDialog(context, u);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isTrainer
+                          ? const Color(0xFF0D47A1)
+                          : const Color(0xFF1976D2),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
           onEdit: (u) async {
             await showBaseFormDialog(
               context: context,
@@ -238,8 +272,8 @@ Widget StaffWidget() {
                 "role": (u.isTrener == true)
                     ? "Trener"
                     : (u.isRadnik == true)
-                    ? "Radnik"
-                    : "",
+                        ? "Radnik"
+                        : "",
               },
               fieldsDef: [
                 const BaseFormFieldDef(
@@ -252,7 +286,6 @@ Widget StaffWidget() {
                   label: "Prezime",
                   requiredField: true,
                 ),
-
                 BaseFormFieldDef(
                   name: "username",
                   label: "Username",
@@ -264,7 +297,6 @@ Widget StaffWidget() {
                     return null;
                   },
                 ),
-
                 BaseFormFieldDef(
                   name: "role",
                   label: "Uloga",
@@ -301,9 +333,7 @@ Widget StaffWidget() {
                     "lastName": payload["lastName"],
                     "email": payload["email"],
                     "phoneNumber": payload["phone"],
-                    "dateOfBirth": DateHelper.toIsoFromUi(
-                      payload["dateOfBirth"],
-                    ),
+                    "dateOfBirth": DateHelper.toIsoFromUi(payload["dateOfBirth"]),
                     "username": payload["username"],
                     "isTrener": payload["role"] == "Trener",
                     "isRadnik": payload["role"] == "Radnik",
@@ -322,7 +352,6 @@ Widget StaffWidget() {
               },
             );
           },
-
           onDelete: (u) async {
             final ok = await showDialog<bool>(
               context: context,
@@ -349,7 +378,6 @@ Widget StaffWidget() {
             await context.read<UserProvider>().delete(u.id!);
             await paging.loadPage();
           },
-
           footer: _pagingControls(paging),
         );
       },
@@ -377,5 +405,141 @@ Widget _pagingControls(UniversalPagingProvider<User> paging) {
         icon: const Icon(Icons.arrow_forward),
       ),
     ],
+  );
+}
+
+// =============================
+// DIALOG: DODAJ TRENING (TRENER)
+// =============================
+Future<void> _openAddTrainingDialog(BuildContext context, User trainer) async {
+  await showBaseFormDialog(
+    context: context,
+    title: "Dodaj trening",
+    initialValues: {
+      "trainer": "${trainer.firstName ?? ""} ${trainer.lastName ?? ""}".trim(),
+      "trainerId": trainer.id,
+      "name": "",
+      "maxAmountOfParticipants": "15",
+      "currentParticipants": "0",
+      "startDate": "",
+      "trainingImage": "https://picsum.photos/seed/training/600/400",
+    },
+    fieldsDef: const [
+      BaseFormFieldDef(
+        name: "trainer",
+        label: "Trener",
+        requiredField: true,
+        readOnly: true,
+        enabled: false,
+      ),
+      BaseFormFieldDef(
+        name: "name",
+        label: "Naziv treninga",
+        requiredField: true,
+      ),
+      BaseFormFieldDef(
+        name: "maxAmountOfParticipants",
+        label: "Max broj učesnika",
+        type: BaseFieldType.number,
+        requiredField: true,
+      ),
+      BaseFormFieldDef(
+        name: "currentParticipants",
+        label: "Trenutni učesnici",
+        type: BaseFieldType.number,
+        requiredField: true,
+      ),
+      BaseFormFieldDef(
+        name: "startDate",
+        label: "Datum početka",
+        type: BaseFieldType.date,
+        requiredField: true,
+      ),
+    ],
+    onSubmit: (payload) async {
+      try {
+        await context.read<TrainingProvider>().insert({
+          "userId": payload["trainerId"],
+          "name": payload["name"],
+          "maxAmountOfParticipants": int.parse(payload["maxAmountOfParticipants"]),
+          "currentParticipants": int.parse(payload["currentParticipants"]),
+          "startDate": DateHelper.toIsoFromUi(payload["startDate"]),
+          "paricipatedOfAllTime": 0,
+        });
+
+        SnackbarHelper.showSuccess(context, "Trening uspješno dodan.");
+      } catch (e) {
+        SnackbarHelper.showError(context, e.toString());
+        rethrow;
+      }
+    },
+  );
+}
+
+// =============================
+// DIALOG: DODAJ ZADATAK (RADNIK)
+// =============================
+Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
+  await showBaseFormDialog(
+    context: context,
+    title: "Dodaj zadatak",
+    initialValues: {
+      "worker": "${worker.firstName ?? ""} ${worker.lastName ?? ""}".trim(),
+      "userId": worker.id,
+      "name": "",
+      "details": "",
+      "createdTaskDate": DateHelper.format(DateTime.now()),
+      "exparationTaskDate": "",
+    },
+    fieldsDef: const [
+      BaseFormFieldDef(
+        name: "worker",
+        label: "Radnik",
+        requiredField: true,
+        readOnly: true,
+        enabled: false,
+      ),
+      BaseFormFieldDef(
+        name: "name",
+        label: "Naziv zadatka",
+        requiredField: true,
+      ),
+      BaseFormFieldDef(
+        name: "details",
+        label: "Detalji",
+        requiredField: true,
+      ),
+      BaseFormFieldDef(
+        name: "createdTaskDate",
+        label: "Datum kreiranja",
+        type: BaseFieldType.date,
+        requiredField: true,
+        readOnly: true,
+        enabled: false,
+      ),
+      BaseFormFieldDef(
+        name: "exparationTaskDate",
+        label: "Rok izvršenja",
+        type: BaseFieldType.date,
+        requiredField: true,
+      ),
+    ],
+    onSubmit: (payload) async {
+      try {
+        await context.read<WorkerTaskProvider>().insert({
+          "userId": payload["userId"],
+          "name": payload["name"],
+          "details": payload["details"],
+          "createdTaskDate": DateHelper.toIsoFromUi(payload["createdTaskDate"]),
+          "exparationTaskDate": DateHelper.toIsoFromUi(payload["exparationTaskDate"]),
+          "isFinished": false,
+        });
+
+        SnackbarHelper.showSuccess(context, "Zadatak uspješno dodan.");
+      } catch (e) {
+        SnackbarHelper.showError(context, e.toString());
+        rethrow;
+      }
+    },
   );
 }

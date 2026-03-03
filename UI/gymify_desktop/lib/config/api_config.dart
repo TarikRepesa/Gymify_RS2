@@ -1,4 +1,4 @@
 class ApiConfig {
-  static const String apiBase = "http://localhost:5297";
+  static const String apiBase = "http://localhost:5265";
 }
 

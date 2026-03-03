@@ -31,12 +31,12 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
 
     final email = _emailController.text.trim();
 
-    // ✅ koristi tvoje centralne Rules
-    final err = Rules.email('email', email, required: true).validate();
-    if (err != null) {
-      setState(() => error = err);
-      return;
-    }
+    // // ✅ koristi tvoje centralne Rules
+    // final err = Rules.email('email', email, required: true).validate();
+    // if (err != null) {
+    //   setState(() => error = err);
+    //   return;
+    // }
 
     setState(() => isLoading = true);
 

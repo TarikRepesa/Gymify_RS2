@@ -81,6 +81,7 @@ class _ReservationWidgetState extends State<ReservationWidget> {
       "page": page,
       "pageSize": pageSize,
       if (includeTotalCount) "includeTotalCount": true,
+      "userId": Session.userId,
 
       "IncludeTraining": true,
       "IncludeUser": true,

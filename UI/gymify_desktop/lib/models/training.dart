@@ -13,6 +13,7 @@ class Training {
   final int maxAmountOfParticipants;
   final int currentParticipants;
   final DateTime startDate;
+  int? paricipatedOfAllTime;
 
   Training({
     required this.id,
@@ -23,6 +24,7 @@ class Training {
     required this.maxAmountOfParticipants,
     required this.currentParticipants,
     required this.startDate,
+    this.paricipatedOfAllTime
   });
 
   factory Training.fromJson(Map<String, dynamic> json) =>

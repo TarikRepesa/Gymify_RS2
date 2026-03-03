@@ -18,6 +18,11 @@ namespace Gymify.Services.Services
     IQueryable<Reservation> query,
     ReservationSearchObject search)
         {
+            if (search.UserId.HasValue)
+            {
+                query = query.Where(x => x.UserId == search.UserId);
+            }
+
             if (!string.IsNullOrWhiteSpace(search.FTS))
             {
                 var fts = search.FTS.Trim().ToLower();

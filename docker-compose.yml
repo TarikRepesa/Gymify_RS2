@@ -1,3 +1,5 @@
+version: "3.9"
+
 networks:
   gymifynet:
     driver: bridge
@@ -18,7 +20,11 @@ services:
     volumes:
       - sqlserver_data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q \"SELECT 1\" -C || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q \"SELECT 1\" -C || exit 1"
+        ]
       interval: 20s
       timeout: 10s
       retries: 10
@@ -34,8 +40,9 @@ services:
       - "8080:15672"
       - "15692:15692"
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VIRTUALHOST}
     networks:
       - gymifynet
     healthcheck:
@@ -50,15 +57,26 @@ services:
     build:
       context: .
       dockerfile: Gymify.API/DockerFile.api
+
+    env_file:
+      - .env
+
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
+
       ConnectionStrings__DefaultConnection: "Server=gymify-sqlserver,1433;Database=${MSSQL_DB};User Id=${MSSQL_USER};Password=${MSSQL_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=True"
+
       RABBITMQ_HOST: gymify-rabbitmq
-      RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VIRTUALHOST: /
-      RABBITMQ_PORT: 5672
+      RABBITMQ_VIRTUALHOST: ${RABBITMQ_VIRTUALHOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+
+      Stripe__SecretKey: ${STRIPE_SECRET_KEY}
+      Stripe__PublishableKey: ${STRIPE_PUBLISHABLE_KEY}
+      Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET}
+
     ports:
       - "${API_PORT}:8080"
     depends_on:
@@ -77,12 +95,17 @@ services:
     build:
       context: .
       dockerfile: Gymify.EmailConsumer/DockerFile.emailconsumer
+
+    env_file:
+      - .env
+
     environment:
       RABBITMQ_HOST: gymify-rabbitmq
-      RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VIRTUALHOST: /
-      RABBITMQ_PORT: 5672
+      RABBITMQ_VIRTUALHOST: ${RABBITMQ_VIRTUALHOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
@@ -90,6 +113,7 @@ services:
       SMTP_SSL: ${SMTP_SSL}
       FROM_EMAIL: ${FROM_EMAIL}
       FROM_NAME: ${FROM_NAME}
+
     depends_on:
       gymify-rabbitmq:
         condition: service_healthy
