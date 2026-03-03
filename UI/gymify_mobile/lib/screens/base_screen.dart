@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_mobile/widgets/home_widget.dart';
+import 'package:gymify_mobile/widgets/membership_widget.dart';
 import 'package:gymify_mobile/widgets/staff_widget.dart';
 import 'package:gymify_mobile/widgets/training_widget.dart';
 
@@ -39,7 +40,7 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
       label: "Članarine",
       icon: Icons.card_membership_outlined,
       activeIcon: Icons.card_membership,
-      body: const Center(child: Text("Članarine")),
+      body: const MembershipWidget(),
     ),
     _TabItem(
       label: "Rezervacije",

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Gymify.Services.Services
 {
-    public class MemberService : BaseCRUDService<MemberResponse, MemberSearchObject, Member, MemberUpsertRequest, MemberUpsertRequest>, IMemberService
+    public class MemberService : BaseCRUDService<MemberResponse, MemberSearchObject, Member, MemberInsertRequest, MemberUpdateRequest>, IMemberService
     {
         public MemberService(GymifyDbContext context, IMapper mapper) : base(context, mapper)
         {

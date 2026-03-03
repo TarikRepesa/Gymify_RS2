@@ -4,7 +4,7 @@ using Gymify.Model.SearchObjects;
 
 namespace Gymify.Services.Interfaces
 {
-    public interface IPaymentService : ICRUDService<PaymentResponse, BaseSearchObject, PaymentUpsertRequest, PaymentUpsertRequest>
+    public interface IPaymentService : ICRUDService<PaymentResponse, PaymentSearchObject, PaymentUpsertRequest, PaymentUpsertRequest>
     {
     }
 }

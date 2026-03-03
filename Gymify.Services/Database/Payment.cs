@@ -25,6 +25,10 @@ namespace Gymify.Services.Database
         public double Amount {get; set;}
 
         public DateTime PaymentDate {get; set;}
+
+        public string? StripePaymentIntentId { get; set; }
+        public DateTime? PaidAt { get; set; }
+        public string PaymentStatus { get; set; } = "Pending"; 
         
     }
 }

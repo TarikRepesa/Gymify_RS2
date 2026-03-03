@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:gymify_mobile/providers/member_provider.dart';
+import 'package:gymify_mobile/providers/membership_provider.dart';
 import 'package:gymify_mobile/providers/notification_provider.dart';
+import 'package:gymify_mobile/providers/payment_provider.dart';
 import 'package:gymify_mobile/providers/reservation_provider.dart';
 import 'package:gymify_mobile/providers/review_provider.dart';
 import 'package:gymify_mobile/providers/training_provider.dart';
@@ -13,6 +17,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('bs');
 
+  Stripe.publishableKey = "pk_test_51T6hS0CMbcejIOSaWb12W42JyQNdTJHRweDtYsN01qYQx1NFT04sUGdUIHKx1OV5MZJKvMHHpgoWzvOPi9955ZhJ002lptva2y";
+  await Stripe.instance.applySettings();
+
   runApp(
     MultiProvider(
       providers: [
@@ -22,6 +29,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider(create: (_) => TrainingProvider()),
         ChangeNotifierProvider(create: (_) => ReservationProvider()),
+        ChangeNotifierProvider(create: (_) => MembershipProvider()),
+        ChangeNotifierProvider(create: (_) => MemberProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
       ],
       child: const GymifyApp(),
     ),

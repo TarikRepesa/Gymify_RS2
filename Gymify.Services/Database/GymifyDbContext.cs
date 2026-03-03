@@ -160,7 +160,7 @@ namespace Gymify.Services.Database
 
 
             modelBuilder.Entity<Member>().HasData(
-                new Member { Id = 1, UserId = 11, MembershipId = 1, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(30) },
+                new Member { Id = 1, UserId = 11, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(-3)},
                 new Member { Id = 2, UserId = 12, MembershipId = 2, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(90) },
                 new Member { Id = 3, UserId = 13, MembershipId = 3, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(180) },
                 new Member { Id = 4, UserId = 14, MembershipId = 4, PaymentDate = DateTime.UtcNow, ExpirationDate = DateTime.UtcNow.AddDays(365) },
@@ -416,6 +416,19 @@ new WorkerTask
     IsFinished = true,
     UserId = 10
 }
+);
+
+modelBuilder.Entity<Payment>().HasData(
+    new Payment { Id = 1, UserId = 11, MembershipId = 2, Amount = 45.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 2, UserId = 12, MembershipId = 2, Amount = 45.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 3, UserId = 13, MembershipId = 3, Amount = 60.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 4, UserId = 14, MembershipId = 4, Amount = 80.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 5, UserId = 15, MembershipId = 1, Amount = 30.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 6, UserId = 16, MembershipId = 2, Amount = 45.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 7, UserId = 17, MembershipId = 3, Amount = 60.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 8, UserId = 18, MembershipId = 4, Amount = 80.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 9, UserId = 19, MembershipId = 1, Amount = 30.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
+    new Payment { Id = 10, UserId = 20, MembershipId = 2, Amount = 45.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null }
 );
 
         }

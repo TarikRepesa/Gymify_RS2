@@ -9,6 +9,12 @@ using Gymify.WebAPI.Authentication;
 using Gymify.Services.Interfaces;
 using Gymify.Services.Services;
 using RabbitMQ.Client;
+using Gymify.WebAPI.Services;
+using DotNetEnv;
+using Stripe;
+using Gymify.WebAPI.StripeConfig;
+
+Env.Load(Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"));
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,7 +68,7 @@ builder.Services.AddTransient<IMemberService, MemberService>();
 builder.Services.AddTransient<IMembershipService, MembershipService>();
 builder.Services.AddTransient<IPaymentService, PaymentService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
-builder.Services.AddTransient<IReviewService, ReviewService>();
+builder.Services.AddTransient<IReviewService, Gymify.Services.Services.ReviewService>();
 builder.Services.AddTransient<ISpecialOfferService, SpecialOfferService>();
 builder.Services.AddTransient<ITrainingService, TrainingService>();
 builder.Services.AddTransient<IWorkerTaskService, WorkerTaskService>();
@@ -70,13 +76,26 @@ builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
 
+var stripeSecret = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+var stripeWebhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET");
+
+StripeConfiguration.ApiKey = stripeSecret;
+
+builder.Services.AddSingleton(new StripeSettings
+{
+    SecretKey = stripeSecret!,
+    WebhookSecret = stripeWebhookSecret!
+});
+
+builder.Services.AddScoped<StripeService>();
+
 builder.Services.AddSingleton<IConnection>(_ =>
 {
-    var host = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
-    var port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ_PORT") ?? "5672");
-    var user = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest";
-    var pass = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest";
-    var vhost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST") ?? "/";
+    var host = Environment.GetEnvironmentVariable("RABBITMQ_HOST");
+    var port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ_PORT"));
+    var user = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME");
+    var pass = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD");
+    var vhost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST");
 
     var factory = new ConnectionFactory
     {

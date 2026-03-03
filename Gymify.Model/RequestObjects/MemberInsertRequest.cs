@@ -2,7 +2,7 @@ using System;
 
 namespace Gymify.Model.RequestObjects
 {
-    public class MemberUpsertRequest
+    public class MemberInsertRequest
     {
         public int UserId { get; set; }
         public int MembershipId { get; set; }
