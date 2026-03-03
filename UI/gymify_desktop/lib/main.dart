@@ -3,6 +3,7 @@ import 'package:gymify_desktop/providers/auth_provider.dart';
 import 'package:gymify_desktop/providers/member_provider.dart';
 import 'package:gymify_desktop/providers/membership_provider.dart';
 import 'package:gymify_desktop/providers/notification_provider.dart';
+import 'package:gymify_desktop/providers/report_provider.dart';
 import 'package:gymify_desktop/providers/review_provider.dart';
 import 'package:gymify_desktop/providers/training_provider.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
@@ -25,6 +26,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider(create: (_) => WorkerTaskProvider()),
+        ChangeNotifierProvider(create: (_) => ReportProvider()),
       ],
       child: const RentifyApp(),
     ),

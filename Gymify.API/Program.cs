@@ -78,6 +78,7 @@ builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
 builder.Services.AddTransient<IRewardService, RewardService>();
 builder.Services.AddTransient<IUserRewardService, UserRewardService>();
+builder.Services.AddTransient<IReportsService, ReportService>();
 
 var stripeSecret = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
 var stripeWebhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET");

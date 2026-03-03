@@ -20,7 +20,9 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
   isAdmin: json['isAdmin'] as bool?,
   isRadnik: json['isRadnik'] as bool?,
   isTrener: json['isTrener'] as bool?,
-  createdAt: DateTime.parse(json['createdAt'] as String),
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
   lastLoginAt: json['lastLoginAt'] == null
       ? null
       : DateTime.parse(json['lastLoginAt'] as String),
@@ -39,7 +41,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
   'isAdmin': instance.isAdmin,
   'isRadnik': instance.isRadnik,
   'isTrener': instance.isTrener,
-  'createdAt': instance.createdAt.toIso8601String(),
+  'createdAt': instance.createdAt?.toIso8601String(),
   'lastLoginAt': instance.lastLoginAt?.toIso8601String(),
   'phoneNumber': instance.phoneNumber,
 };

@@ -15,7 +15,7 @@ class User {
   bool? isAdmin;
   bool? isRadnik;
   bool? isTrener;
-  final DateTime createdAt;
+  DateTime? createdAt;
   final DateTime? lastLoginAt;
   String? phoneNumber;
 
@@ -31,7 +31,7 @@ class User {
     this.isAdmin,
     this.isRadnik,
     this.isTrener,
-    required this.createdAt,
+    this.createdAt,
     this.lastLoginAt,
     this.phoneNumber,
   });

@@ -164,9 +164,7 @@ Widget StaffWidget() {
                     "lastName": payload["lastName"],
                     "email": payload["email"],
                     "phoneNumber": payload["phone"],
-                    "dateOfBirth": DateHelper.formatNullable(
-                      payload["dateOfBirth"],
-                    ),
+                    "dateOfBirth": DateHelper.toIsoFromUi(payload["dateOfBirth"]),
                     "username": payload["username"],
                     "isActive": true,
                     "createdAt": DateTime.now().toIso8601String(),

@@ -25,7 +25,8 @@ namespace Gymify.Services.Database
 
        public int CurrentParticipants {get; set;}
        // Posto start date ima i podatke u vremenu, tu cu izvlaciti vrijeme u klk trening pocinje
-       //Imat cu posebne 2 metode u helperu koje ce ovo regulisati 
+       //Imat cu posebne 2 metode u helperu koje ce ovo regulisati
+       public int ParicipatedOfAllTime {get; set;} 
        public DateTime StartDate {get; set;}
 
 
