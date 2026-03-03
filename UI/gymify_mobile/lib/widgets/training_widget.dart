@@ -116,47 +116,69 @@ class _TrainingWidgetState extends State<TrainingWidget> {
   }
 
   Future<void> _reserveTraining(Training t) async {
-    final ok = await ConfirmDialogs.yesNoConfirmation(
+  final reservationProvider = context.read<ReservationProvider>();
+  final trainingProvider = context.read<TrainingProvider>();
+
+  final userId = Session.userId;
+  final trainingId = t.id;
+
+  final already = await reservationProvider.exists({
+    "userId": userId,
+    "trainingId": t.id
+  });
+
+  if (already) {
+    await ConfirmDialogs.okConfirmation(
       context,
-      title: "Rezervacija",
-      question:
-          "Da li ste sigurni da želite rezervisati trening:\n\n${t.name}?",
-      yesText: "Rezerviši",
-      noText: "Odustani",
+      title: "Info",
+      message: "Već imate rezervisan ovaj trening.",
+      okText: "U redu",
+    );
+    return;
+  }
+
+  // 🔥 2. Potvrda korisnika
+  final ok = await ConfirmDialogs.yesNoConfirmation(
+    context,
+    title: "Rezervacija",
+    question:
+        "Da li ste sigurni da želite rezervisati trening:\n\n${t.name}?",
+    yesText: "Rezerviši",
+    noText: "Odustani",
+  );
+
+  if (!ok) return;
+
+  try {
+    final request = {
+      "userId": userId,
+      "trainingId": trainingId,
+      "createdAt": DateTime.now().toIso8601String(),
+    };
+
+    await reservationProvider.insert(request);
+
+    await trainingProvider.up(t.id);
+
+    await ConfirmDialogs.okConfirmation(
+      context,
+      title: "Uspješno",
+      message:
+          "Rezervacija je uspješno kreirana.\n\nSve rezervacije možete pogledati u sekciji 'Rezervacije'.",
+      okText: "U redu",
     );
 
-    if (!ok) return;
-
-    try {
-      final reservationProvider = context.read<ReservationProvider>();
-
-      final request = {
-        "userId": Session.userId,
-        "trainingId": t.id,
-        "createdAt": DateTime.now().toIso8601String()
-      };
-
-      await reservationProvider.insert(request);
-
-      await ConfirmDialogs.okConfirmation(
-        context,
-        title: "Uspješno",
-        message:
-            "Rezervacija je uspješno kreirana.\n\nSve rezervacije možete pogledati u sekciji 'Rezervacije'.",
-        okText: "U redu",
-      );
-
-      await _paging.refresh();
-    } catch (e) {
-      await ConfirmDialogs.okConfirmation(
-        context,
-        title: "Greška",
-        message: "Nije moguće napraviti rezervaciju.\n\n$e",
-        okText: "OK",
-        danger: true,
-      );
-    }
+    await _paging.refresh();
+  } catch (e) {
+    await ConfirmDialogs.okConfirmation(
+      context,
+      title: "Greška",
+      message: "Nije moguće napraviti rezervaciju.\n\n$e",
+      okText: "OK",
+      danger: true,
+    );
   }
+}
 
   Future<void> _pickDate() async {
     final now = DateTime.now();

@@ -195,6 +195,83 @@ namespace Gymify.Services.Database
     new Training { Id = 20, UserId = 6, Name = "Core Workout", MaxAmountOfParticipants = 15, CurrentParticipants = 10, StartDate = new DateTime(2026, 6, 20), TrainingImage = "https://picsum.photos/seed/core/600/400" }
 );
 
+modelBuilder.Entity<Training>().HasData(
+    new Training
+    {
+        Id = 21,
+        UserId = 3, // trener Marko
+        Name = "HIIT (Feb)",
+        MaxAmountOfParticipants = 15,
+        CurrentParticipants = 11,
+        StartDate = new DateTime(2026, 2, 10, 18, 0, 0),
+        TrainingImage = "https://picsum.photos/seed/hiitfeb/600/400"
+    },
+    new Training
+    {
+        Id = 22,
+        UserId = 4, // trener Ivan
+        Name = "Yoga Flow (Feb)",
+        MaxAmountOfParticipants = 12,
+        CurrentParticipants = 9,
+        StartDate = new DateTime(2026, 2, 14, 19, 30, 0),
+        TrainingImage = "https://picsum.photos/seed/yogafeb/600/400"
+    },
+    new Training
+    {
+        Id = 23,
+        UserId = 5, // trener Petar
+        Name = "Strength Training (Feb)",
+        MaxAmountOfParticipants = 16,
+        CurrentParticipants = 13,
+        StartDate = new DateTime(2026, 2, 20, 17, 0, 0),
+        TrainingImage = "https://picsum.photos/seed/strengthfeb/600/400"
+    },
+    new Training
+    {
+        Id = 24,
+        UserId = 6, // trener Luka
+        Name = "Boxing (Feb)",
+        MaxAmountOfParticipants = 14,
+        CurrentParticipants = 10,
+        StartDate = new DateTime(2026, 2, 25, 20, 0, 0),
+        TrainingImage = "https://picsum.photos/seed/boxingfeb/600/400"
+    }
+);
+
+// ============================
+// RESERVATIONS - Haris (UserId = 11) na treninzima koji su prošli
+// ============================
+modelBuilder.Entity<Reservation>().HasData(
+    new Reservation
+    {
+        Id = 1,
+        UserId = 11,       // Haris
+        TrainingId = 21,   // HIIT (Feb)
+        CreatedAt = new DateTime(2026, 2, 9, 12, 15, 0)
+    },
+    new Reservation
+    {
+        Id = 2,
+        UserId = 11,
+        TrainingId = 22,   // Yoga Flow (Feb)
+        CreatedAt = new DateTime(2026, 2, 13, 10, 0, 0)
+    },
+    new Reservation
+    {
+        Id = 3,
+        UserId = 11,
+        TrainingId = 23,   // Strength Training (Feb)
+        CreatedAt = new DateTime(2026, 2, 19, 14, 30, 0)
+    },
+    new Reservation
+    {
+        Id = 4,
+        UserId = 11,
+        TrainingId = 24,   // Boxing (Feb)
+        CreatedAt = new DateTime(2026, 2, 24, 9, 45, 0)
+    }
+);
+
             // ============================
             // NOTIFICATIONS (seed)
             // Admini + Radnici najčešće dodaju obavijesti

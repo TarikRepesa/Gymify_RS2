@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_mobile/widgets/home_widget.dart';
 import 'package:gymify_mobile/widgets/membership_widget.dart';
+import 'package:gymify_mobile/widgets/reservation_widget.dart';
 import 'package:gymify_mobile/widgets/staff_widget.dart';
 import 'package:gymify_mobile/widgets/training_widget.dart';
 
@@ -46,7 +47,7 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
       label: "Rezervacije",
       icon: Icons.note_alt,
       activeIcon: Icons.note_alt,
-      body: const Center(child: Text("Rezervacije")),
+      body: const ReservationWidget(),
     ),
     _TabItem(
       label: "Profil",

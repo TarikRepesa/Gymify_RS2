@@ -4,7 +4,8 @@ using Gymify.Model.SearchObjects;
 
 namespace Gymify.Services.Interfaces
 {
-    public interface IReservationService : ICRUDService<ReservationResponse, BaseSearchObject, ReservationUpsertRequest, ReservationUpsertRequest>
+    public interface IReservationService : ICRUDService<ReservationResponse, ReservationSearchObject, ReservationUpsertRequest, ReservationUpsertRequest>
     {
+        Task<bool> ExistsAsync(ReservationCheckRequets req);
     }
 }

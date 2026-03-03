@@ -5,6 +5,7 @@ using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 
 namespace Gymify.Services.Services
 {
@@ -16,6 +17,8 @@ namespace Gymify.Services.Services
 
         protected override IQueryable<Training> ApplyFilter(IQueryable<Training> query, TrainingSearchObject search)
         {
+            var today = DateTime.Today;
+            query = query.Where(x => x.StartDate.Date >= today);
             if (search.UserId.HasValue)
             {
                 query = query.Where(x => x.UserId == search.UserId);
@@ -42,5 +45,38 @@ namespace Gymify.Services.Services
             }
             return base.AddInclude(query, search);
         }
+
+        public async Task Up(int trainingId)
+{
+    var training = await _context.Trainings
+        .FirstOrDefaultAsync(x => x.Id == trainingId);
+
+    if (training == null)
+        throw new SEHException("Trening ne postoji.");
+
+    var current = training.CurrentParticipants;
+    var max = training.MaxAmountOfParticipants;
+
+    if (current >= max)
+        throw new Exception("Trening je popunjen.");
+
+    training.CurrentParticipants = current + 1;
+
+    await _context.SaveChangesAsync();
+}
+
+public async Task Down(int trainingId)
+{
+    var training = await _context.Trainings
+        .FirstOrDefaultAsync(x => x.Id == trainingId);
+
+    if (training == null)
+        throw new Exception("Trening ne postoji.");
+
+    var current = training.CurrentParticipants;
+    training.CurrentParticipants = Math.Max(0, current - 1);
+
+    await _context.SaveChangesAsync();
+}
     }
 }

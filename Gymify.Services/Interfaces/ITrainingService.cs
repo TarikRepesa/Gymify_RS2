@@ -6,5 +6,7 @@ namespace Gymify.Services.Interfaces
 {
     public interface ITrainingService : ICRUDService<TrainingResponse, TrainingSearchObject, TrainingUpsertRequest, TrainingUpsertRequest>
     {
+        Task Up(int trainingId);
+        Task Down(int trainingId);
     }
 }

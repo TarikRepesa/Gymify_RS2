@@ -8,8 +8,24 @@ namespace Gymify.API.Controllers
 {
     public class TrainingController : BaseCRUDController<TrainingResponse, TrainingSearchObject, TrainingUpsertRequest, TrainingUpsertRequest>
     {
+        ITrainingService _trainingService;
         public TrainingController(ITrainingService service) : base(service)
         {
+            _trainingService = service;
+        }
+
+        [HttpPost("{id}/up")]
+        public async Task<IActionResult> Up(int id)
+        {
+            await _trainingService.Up(id);
+            return Ok(true);
+        }
+
+        [HttpPost("{id}/down")]
+        public async Task<IActionResult> Down(int id)
+        {
+            await _trainingService.Down(id);
+            return Ok(true);
         }
     }
 }
