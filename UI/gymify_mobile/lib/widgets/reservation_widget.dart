@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gymify_mobile/providers/loyalty_point_history_provider.dart';
+import 'package:gymify_mobile/providers/loyalty_point_provider.dart';
 import 'package:gymify_mobile/providers/training_provider.dart';
+import 'package:gymify_mobile/utils/session.dart';
 import 'package:gymify_mobile/widgets/review_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:gymify_mobile/config/api_config.dart';
@@ -103,8 +106,10 @@ class _ReservationWidgetState extends State<ReservationWidget> {
   }
 
   Future<void> _cancelReservation(Reservation r) async {
+    final lpProvider = context.read<LoyaltyPointProvider>();
+    final lpProviderH = context.read<LoyaltyPointHistoryProvider>();
     final trainingName = r.training?.name ?? "trening";
-    final trainingId = r.trainingId; // ili r.training?.id
+    final trainingId = r.trainingId; 
     final trainingProvider = context.read<TrainingProvider>();
 
     final ok = await ConfirmDialogs.yesNoConfirmation(
@@ -124,6 +129,18 @@ class _ReservationWidgetState extends State<ReservationWidget> {
       await provider.delete(r.id);
 
       await trainingProvider.down(trainingId);
+
+      await lpProvider.subtractPoints({
+        "userId": Session.userId,
+        "points": 1
+      });
+
+      await lpProviderH.insert({
+        "userId": Session.userId,
+        "status": "Otkazivanje rezervacije",
+        "amountPointsParticipation": 1,
+        "createdAt": DateTime.now().toIso8601String()
+      });
 
       await ConfirmDialogs.okConfirmation(
         context,
@@ -230,6 +247,7 @@ class _ReservationWidgetState extends State<ReservationWidget> {
                       onReviewSuccess: () async {
                         final provider = context.read<ReservationProvider>();
                         await provider.delete(r.id);
+
                         await _paging.refresh();
                       },
                     );

@@ -28,6 +28,8 @@ namespace Gymify.Services.Database
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<SpecialOffer> SpecialOffers { get; set; }
         public DbSet<WorkerTask> WorkerTasks { get; set; }
+        public DbSet<Reward> Rewards { get; set; }
+        public DbSet<UserReward> UserRewards { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -507,6 +509,70 @@ modelBuilder.Entity<Payment>().HasData(
     new Payment { Id = 9, UserId = 19, MembershipId = 1, Amount = 30.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null },
     new Payment { Id = 10, UserId = 20, MembershipId = 2, Amount = 45.00, PaymentDate = new DateTime(2026, 2, 1), PaymentStatus = "Paid", PaidAt = new DateTime(2026, 2, 1), StripePaymentIntentId = null }
 );
+
+modelBuilder.Entity<Reward>().HasData(
+        new Reward
+        {
+            Id = 1,
+            Name = "Besplatan proteinski shake",
+            Description = "Dobij besplatan proteinski shake u gym baru.",
+            RequiredPoints = 100,
+            IsActive = true
+        },
+        new Reward
+        {
+            Id = 2,
+            Name = "1 dan besplatne članarine",
+            Description = "Jedan dan besplatnog treninga.",
+            RequiredPoints = 250,
+            IsActive = true
+        },
+        new Reward
+        {
+            Id = 3,
+            Name = "Personalni trening - 30 min",
+            Description = "Besplatan personalni trening u trajanju 30 minuta.",
+            RequiredPoints = 500,
+            IsActive = true
+        },
+        new Reward
+        {
+            Id = 4,
+            Name = "20% popusta na članarinu",
+            Description = "Popust od 20% na narednu članarinu.",
+            RequiredPoints = 750,
+            IsActive = true
+        },
+        new Reward
+        {
+            Id = 5,
+            Name = "Gymify premium majica",
+            Description = "Ekskluzivna Gymify majica.",
+            RequiredPoints = 1000,
+            IsActive = true
+        }
+    );
+
+    modelBuilder.Entity<LoyaltyPoint>().HasData(
+        new LoyaltyPoint
+        {
+            Id = 1,
+            UserId = 11, 
+            TotalPoints = 120
+        },
+        new LoyaltyPoint
+        {
+            Id = 2,
+            UserId = 12,
+            TotalPoints = 350
+        },
+        new LoyaltyPoint
+        {
+            Id = 3,
+            UserId = 13,
+            TotalPoints = 780
+        }
+    );
 
         }
     }

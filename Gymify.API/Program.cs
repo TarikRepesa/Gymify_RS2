@@ -13,6 +13,7 @@ using Gymify.WebAPI.Services;
 using DotNetEnv;
 using Stripe;
 using Gymify.WebAPI.StripeConfig;
+using Gymify.Services.Implementations;
 
 Env.Load(Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"));
 
@@ -75,6 +76,8 @@ builder.Services.AddTransient<IWorkerTaskService, WorkerTaskService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddTransient<IRewardService, RewardService>();
+builder.Services.AddTransient<IUserRewardService, UserRewardService>();
 
 var stripeSecret = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
 var stripeWebhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET");

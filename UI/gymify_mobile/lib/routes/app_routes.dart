@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_mobile/screens/base_screen.dart';
-import 'package:gymify_mobile/screens/home_screen.dart';
 import 'package:gymify_mobile/screens/login_screen.dart';
 import 'package:gymify_mobile/screens/register_screen.dart';
 

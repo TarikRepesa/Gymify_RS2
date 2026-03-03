@@ -28,52 +28,56 @@ class _HomeWidgetState extends State<HomeWidget> {
 
     _notifPaging = UniversalPagingProvider<NotificationModel>(
       pageSize: 5,
-      fetcher: ({
-        required int page,
-        required int pageSize,
-        String? filter,
-        Map<String, dynamic>? extra,
-        bool includeTotalCount = true,
-      }) async {
-        final provider = context.read<NotificationProvider>();
+      fetcher:
+          ({
+            required int page,
+            required int pageSize,
+            String? filter,
+            Map<String, dynamic>? extra,
+            bool includeTotalCount = true,
+          }) async {
+            final provider = context.read<NotificationProvider>();
 
-        final query = <String, dynamic>{
-          // 🔁 Ako API koristi druga imena, promijeni ovdje:
-          "page": page,
-          "pageSize": pageSize,
-          if (filter != null && filter.isNotEmpty) "filter": filter,
-          // dodatni filteri (npr userId, sort...) preko applyExtra
-          ...?extra,
-          if (includeTotalCount) "includeTotalCount": true,
-        };
+            final query = <String, dynamic>{
+              // 🔁 Ako API koristi druga imena, promijeni ovdje:
+              "page": page,
+              "pageSize": pageSize,
+              if (filter != null && filter.isNotEmpty) "filter": filter,
+              // dodatni filteri (npr userId, sort...) preko applyExtra
+              ...?extra,
+              "SortBy": "createdAt",
+              "SortDirection": "desc",
+              if (includeTotalCount) "includeTotalCount": true,
+            };
 
-        return provider.get(filter: query);
-      },
+            return provider.get(filter: query);
+          },
     );
 
     _reviewPaging = UniversalPagingProvider<Review>(
       pageSize: 3,
-      fetcher: ({
-        required int page,
-        required int pageSize,
-        String? filter,
-        Map<String, dynamic>? extra,
-        bool includeTotalCount = true,
-      }) async {
-        final provider = context.read<ReviewProvider>();
+      fetcher:
+          ({
+            required int page,
+            required int pageSize,
+            String? filter,
+            Map<String, dynamic>? extra,
+            bool includeTotalCount = true,
+          }) async {
+            final provider = context.read<ReviewProvider>();
 
-        final query = <String, dynamic>{
-          // 🔁 Ako API koristi druga imena, promijeni ovdje:
-          "page": page,
-          "pageSize": pageSize,
-          "IncludeUser": true,
-          if (filter != null && filter.isNotEmpty) "filter": filter,
-          ...?extra,
-          if (includeTotalCount) "includeTotalCount": true,
-        };
+            final query = <String, dynamic>{
+              // 🔁 Ako API koristi druga imena, promijeni ovdje:
+              "page": page,
+              "pageSize": pageSize,
+              "IncludeUser": true,
+              if (filter != null && filter.isNotEmpty) "filter": filter,
+              ...?extra,
+              if (includeTotalCount) "includeTotalCount": true,
+            };
 
-        return provider.get(filter: query);
-      },
+            return provider.get(filter: query);
+          },
     );
 
     // prvi load
@@ -186,14 +190,16 @@ class _HomeWidgetState extends State<HomeWidget> {
                   provider: _notifPaging,
                   separatorHeight: 14,
                   itemBuilder: (context, n) {
+                    final index = _notifPaging.items.indexOf(n);
+                    final isFirst = index == 0;
+
                     final date = _formatDate(n.createdAt);
                     final text = _buildNotificationText(n);
-                    final important = _isImportant(n);
 
                     return _notificationCard(
                       date: date,
                       text: text,
-                      isImportant: important,
+                      isImportant: isFirst, // 👈 samo prva je istaknuta
                     );
                   },
                 ),
@@ -206,10 +212,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               /// ===========================
               const Text(
                 "Drugo o nama",
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 15,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
               ),
 
               const SizedBox(height: 12),
@@ -280,10 +283,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
           child: Text(
             text,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
           ),
         ),
       ],
@@ -321,10 +321,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           const SizedBox(height: 10),
           Text(
             message,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -338,7 +335,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 size: 18,
               ),
             ),
-          )
+          ),
         ],
       ),
     );

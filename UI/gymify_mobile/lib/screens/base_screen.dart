@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_mobile/widgets/home_widget.dart';
 import 'package:gymify_mobile/widgets/membership_widget.dart';
+import 'package:gymify_mobile/widgets/profile_widget.dart';
 import 'package:gymify_mobile/widgets/reservation_widget.dart';
 import 'package:gymify_mobile/widgets/staff_widget.dart';
 import 'package:gymify_mobile/widgets/training_widget.dart';
@@ -18,44 +19,54 @@ class BaseMobileScreen extends StatefulWidget {
 class _BaseMobileScreenState extends State<BaseMobileScreen> {
   int _index = 0;
 
-  late final List<_TabItem> _tabs = [
-    _TabItem(
-      label: "Početna",
-      icon: Icons.home_outlined,
-      activeIcon: Icons.home,
-      body: const HomeWidget(),
-    ),
-    _TabItem(
-      label: "Osoblje",
-      icon: Icons.person_3_outlined,
-      activeIcon: Icons.person_3_outlined,
-      body: const StaffWidget(),
-    ),
-    _TabItem(
-      label: "Treninzi",
-      icon: Icons.fitness_center_outlined,
-      activeIcon: Icons.fitness_center,
-      body: const TrainingWidget(),
-    ),
-    _TabItem(
-      label: "Članarine",
-      icon: Icons.card_membership_outlined,
-      activeIcon: Icons.card_membership,
-      body: const MembershipWidget(),
-    ),
-    _TabItem(
-      label: "Rezervacije",
-      icon: Icons.note_alt,
-      activeIcon: Icons.note_alt,
-      body: const ReservationWidget(),
-    ),
-    _TabItem(
-      label: "Profil",
-      icon: Icons.person_outline,
-      activeIcon: Icons.person,
-      body: const Center(child: Text("Profil")),
-    ),
-  ];
+  late List<_TabItem> _tabs;
+
+  @override
+  void initState() {
+    super.initState();
+    _buildTabs();
+  }
+
+  void _buildTabs() {
+    _tabs = [
+      _TabItem(
+        label: "Početna",
+        icon: Icons.home_outlined,
+        activeIcon: Icons.home,
+        body: HomeWidget(key: UniqueKey()),
+      ),
+      _TabItem(
+        label: "Osoblje",
+        icon: Icons.person_3_outlined,
+        activeIcon: Icons.person_3,
+        body: StaffWidget(key: UniqueKey()),
+      ),
+      _TabItem(
+        label: "Treninzi",
+        icon: Icons.fitness_center_outlined,
+        activeIcon: Icons.fitness_center,
+        body: TrainingWidget(key: UniqueKey()),
+      ),
+      _TabItem(
+        label: "Članarine",
+        icon: Icons.card_membership_outlined,
+        activeIcon: Icons.card_membership,
+        body: MembershipWidget(key: UniqueKey()),
+      ),
+      _TabItem(
+        label: "Rezervacije",
+        icon: Icons.note_alt_outlined,
+        activeIcon: Icons.note_alt,
+        body: ReservationWidget(key: UniqueKey()),
+      ),
+      _TabItem(
+        label: "Profil",
+        icon: Icons.person_outline,
+        activeIcon: Icons.person,
+        body: ProfileWidget(key: UniqueKey()),
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +92,12 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
           unselectedItemColor: const Color(0xFF8A8A8A),
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w800),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
-          onTap: (i) => setState(() => _index = i),
+          onTap: (i) {
+            setState(() {
+              _index = i;
+              _buildTabs(); // 🔥 rebuild tabova -> initState opet
+            });
+          },
           items: [
             for (final t in _tabs)
               BottomNavigationBarItem(

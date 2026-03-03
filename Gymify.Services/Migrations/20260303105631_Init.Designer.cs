@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gymify.Services.Migrations
 {
     [DbContext(typeof(GymifyDbContext))]
-    [Migration("20260303035746_Init")]
+    [Migration("20260303105631_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -44,6 +44,26 @@ namespace Gymify.Services.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("LoyaltyPoints");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            TotalPoints = 120,
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 2,
+                            TotalPoints = 350,
+                            UserId = 12
+                        },
+                        new
+                        {
+                            Id = 3,
+                            TotalPoints = 780,
+                            UserId = 13
+                        });
                 });
 
             modelBuilder.Entity("Gymify.Services.Database.LoyaltyPointHistory", b =>
@@ -106,81 +126,81 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 1,
-                            ExpirationDate = new DateTime(2026, 2, 28, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1062),
+                            ExpirationDate = new DateTime(2026, 2, 28, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9116),
                             MembershipId = 2,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(900),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(8993),
                             UserId = 11
                         },
                         new
                         {
                             Id = 2,
-                            ExpirationDate = new DateTime(2026, 6, 1, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1318),
+                            ExpirationDate = new DateTime(2026, 6, 1, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9300),
                             MembershipId = 2,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1318),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9300),
                             UserId = 12
                         },
                         new
                         {
                             Id = 3,
-                            ExpirationDate = new DateTime(2026, 8, 30, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1323),
+                            ExpirationDate = new DateTime(2026, 8, 30, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9304),
                             MembershipId = 3,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1322),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9304),
                             UserId = 13
                         },
                         new
                         {
                             Id = 4,
-                            ExpirationDate = new DateTime(2027, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1324),
+                            ExpirationDate = new DateTime(2027, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9306),
                             MembershipId = 4,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1324),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9305),
                             UserId = 14
                         },
                         new
                         {
                             Id = 5,
-                            ExpirationDate = new DateTime(2026, 2, 26, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1326),
+                            ExpirationDate = new DateTime(2026, 2, 26, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9307),
                             MembershipId = 1,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1326),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9307),
                             UserId = 15
                         },
                         new
                         {
                             Id = 6,
-                            ExpirationDate = new DateTime(2026, 6, 1, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1327),
+                            ExpirationDate = new DateTime(2026, 6, 1, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9308),
                             MembershipId = 2,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1327),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9308),
                             UserId = 16
                         },
                         new
                         {
                             Id = 7,
-                            ExpirationDate = new DateTime(2026, 2, 21, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1350),
+                            ExpirationDate = new DateTime(2026, 2, 21, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9309),
                             MembershipId = 3,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1350),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9309),
                             UserId = 17
                         },
                         new
                         {
                             Id = 8,
-                            ExpirationDate = new DateTime(2026, 2, 26, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1351),
+                            ExpirationDate = new DateTime(2026, 2, 26, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9310),
                             MembershipId = 4,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1351),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9310),
                             UserId = 18
                         },
                         new
                         {
                             Id = 9,
-                            ExpirationDate = new DateTime(2026, 4, 2, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1353),
+                            ExpirationDate = new DateTime(2026, 4, 2, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9312),
                             MembershipId = 1,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1352),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9311),
                             UserId = 19
                         },
                         new
                         {
                             Id = 10,
-                            ExpirationDate = new DateTime(2026, 2, 21, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1354),
+                            ExpirationDate = new DateTime(2026, 2, 21, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9313),
                             MembershipId = 2,
-                            PaymentDate = new DateTime(2026, 3, 3, 3, 57, 46, 414, DateTimeKind.Utc).AddTicks(1354),
+                            PaymentDate = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(9313),
                             UserId = 20
                         });
                 });
@@ -618,6 +638,76 @@ namespace Gymify.Services.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Gymify.Services.Database.Reward", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("RequiredPoints")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rewards");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Dobij besplatan proteinski shake u gym baru.",
+                            IsActive = true,
+                            Name = "Besplatan proteinski shake",
+                            RequiredPoints = 100
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Jedan dan besplatnog treninga.",
+                            IsActive = true,
+                            Name = "1 dan besplatne članarine",
+                            RequiredPoints = 250
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Besplatan personalni trening u trajanju 30 minuta.",
+                            IsActive = true,
+                            Name = "Personalni trening - 30 min",
+                            RequiredPoints = 500
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Popust od 20% na narednu članarinu.",
+                            IsActive = true,
+                            Name = "20% popusta na članarinu",
+                            RequiredPoints = 750
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Ekskluzivna Gymify majica.",
+                            IsActive = true,
+                            Name = "Gymify premium majica",
+                            RequiredPoints = 1000
+                        });
+                });
+
             modelBuilder.Entity("Gymify.Services.Database.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -650,7 +740,7 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 3, 3, 3, 57, 46, 407, DateTimeKind.Utc).AddTicks(8442),
+                            CreatedAt = new DateTime(2026, 3, 3, 10, 56, 31, 512, DateTimeKind.Utc).AddTicks(672),
                             Description = "",
                             IsActive = true,
                             Name = "Korisnik"
@@ -658,7 +748,7 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 3, 3, 3, 57, 46, 407, DateTimeKind.Utc).AddTicks(8855),
+                            CreatedAt = new DateTime(2026, 3, 3, 10, 56, 31, 512, DateTimeKind.Utc).AddTicks(1067),
                             Description = "",
                             IsActive = true,
                             Name = "Admin"
@@ -666,7 +756,7 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 3, 3, 3, 57, 46, 407, DateTimeKind.Utc).AddTicks(8857),
+                            CreatedAt = new DateTime(2026, 3, 3, 10, 56, 31, 512, DateTimeKind.Utc).AddTicks(1069),
                             Description = "",
                             IsActive = true,
                             Name = "Trener"
@@ -674,7 +764,7 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2026, 3, 3, 3, 57, 46, 407, DateTimeKind.Utc).AddTicks(8858),
+                            CreatedAt = new DateTime(2026, 3, 3, 10, 56, 31, 512, DateTimeKind.Utc).AddTicks(1070),
                             Description = "",
                             IsActive = true,
                             Name = "Radnik"
@@ -1066,8 +1156,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsAdmin = true,
                             LastName = "Malic",
-                            PasswordHash = "a/ltJ7B7vtcMZhCIzkgBJXCATnneMEFEc3Hgx94v0nGcbFkUX2pthowUrhxC1XSO2U+eLfnj7LFU1IUgNYffug==",
-                            PasswordSalt = "CcnZ27SnBRmidH0pkSukCGrXgDt5//O1hzk6YfwhxQiudnQphUnNz60OQo3ADwZfJnYEG1P4m73ypqwkmywecN4sxYh5p0eAtRsYN6ykzF4xiPz7zr7o+KGLmTRIpvSl97idCk57a7HXfjme/CAWfkTidyafWQLS6awRMuTzYxY=",
+                            PasswordHash = "P5D2HDKprQFvtlmdTtqHYwiVGVw1fcv9uXgGuqBucmspCpy8sAnpqwV+FO6og1XJPogxk4JZLK78R9CYgytLzA==",
+                            PasswordSalt = "ELgNftxviJ5gnnJ4jUD9zW+r694EEK8RmM344oeNSshYfCOAX6mN6sQvUg+DX4Z1+v3991+/kAL0qy/82MFe1vh2eY4UO3+tEJ5Yft1hZ4LWVb1WyOeqEhSpH5HHSV7/moHiJxj9xOTqagd5byBHQzkjE+zo1lekJWQk/fvG+e8=",
                             PhoneNumber = "061111111",
                             Username = "tare45"
                         },
@@ -1081,8 +1171,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsAdmin = true,
                             LastName = "Ibrahimovic",
-                            PasswordHash = "a/ltJ7B7vtcMZhCIzkgBJXCATnneMEFEc3Hgx94v0nGcbFkUX2pthowUrhxC1XSO2U+eLfnj7LFU1IUgNYffug==",
-                            PasswordSalt = "CcnZ27SnBRmidH0pkSukCGrXgDt5//O1hzk6YfwhxQiudnQphUnNz60OQo3ADwZfJnYEG1P4m73ypqwkmywecN4sxYh5p0eAtRsYN6ykzF4xiPz7zr7o+KGLmTRIpvSl97idCk57a7HXfjme/CAWfkTidyafWQLS6awRMuTzYxY=",
+                            PasswordHash = "P5D2HDKprQFvtlmdTtqHYwiVGVw1fcv9uXgGuqBucmspCpy8sAnpqwV+FO6og1XJPogxk4JZLK78R9CYgytLzA==",
+                            PasswordSalt = "ELgNftxviJ5gnnJ4jUD9zW+r694EEK8RmM344oeNSshYfCOAX6mN6sQvUg+DX4Z1+v3991+/kAL0qy/82MFe1vh2eY4UO3+tEJ5Yft1hZ4LWVb1WyOeqEhSpH5HHSV7/moHiJxj9xOTqagd5byBHQzkjE+zo1lekJWQk/fvG+e8=",
                             PhoneNumber = "061111112",
                             Username = "amir56"
                         },
@@ -1097,8 +1187,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsTrener = true,
                             LastName = "Markovic",
-                            PasswordHash = "NqfMnfO/TvQrSWt7BTlSlGIXiuXbIQFrDD14EHu0l1N/uh6jAtpp/DdUVurizbfI02Z5BS2bhZFVBIwfPwhzXg==",
-                            PasswordSalt = "1bHWJrU96ikBB1lg3+s0+b1oRGQYOCBqkXEim2ax58Lz6CcbEVe1/dKZD+X3eNeHR01nhjsiaXE8MwdjW7vh2tcNxF613HLKBGSKjYgvU5wU/50y0iz/1fUuovvPfk1ostCfmyrNAjtQdJRPkzCKVNQU71WY+kWvZlDtySNuQKc=",
+                            PasswordHash = "bagZI9OjiJIqC5pPdzrIoEfa18OcmZ7Th+pAwH9JAmlFOczHdv0pFR157ETgLR0RN5+oMzMjrckEalK6UjQ4gg==",
+                            PasswordSalt = "zsrabfT9LB/+Wc/4RRjPVGPmJZeQqusOqfdrcBLJD6t74mgJAGdQM+Qe2hoB28chPzpPrQ063I4Vac0T67/fuAK/XWABbi6uhTAn6LLGiV3kXptNdMIjqL7a6YWOnUz3GVv0y5Ln7j8Tb+aYfsUViKCNlVJJGMwB+goZuMfe5lE=",
                             PhoneNumber = "061111113",
                             Username = "marko78"
                         },
@@ -1113,8 +1203,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsTrener = true,
                             LastName = "Ivic",
-                            PasswordHash = "NqfMnfO/TvQrSWt7BTlSlGIXiuXbIQFrDD14EHu0l1N/uh6jAtpp/DdUVurizbfI02Z5BS2bhZFVBIwfPwhzXg==",
-                            PasswordSalt = "1bHWJrU96ikBB1lg3+s0+b1oRGQYOCBqkXEim2ax58Lz6CcbEVe1/dKZD+X3eNeHR01nhjsiaXE8MwdjW7vh2tcNxF613HLKBGSKjYgvU5wU/50y0iz/1fUuovvPfk1ostCfmyrNAjtQdJRPkzCKVNQU71WY+kWvZlDtySNuQKc=",
+                            PasswordHash = "bagZI9OjiJIqC5pPdzrIoEfa18OcmZ7Th+pAwH9JAmlFOczHdv0pFR157ETgLR0RN5+oMzMjrckEalK6UjQ4gg==",
+                            PasswordSalt = "zsrabfT9LB/+Wc/4RRjPVGPmJZeQqusOqfdrcBLJD6t74mgJAGdQM+Qe2hoB28chPzpPrQ063I4Vac0T67/fuAK/XWABbi6uhTAn6LLGiV3kXptNdMIjqL7a6YWOnUz3GVv0y5Ln7j8Tb+aYfsUViKCNlVJJGMwB+goZuMfe5lE=",
                             PhoneNumber = "061111114",
                             Username = "ivan11"
                         },
@@ -1129,8 +1219,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsTrener = true,
                             LastName = "Petrovic",
-                            PasswordHash = "NqfMnfO/TvQrSWt7BTlSlGIXiuXbIQFrDD14EHu0l1N/uh6jAtpp/DdUVurizbfI02Z5BS2bhZFVBIwfPwhzXg==",
-                            PasswordSalt = "1bHWJrU96ikBB1lg3+s0+b1oRGQYOCBqkXEim2ax58Lz6CcbEVe1/dKZD+X3eNeHR01nhjsiaXE8MwdjW7vh2tcNxF613HLKBGSKjYgvU5wU/50y0iz/1fUuovvPfk1ostCfmyrNAjtQdJRPkzCKVNQU71WY+kWvZlDtySNuQKc=",
+                            PasswordHash = "bagZI9OjiJIqC5pPdzrIoEfa18OcmZ7Th+pAwH9JAmlFOczHdv0pFR157ETgLR0RN5+oMzMjrckEalK6UjQ4gg==",
+                            PasswordSalt = "zsrabfT9LB/+Wc/4RRjPVGPmJZeQqusOqfdrcBLJD6t74mgJAGdQM+Qe2hoB28chPzpPrQ063I4Vac0T67/fuAK/XWABbi6uhTAn6LLGiV3kXptNdMIjqL7a6YWOnUz3GVv0y5Ln7j8Tb+aYfsUViKCNlVJJGMwB+goZuMfe5lE=",
                             PhoneNumber = "061111115",
                             Username = "petar21"
                         },
@@ -1145,8 +1235,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsTrener = true,
                             LastName = "Lukic",
-                            PasswordHash = "NqfMnfO/TvQrSWt7BTlSlGIXiuXbIQFrDD14EHu0l1N/uh6jAtpp/DdUVurizbfI02Z5BS2bhZFVBIwfPwhzXg==",
-                            PasswordSalt = "1bHWJrU96ikBB1lg3+s0+b1oRGQYOCBqkXEim2ax58Lz6CcbEVe1/dKZD+X3eNeHR01nhjsiaXE8MwdjW7vh2tcNxF613HLKBGSKjYgvU5wU/50y0iz/1fUuovvPfk1ostCfmyrNAjtQdJRPkzCKVNQU71WY+kWvZlDtySNuQKc=",
+                            PasswordHash = "bagZI9OjiJIqC5pPdzrIoEfa18OcmZ7Th+pAwH9JAmlFOczHdv0pFR157ETgLR0RN5+oMzMjrckEalK6UjQ4gg==",
+                            PasswordSalt = "zsrabfT9LB/+Wc/4RRjPVGPmJZeQqusOqfdrcBLJD6t74mgJAGdQM+Qe2hoB28chPzpPrQ063I4Vac0T67/fuAK/XWABbi6uhTAn6LLGiV3kXptNdMIjqL7a6YWOnUz3GVv0y5Ln7j8Tb+aYfsUViKCNlVJJGMwB+goZuMfe5lE=",
                             PhoneNumber = "061111116",
                             Username = "luka34"
                         },
@@ -1161,8 +1251,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsRadnik = true,
                             LastName = "Nedimovic",
-                            PasswordHash = "NeLI1bzsBtEfLvrvyBiyoAwp/cwe0wNZqTWIfEb4+kzqtW4/JUXtrZdDuC2SjAk1MiTlBj0DoE9Iv9PviAZh+g==",
-                            PasswordSalt = "lWL//ugb+8T/rG16xcttUfa8fLd/OpWJRQYYBxl7tGSWGNlu8oyKOTuWw/9QD+nMt9Sq5VmMirqgJXCVdmI/DX0chz0Qpd+Piz5+yPGabBfBrEGAe0ONQMLl0Z0N1Lafj9MCr0OSsdw2kGwM0OSoSDGqsL4nzDi6GbKuGdaBRBc=",
+                            PasswordHash = "G4xCza5rB0cY3j+8MuebnH1NZ87sg77zX5CCshXx7D+duo5LZGp6od9OZwDM0EbobYq8MzDqVMkyeKY1UsIAkQ==",
+                            PasswordSalt = "r9hC+/e3tlHTU42l9XocVI0GvRvIyM5iNw4vwzwuwGWKq3PHlIdjgOGcpMxmsO8mks22ixHI58aGDDavFe5ogl1WC9o4aMpSXgEWSO0eziLrmzjz0UkCPyao7TDqa2KAilTI3CWl4aBfGRXh1GuMZL0QUTcxlloVR6XQLzrXw/8=",
                             PhoneNumber = "061111117",
                             Username = "nedim89"
                         },
@@ -1177,8 +1267,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsRadnik = true,
                             LastName = "Amelovic",
-                            PasswordHash = "NeLI1bzsBtEfLvrvyBiyoAwp/cwe0wNZqTWIfEb4+kzqtW4/JUXtrZdDuC2SjAk1MiTlBj0DoE9Iv9PviAZh+g==",
-                            PasswordSalt = "lWL//ugb+8T/rG16xcttUfa8fLd/OpWJRQYYBxl7tGSWGNlu8oyKOTuWw/9QD+nMt9Sq5VmMirqgJXCVdmI/DX0chz0Qpd+Piz5+yPGabBfBrEGAe0ONQMLl0Z0N1Lafj9MCr0OSsdw2kGwM0OSoSDGqsL4nzDi6GbKuGdaBRBc=",
+                            PasswordHash = "G4xCza5rB0cY3j+8MuebnH1NZ87sg77zX5CCshXx7D+duo5LZGp6od9OZwDM0EbobYq8MzDqVMkyeKY1UsIAkQ==",
+                            PasswordSalt = "r9hC+/e3tlHTU42l9XocVI0GvRvIyM5iNw4vwzwuwGWKq3PHlIdjgOGcpMxmsO8mks22ixHI58aGDDavFe5ogl1WC9o4aMpSXgEWSO0eziLrmzjz0UkCPyao7TDqa2KAilTI3CWl4aBfGRXh1GuMZL0QUTcxlloVR6XQLzrXw/8=",
                             PhoneNumber = "061111118",
                             Username = "amela900"
                         },
@@ -1193,8 +1283,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsRadnik = true,
                             LastName = "Tarikovic",
-                            PasswordHash = "NeLI1bzsBtEfLvrvyBiyoAwp/cwe0wNZqTWIfEb4+kzqtW4/JUXtrZdDuC2SjAk1MiTlBj0DoE9Iv9PviAZh+g==",
-                            PasswordSalt = "lWL//ugb+8T/rG16xcttUfa8fLd/OpWJRQYYBxl7tGSWGNlu8oyKOTuWw/9QD+nMt9Sq5VmMirqgJXCVdmI/DX0chz0Qpd+Piz5+yPGabBfBrEGAe0ONQMLl0Z0N1Lafj9MCr0OSsdw2kGwM0OSoSDGqsL4nzDi6GbKuGdaBRBc=",
+                            PasswordHash = "G4xCza5rB0cY3j+8MuebnH1NZ87sg77zX5CCshXx7D+duo5LZGp6od9OZwDM0EbobYq8MzDqVMkyeKY1UsIAkQ==",
+                            PasswordSalt = "r9hC+/e3tlHTU42l9XocVI0GvRvIyM5iNw4vwzwuwGWKq3PHlIdjgOGcpMxmsO8mks22ixHI58aGDDavFe5ogl1WC9o4aMpSXgEWSO0eziLrmzjz0UkCPyao7TDqa2KAilTI3CWl4aBfGRXh1GuMZL0QUTcxlloVR6XQLzrXw/8=",
                             PhoneNumber = "061111119",
                             Username = "tarik345"
                         },
@@ -1209,8 +1299,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsRadnik = true,
                             LastName = "Eminovic",
-                            PasswordHash = "NeLI1bzsBtEfLvrvyBiyoAwp/cwe0wNZqTWIfEb4+kzqtW4/JUXtrZdDuC2SjAk1MiTlBj0DoE9Iv9PviAZh+g==",
-                            PasswordSalt = "lWL//ugb+8T/rG16xcttUfa8fLd/OpWJRQYYBxl7tGSWGNlu8oyKOTuWw/9QD+nMt9Sq5VmMirqgJXCVdmI/DX0chz0Qpd+Piz5+yPGabBfBrEGAe0ONQMLl0Z0N1Lafj9MCr0OSsdw2kGwM0OSoSDGqsL4nzDi6GbKuGdaBRBc=",
+                            PasswordHash = "G4xCza5rB0cY3j+8MuebnH1NZ87sg77zX5CCshXx7D+duo5LZGp6od9OZwDM0EbobYq8MzDqVMkyeKY1UsIAkQ==",
+                            PasswordSalt = "r9hC+/e3tlHTU42l9XocVI0GvRvIyM5iNw4vwzwuwGWKq3PHlIdjgOGcpMxmsO8mks22ixHI58aGDDavFe5ogl1WC9o4aMpSXgEWSO0eziLrmzjz0UkCPyao7TDqa2KAilTI3CWl4aBfGRXh1GuMZL0QUTcxlloVR6XQLzrXw/8=",
                             PhoneNumber = "061111120",
                             Username = "emina112"
                         },
@@ -1224,8 +1314,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Hasic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111121",
                             Username = "haris1"
                         },
@@ -1239,8 +1329,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Denisovic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111122",
                             Username = "denis2"
                         },
@@ -1254,8 +1344,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Alenovic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111123",
                             Username = "alen3"
                         },
@@ -1269,8 +1359,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Kenanovic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111124",
                             Username = "kenan4"
                         },
@@ -1284,8 +1374,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Jasminovic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111125",
                             Username = "jasmin5"
                         },
@@ -1299,8 +1389,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Lejlovic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111126",
                             Username = "lejla6"
                         },
@@ -1314,8 +1404,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Saric",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111127",
                             Username = "sara7"
                         },
@@ -1329,8 +1419,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Aminovic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111128",
                             Username = "amina8"
                         },
@@ -1344,8 +1434,8 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Emirovic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111129",
                             Username = "emir9"
                         },
@@ -1359,11 +1449,43 @@ namespace Gymify.Services.Migrations
                             IsActive = true,
                             IsUser = true,
                             LastName = "Nerminovic",
-                            PasswordHash = "MXdbK5opJla0Z/g5ooMWC0q1YjuHdHgRJ2gz/1B39WFEN9Vz12gLMp+f1d/4+eLCZpgOdpilzDqOiYB/FLrLoQ==",
-                            PasswordSalt = "QizuJj4FZxWkWzcb9akyUsJir5SJUljCGIyiWZg1SqBXrIBo1mgL13jZ3sQsNsiLsNh8HPrH1+zH6JPXBhgDb5gY95Dyq+MrpgxKZXZ+65Q2CqgcGfMta+gmkwFU++y/xgIA9tjItMZqAmhWFPzodD6DROnApc/8txerKBLTsqY=",
+                            PasswordHash = "LSXEZNCGq81H9uJ36m3SlUQPVobrymBxeqo9jFbW1bPRJeC7RTKTL1QiToM7p3rIR6Cmh+AOlKIoOcDwn84DHQ==",
+                            PasswordSalt = "yX91xeb/yU8r28Cj+hqAT4aRYBg8VetgJmRzB2Dcbph/U0hi2844pjJMhOMNWqUp3DH2wQ/Yc5h5UVptH1YK9G6aC2mh+fGvT1ABsjEC1T10cZ/sAIjzPtf6eriYQrKEUZUOIFWGbX5AxhsdqzuXzVNcuucyemOGhMUINKyDHlA=",
                             PhoneNumber = "061111130",
                             Username = "nermin10"
                         });
+                });
+
+            modelBuilder.Entity("Gymify.Services.Database.UserReward", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("RedeemedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RewardId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RewardId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRewards");
                 });
 
             modelBuilder.Entity("Gymify.Services.Database.UserRole", b =>
@@ -1395,140 +1517,140 @@ namespace Gymify.Services.Migrations
                         new
                         {
                             Id = 1,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8036),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(6718),
                             RoleId = 2,
                             UserId = 1
                         },
                         new
                         {
                             Id = 2,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8518),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7091),
                             RoleId = 2,
                             UserId = 2
                         },
                         new
                         {
                             Id = 3,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8520),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7092),
                             RoleId = 3,
                             UserId = 3
                         },
                         new
                         {
                             Id = 4,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8520),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7093),
                             RoleId = 3,
                             UserId = 4
                         },
                         new
                         {
                             Id = 5,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8521),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7093),
                             RoleId = 3,
                             UserId = 5
                         },
                         new
                         {
                             Id = 6,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8522),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7094),
                             RoleId = 3,
                             UserId = 6
                         },
                         new
                         {
                             Id = 7,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8523),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7095),
                             RoleId = 4,
                             UserId = 7
                         },
                         new
                         {
                             Id = 8,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8524),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7095),
                             RoleId = 4,
                             UserId = 8
                         },
                         new
                         {
                             Id = 9,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8525),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7096),
                             RoleId = 4,
                             UserId = 9
                         },
                         new
                         {
                             Id = 10,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8551),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7097),
                             RoleId = 4,
                             UserId = 10
                         },
                         new
                         {
                             Id = 11,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8552),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7097),
                             RoleId = 1,
                             UserId = 11
                         },
                         new
                         {
                             Id = 12,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8553),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7098),
                             RoleId = 1,
                             UserId = 12
                         },
                         new
                         {
                             Id = 13,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8586),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7098),
                             RoleId = 1,
                             UserId = 13
                         },
                         new
                         {
                             Id = 14,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8587),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7099),
                             RoleId = 1,
                             UserId = 14
                         },
                         new
                         {
                             Id = 15,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8588),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7100),
                             RoleId = 1,
                             UserId = 15
                         },
                         new
                         {
                             Id = 16,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8589),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7100),
                             RoleId = 1,
                             UserId = 16
                         },
                         new
                         {
                             Id = 17,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8590),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7101),
                             RoleId = 1,
                             UserId = 17
                         },
                         new
                         {
                             Id = 18,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8591),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7102),
                             RoleId = 1,
                             UserId = 18
                         },
                         new
                         {
                             Id = 19,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8592),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7102),
                             RoleId = 1,
                             UserId = 19
                         },
                         new
                         {
                             Id = 20,
-                            DateAssigned = new DateTime(2026, 3, 3, 3, 57, 46, 413, DateTimeKind.Utc).AddTicks(8593),
+                            DateAssigned = new DateTime(2026, 3, 3, 10, 56, 31, 517, DateTimeKind.Utc).AddTicks(7103),
                             RoleId = 1,
                             UserId = 20
                         });
@@ -1763,6 +1885,25 @@ namespace Gymify.Services.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Gymify.Services.Database.UserReward", b =>
+                {
+                    b.HasOne("Gymify.Services.Database.Reward", "Reward")
+                        .WithMany("UserRewards")
+                        .HasForeignKey("RewardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gymify.Services.Database.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reward");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Gymify.Services.Database.UserRole", b =>
                 {
                     b.HasOne("Gymify.Services.Database.Role", "Role")
@@ -1791,6 +1932,11 @@ namespace Gymify.Services.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Gymify.Services.Database.Reward", b =>
+                {
+                    b.Navigation("UserRewards");
                 });
 
             modelBuilder.Entity("Gymify.Services.Database.Role", b =>

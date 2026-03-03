@@ -33,6 +33,16 @@ namespace Gymify.Services.Services
                 query = query.Where(x => x.UserId == search.UserId.Value);
             }
 
+            if (!string.IsNullOrEmpty(search.SortBy))
+            {
+                if (search.SortBy == "createdAt")
+                {
+                    query = search.SortDirection == "desc"
+                        ? query.OrderByDescending(x => x.CreatedAt)
+                        : query.OrderBy(x => x.CreatedAt);
+                }
+            }
+
             if (!string.IsNullOrEmpty(search.FTS))
             {
                 query = query.Where(x => x.Title.ToLower().Contains(search.FTS)

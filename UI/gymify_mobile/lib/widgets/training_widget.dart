@@ -3,6 +3,8 @@ import 'package:gymify_mobile/config/api_config.dart';
 import 'package:gymify_mobile/dialogs/confirmation_dialogs.dart';
 import 'package:gymify_mobile/helper/date_helper.dart';
 import 'package:gymify_mobile/helper/image_helper.dart';
+import 'package:gymify_mobile/providers/loyalty_point_history_provider.dart';
+import 'package:gymify_mobile/providers/loyalty_point_provider.dart';
 import 'package:gymify_mobile/providers/reservation_provider.dart';
 import 'package:gymify_mobile/utils/session.dart';
 import 'package:gymify_mobile/widgets/swipe_widget.dart';
@@ -118,6 +120,8 @@ class _TrainingWidgetState extends State<TrainingWidget> {
   Future<void> _reserveTraining(Training t) async {
   final reservationProvider = context.read<ReservationProvider>();
   final trainingProvider = context.read<TrainingProvider>();
+  final lpProviderH = context.read<LoyaltyPointHistoryProvider>();
+  final lpProvider = context.read<LoyaltyPointProvider>();
 
   final userId = Session.userId;
   final trainingId = t.id;
@@ -137,7 +141,6 @@ class _TrainingWidgetState extends State<TrainingWidget> {
     return;
   }
 
-  // 🔥 2. Potvrda korisnika
   final ok = await ConfirmDialogs.yesNoConfirmation(
     context,
     title: "Rezervacija",
@@ -159,6 +162,18 @@ class _TrainingWidgetState extends State<TrainingWidget> {
     await reservationProvider.insert(request);
 
     await trainingProvider.up(t.id);
+
+    await lpProvider.addPoints({
+  "userId": Session.userId,
+  "points": 1, 
+});
+
+await lpProviderH.insert({
+        "userId": Session.userId,
+        "status": "Plaćanje nagrade",
+        "amountPointsParticipation": 1,
+        "createdAt": DateTime.now().toIso8601String()
+      });
 
     await ConfirmDialogs.okConfirmation(
       context,
