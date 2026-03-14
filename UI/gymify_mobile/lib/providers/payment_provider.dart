@@ -37,11 +37,11 @@ class PaymentProvider extends BaseProvider<Payment> {
 }
 
 Future<String> createNewIntent(Map<String, dynamic> request) async {
-  final url = "${ApiConfig.apiBase}/create-new-intent";
+  final url = "${ApiConfig.apiBase}/api/payment/create-new-intent";
 
   final response = await http.post(
     Uri.parse(url),
-    body: jsonEncode(request), 
+    body: jsonEncode(request),
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer ${Session.token}",
@@ -52,7 +52,7 @@ Future<String> createNewIntent(Map<String, dynamic> request) async {
     throw Exception("Greška pri kreiranju payment intenta: ${response.body}");
   }
 
-  final data = jsonDecode(response.body); 
+  final data = jsonDecode(response.body);
 
   return data["clientSecret"] as String;
 }

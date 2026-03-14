@@ -8,27 +8,29 @@ namespace Gymify.Services.Database
     public class Payment
     {
         [Key]
-        public int Id {get; set;}
+        public int Id { get; set; }
 
         [ForeignKey(nameof(UserId))]
 
-        public int UserId {get; set;}
+        public int UserId { get; set; }
 
-        public User User {get; set;}
+        public User User { get; set; }
 
         [ForeignKey(nameof(MembershipId))]
 
-        public int MembershipId {get; set;}
+        public int MembershipId { get; set; }
 
-        public Membership Membership {get; set;}
+        public Membership Membership { get; set; }
 
-        public double Amount {get; set;}
+        public decimal Amount { get; set; }
 
-        public DateTime PaymentDate {get; set;}
+    public DateTime PaymentDate { get; set; }
+    public DateTime? PaidAt { get; set; }
 
-        public string? StripePaymentIntentId { get; set; }
-        public DateTime? PaidAt { get; set; }
-        public string PaymentStatus { get; set; } = "Pending"; 
-        
+    public string PaymentStatus { get; set; } = "Pending";
+    public string? StripePaymentIntentId { get; set; }
+
+    public string? BillingPeriod { get; set; } // monthly / yearl
+
     }
 }

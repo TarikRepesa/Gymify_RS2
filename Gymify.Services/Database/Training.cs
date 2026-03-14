@@ -19,6 +19,10 @@ namespace Gymify.Services.Database
 
        public string Name {get; set;}
 
+       public int DurationMinutes { get; set; }
+       public int IntensityLevel { get; set; } 
+       public string Purpose { get; set; } 
+
        public string? TrainingImage {get; set;}
 
        public int MaxAmountOfParticipants {get; set;}

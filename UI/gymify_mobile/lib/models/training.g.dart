@@ -8,15 +8,21 @@ part of 'training.dart';
 
 Training _$TrainingFromJson(Map<String, dynamic> json) => Training(
   id: (json['id'] as num).toInt(),
-  userId: (json['userId'] as num).toInt(),
+  userId: (json['userId'] as num?)?.toInt(),
   user: json['user'] == null
       ? null
       : User.fromJson(json['user'] as Map<String, dynamic>),
-  name: json['name'] as String,
+  name: json['name'] as String?,
+  durationMinutes: (json['durationMinutes'] as num?)?.toInt(),
+  intensityLevel: (json['intensityLevel'] as num?)?.toInt(),
+  purpose: json['purpose'] as String?,
   trainingImage: json['trainingImage'] as String?,
-  maxAmountOfParticipants: (json['maxAmountOfParticipants'] as num).toInt(),
-  currentParticipants: (json['currentParticipants'] as num).toInt(),
-  startDate: DateTime.parse(json['startDate'] as String),
+  maxAmountOfParticipants: (json['maxAmountOfParticipants'] as num?)?.toInt(),
+  currentParticipants: (json['currentParticipants'] as num?)?.toInt(),
+  paricipatedOfAllTime: (json['paricipatedOfAllTime'] as num?)?.toInt(),
+  startDate: json['startDate'] == null
+      ? null
+      : DateTime.parse(json['startDate'] as String),
 );
 
 Map<String, dynamic> _$TrainingToJson(Training instance) => <String, dynamic>{
@@ -24,8 +30,12 @@ Map<String, dynamic> _$TrainingToJson(Training instance) => <String, dynamic>{
   'userId': instance.userId,
   'user': instance.user,
   'name': instance.name,
+  'durationMinutes': instance.durationMinutes,
+  'intensityLevel': instance.intensityLevel,
+  'purpose': instance.purpose,
   'trainingImage': instance.trainingImage,
   'maxAmountOfParticipants': instance.maxAmountOfParticipants,
   'currentParticipants': instance.currentParticipants,
-  'startDate': instance.startDate.toIso8601String(),
+  'paricipatedOfAllTime': instance.paricipatedOfAllTime,
+  'startDate': instance.startDate?.toIso8601String(),
 };

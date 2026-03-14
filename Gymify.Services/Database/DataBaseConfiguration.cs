@@ -1,4 +1,4 @@
-using Gymify.Services.Database;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -8,10 +8,17 @@ namespace Gymify.Services.Database
     {
         public GymifyDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<GymifyDbContext>();
+            Env.Load(Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"));
 
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new Exception("CONNECTION_STRING nije postavljen u .env fajlu.");
+
+            var optionsBuilder = new DbContextOptionsBuilder<GymifyDbContext>();
             optionsBuilder.UseSqlServer(
-                "Server=.\\SQLEXPRESS;Database=GymifyDb;Trusted_Connection=True;TrustServerCertificate=True;"
+                connectionString,
+                b => b.MigrationsAssembly("Gymify.Services")
             );
 
             return new GymifyDbContext(optionsBuilder.Options);

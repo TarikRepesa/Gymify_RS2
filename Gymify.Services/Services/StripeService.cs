@@ -1,22 +1,27 @@
+using Gymify.Services.Interfaces;
 using Stripe;
 
 namespace Gymify.WebAPI.Services
 {
-    public class StripeService
+    public class StripeService : IStripeService
     {
         public async Task<PaymentIntent> CreatePaymentIntentAsync(
-            double amount,
+            decimal amount,
             string currency,
             Dictionary<string, string> metadata)
         {
             var options = new PaymentIntentCreateOptions
             {
-                Amount = (long)(amount * 100), // 2 decimal currency
+                
+                Amount = (long)(amount * 100m),
+
                 Currency = currency,
+
                 AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
                 {
                     Enabled = true
                 },
+
                 Metadata = metadata
             };
 

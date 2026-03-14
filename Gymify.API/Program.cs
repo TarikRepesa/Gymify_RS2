@@ -1,32 +1,81 @@
+using DotNetEnv;
 using Gymify.Services;
 using Gymify.Services.Database;
-using Mapster;
-using MapsterMapper;
-using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
-using Gymify.WebAPI.Authentication;
+using Gymify.Services.Implementations;
 using Gymify.Services.Interfaces;
 using Gymify.Services.Services;
-using RabbitMQ.Client;
+using Gymify.WebAPI.Authentication;
 using Gymify.WebAPI.Services;
-using DotNetEnv;
-using Stripe;
 using Gymify.WebAPI.StripeConfig;
-using Gymify.Services.Implementations;
+using Mapster;
+using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
+using Stripe;
 
 Env.Load(Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"));
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
+var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+
+var stripeSecret = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+var stripeWebhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET");
+
+var rabbitHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST");
+var rabbitPortString = Environment.GetEnvironmentVariable("RABBITMQ_PORT");
+var rabbitUser = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME");
+var rabbitPass = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD");
+var rabbitVHost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST");
+
+
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new Exception("CONNECTION_STRING nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(jwtSecret))
+    throw new Exception("JWT_SECRET nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(jwtIssuer))
+    throw new Exception("JWT_ISSUER nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(jwtAudience))
+    throw new Exception("JWT_AUDIENCE nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(stripeSecret))
+    throw new Exception("STRIPE_SECRET_KEY nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(stripeWebhookSecret))
+    throw new Exception("STRIPE_WEBHOOK_SECRET nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(rabbitHost))
+    throw new Exception("RABBITMQ_HOST nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(rabbitPortString) || !int.TryParse(rabbitPortString, out var rabbitPort))
+    throw new Exception("RABBITMQ_PORT nije validan u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(rabbitUser))
+    throw new Exception("RABBITMQ_USERNAME nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(rabbitPass))
+    throw new Exception("RABBITMQ_PASSWORD nije postavljen u .env fajlu.");
+
+if (string.IsNullOrWhiteSpace(rabbitVHost))
+    rabbitVHost = "/";
+
 builder.Services.AddDbContext<GymifyDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        connectionString,
         b => b.MigrationsAssembly("Gymify.Services")
     ));
 
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gymify API", Version = "v1" });
@@ -46,22 +95,25 @@ builder.Services.AddSwaggerGen(c =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
             },
             Array.Empty<string>()
         }
     });
 });
 
-
-
 TypeAdapterConfig.GlobalSettings.Default
-            .IgnoreNullValues(true)      
-            .PreserveReference(true)     
-            .ShallowCopyForSameType(true);
+    .IgnoreNullValues(true)
+    .PreserveReference(true)
+    .ShallowCopyForSameType(true);
 
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddTransient<IMapper, ServiceMapper>();
+
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILoyaltyPointHistoryService, LoyaltyPointHistoryService>();
 builder.Services.AddTransient<ILoyaltyPointService, LoyaltyPointService>();
@@ -80,44 +132,37 @@ builder.Services.AddTransient<IRewardService, RewardService>();
 builder.Services.AddTransient<IUserRewardService, UserRewardService>();
 builder.Services.AddTransient<IReportsService, ReportService>();
 
-var stripeSecret = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
-var stripeWebhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET");
 
 StripeConfiguration.ApiKey = stripeSecret;
 
 builder.Services.AddSingleton(new StripeSettings
 {
-    SecretKey = stripeSecret!,
-    WebhookSecret = stripeWebhookSecret!
+    SecretKey = stripeSecret,
+    WebhookSecret = stripeWebhookSecret
 });
 
-builder.Services.AddScoped<StripeService>();
+builder.Services.AddScoped<IStripeService,StripeService>();
+
 
 builder.Services.AddSingleton<IConnection>(_ =>
 {
-    var host = Environment.GetEnvironmentVariable("RABBITMQ_HOST");
-    var port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ_PORT"));
-    var user = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME");
-    var pass = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD");
-    var vhost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST");
-
     var factory = new ConnectionFactory
     {
-        HostName = host,
-        Port = port,
-        UserName = user,
-        Password = pass,
-        VirtualHost = vhost
+        HostName = rabbitHost,
+        Port = rabbitPort,
+        UserName = rabbitUser,
+        Password = rabbitPass,
+        VirtualHost = rabbitVHost
     };
 
     return factory.CreateConnectionAsync().GetAwaiter().GetResult();
 });
 
-builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddJwtAuthentication();
 builder.Services.AddAuthorization();
 
-
 var app = builder.Build();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -125,12 +170,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<GymifyDbContext>();
-    db.Database.Migrate();
-}
-
+// using (var scope = app.Services.CreateScope())
+// {
+//     var db = scope.ServiceProvider.GetRequiredService<GymifyDbContext>();
+//     db.Database.Migrate();
+// }
 
 app.UseStaticFiles();
 

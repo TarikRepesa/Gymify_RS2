@@ -20,8 +20,8 @@ namespace Gymify.Services.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MonthlyPrice = table.Column<double>(type: "float", nullable: false),
-                    YearPrice = table.Column<double>(type: "float", nullable: false),
+                    MonthlyPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    YearPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -205,11 +205,12 @@ namespace Gymify.Services.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     MembershipId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<double>(type: "float", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StripePaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StripePaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BillingPeriod = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -257,6 +258,9 @@ namespace Gymify.Services.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DurationMinutes = table.Column<int>(type: "int", nullable: false),
+                    IntensityLevel = table.Column<int>(type: "int", nullable: false),
+                    Purpose = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TrainingImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MaxAmountOfParticipants = table.Column<int>(type: "int", nullable: false),
                     CurrentParticipants = table.Column<int>(type: "int", nullable: false),
@@ -386,10 +390,10 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "CreatedAt", "MonthlyPrice", "Name", "YearPrice" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 30.0, "Basic", 300.0 },
-                    { 2, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 45.0, "Standard", 450.0 },
-                    { 3, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 60.0, "Premium", 600.0 },
-                    { 4, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 80.0, "VIP", 800.0 }
+                    { 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 30m, "Basic", 300m },
+                    { 2, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 45m, "Standard", 450m },
+                    { 3, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 60m, "Premium", 600m },
+                    { 4, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 80m, "VIP", 800m }
                 });
 
             migrationBuilder.InsertData(
@@ -409,10 +413,10 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "CreatedAt", "Description", "IsActive", "Name" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 3, 3, 20, 55, 43, 360, DateTimeKind.Utc).AddTicks(549), "", true, "Korisnik" },
-                    { 2, new DateTime(2026, 3, 3, 20, 55, 43, 360, DateTimeKind.Utc).AddTicks(942), "", true, "Admin" },
-                    { 3, new DateTime(2026, 3, 3, 20, 55, 43, 360, DateTimeKind.Utc).AddTicks(944), "", true, "Trener" },
-                    { 4, new DateTime(2026, 3, 3, 20, 55, 43, 360, DateTimeKind.Utc).AddTicks(946), "", true, "Radnik" }
+                    { 1, new DateTime(2026, 3, 13, 15, 0, 32, 877, DateTimeKind.Utc).AddTicks(2505), "", true, "Korisnik" },
+                    { 2, new DateTime(2026, 3, 13, 15, 0, 32, 877, DateTimeKind.Utc).AddTicks(2942), "", true, "Admin" },
+                    { 3, new DateTime(2026, 3, 13, 15, 0, 32, 877, DateTimeKind.Utc).AddTicks(2960), "", true, "Trener" },
+                    { 4, new DateTime(2026, 3, 13, 15, 0, 32, 877, DateTimeKind.Utc).AddTicks(2961), "", true, "Radnik" }
                 });
 
             migrationBuilder.InsertData(
@@ -420,26 +424,26 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "AboutMe", "CreatedAt", "DateOfBirth", "Email", "FirstName", "IsActive", "IsAdmin", "IsRadnik", "IsTrener", "IsUser", "LastLoginAt", "LastName", "PasswordHash", "PasswordSalt", "PhoneNumber", "UserImage", "Username" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1995, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "healthcaretest190@gmail.com", "Tarik", true, true, null, null, null, null, "Malic", "V26/Yx5PXrUhh0yJVMk1GUe0soYwbRm9o0h30WF3hNm0YvpK5CFhurKB4ZA8TRMk3ZjSpIpZsyWWzpdqgkVfQw==", "MYa/u6NzLof6vOnK0/4BKAhM3fKtvasv1Cp6SxiRqfHXiwX+VGlb6tMdGfI296lFcC/94juBxhiDWqb8vxihyxLRQbyDO+9+P5iterCeQvM9zua5u3iybcg5+TA7Y++nP0PsfzGyf8CMSpkkFXsfJMxQ38MvtNzMFhKQ9EDuOkE=", "061111111", null, "tare45" },
-                    { 2, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1994, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "amir@example.com", "Amir", true, true, null, null, null, null, "Ibrahimovic", "V26/Yx5PXrUhh0yJVMk1GUe0soYwbRm9o0h30WF3hNm0YvpK5CFhurKB4ZA8TRMk3ZjSpIpZsyWWzpdqgkVfQw==", "MYa/u6NzLof6vOnK0/4BKAhM3fKtvasv1Cp6SxiRqfHXiwX+VGlb6tMdGfI296lFcC/94juBxhiDWqb8vxihyxLRQbyDO+9+P5iterCeQvM9zua5u3iybcg5+TA7Y++nP0PsfzGyf8CMSpkkFXsfJMxQ38MvtNzMFhKQ9EDuOkE=", "061111112", null, "amir56" },
-                    { 3, "Licencirani fitness trener sa 5 godina iskustva u radu sa klijentima svih uzrasta.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1990, 7, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), "marko@example.com", "Marko", true, null, null, true, null, null, "Markovic", "4NrtPp2ClXXtY/C5fLwTxqTrNDUDM/Hi4CmsDfGYwFwI0OELlpf9/8A+fPaJiVHZrg18xOyAd91uSeT7OUTxvQ==", "tTloXm8SosS7ZMvzp6fuzLfkLgCHz36KAZW5VE1miqsaULHC6xao022V8CDB1dgOX3Q0v4l1JyW6uM+13ShbZGZt6bZi/TC3bXMp1dGEbgsRsrg0cxTWrsifoMgzWGlqu4TTqjaLw1g1zPyNvxRt+wioRuWKlqfwni4/HQbQNrk=", "061111113", null, "marko78" },
-                    { 4, "Specijalizovan za kondicionu pripremu i izgradnju mišićne mase.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1989, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "ivan@example.com", "Ivan", true, null, null, true, null, null, "Ivic", "4NrtPp2ClXXtY/C5fLwTxqTrNDUDM/Hi4CmsDfGYwFwI0OELlpf9/8A+fPaJiVHZrg18xOyAd91uSeT7OUTxvQ==", "tTloXm8SosS7ZMvzp6fuzLfkLgCHz36KAZW5VE1miqsaULHC6xao022V8CDB1dgOX3Q0v4l1JyW6uM+13ShbZGZt6bZi/TC3bXMp1dGEbgsRsrg0cxTWrsifoMgzWGlqu4TTqjaLw1g1zPyNvxRt+wioRuWKlqfwni4/HQbQNrk=", "061111114", null, "ivan11" },
-                    { 5, "Stručnjak za funkcionalne treninge i planove ishrane.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1992, 9, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "petar@example.com", "Petar", true, null, null, true, null, null, "Petrovic", "4NrtPp2ClXXtY/C5fLwTxqTrNDUDM/Hi4CmsDfGYwFwI0OELlpf9/8A+fPaJiVHZrg18xOyAd91uSeT7OUTxvQ==", "tTloXm8SosS7ZMvzp6fuzLfkLgCHz36KAZW5VE1miqsaULHC6xao022V8CDB1dgOX3Q0v4l1JyW6uM+13ShbZGZt6bZi/TC3bXMp1dGEbgsRsrg0cxTWrsifoMgzWGlqu4TTqjaLw1g1zPyNvxRt+wioRuWKlqfwni4/HQbQNrk=", "061111115", null, "petar21" },
-                    { 6, "Posvećen radu sa početnicima i personalizovanim fitness programima.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1993, 12, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "luka@example.com", "Luka", true, null, null, true, null, null, "Lukic", "4NrtPp2ClXXtY/C5fLwTxqTrNDUDM/Hi4CmsDfGYwFwI0OELlpf9/8A+fPaJiVHZrg18xOyAd91uSeT7OUTxvQ==", "tTloXm8SosS7ZMvzp6fuzLfkLgCHz36KAZW5VE1miqsaULHC6xao022V8CDB1dgOX3Q0v4l1JyW6uM+13ShbZGZt6bZi/TC3bXMp1dGEbgsRsrg0cxTWrsifoMgzWGlqu4TTqjaLw1g1zPyNvxRt+wioRuWKlqfwni4/HQbQNrk=", "061111116", null, "luka34" },
-                    { 7, "Zadužen za organizaciju termina i podršku članovima teretane.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1996, 4, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), "nedim@example.com", "Nedim", true, null, true, null, null, null, "Nedimovic", "oOK82G7zy1tHBkP8BB8o5uQeprxTGP3d+iAzuuJaF5CvCWMQlOD9n5vm8HpbWwgfbzI7ehB4Kyn47S+fpUo54w==", "RISTpm8VRIfvIJ7MNGyEGAsAdaz0YbZU3Ug9G/AOmi59UxncpayM6Lxhz2wXVOwNMy7EO44k9gVZzFjHaKf9C0dA+kzYhFqNW6nOv5Zg12piAiOGKmb7T8N7JXocP6DG5kh5Y03qlLqwTGaQnW9ojbGlTY+NlCK7rrBcvdWB4Og=", "061111117", null, "nedim89" },
-                    { 8, "Brine o administraciji i svakodnevnom radu fitness centra.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1997, 8, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), "amela@example.com", "Amela", true, null, true, null, null, null, "Amelovic", "oOK82G7zy1tHBkP8BB8o5uQeprxTGP3d+iAzuuJaF5CvCWMQlOD9n5vm8HpbWwgfbzI7ehB4Kyn47S+fpUo54w==", "RISTpm8VRIfvIJ7MNGyEGAsAdaz0YbZU3Ug9G/AOmi59UxncpayM6Lxhz2wXVOwNMy7EO44k9gVZzFjHaKf9C0dA+kzYhFqNW6nOv5Zg12piAiOGKmb7T8N7JXocP6DG5kh5Y03qlLqwTGaQnW9ojbGlTY+NlCK7rrBcvdWB4Og=", "061111118", null, "amela900" },
-                    { 9, "Odgovoran za korisničku podršku i prijem novih članova.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1995, 11, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), "tarik@example.com", "Tarik", true, null, true, null, null, null, "Tarikovic", "oOK82G7zy1tHBkP8BB8o5uQeprxTGP3d+iAzuuJaF5CvCWMQlOD9n5vm8HpbWwgfbzI7ehB4Kyn47S+fpUo54w==", "RISTpm8VRIfvIJ7MNGyEGAsAdaz0YbZU3Ug9G/AOmi59UxncpayM6Lxhz2wXVOwNMy7EO44k9gVZzFjHaKf9C0dA+kzYhFqNW6nOv5Zg12piAiOGKmb7T8N7JXocP6DG5kh5Y03qlLqwTGaQnW9ojbGlTY+NlCK7rrBcvdWB4Og=", "061111119", null, "tarik345" },
-                    { 10, "Koordinira raspored treninga i komunikaciju sa trenerima.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1998, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "emina@example.com", "Emina", true, null, true, null, null, null, "Eminovic", "oOK82G7zy1tHBkP8BB8o5uQeprxTGP3d+iAzuuJaF5CvCWMQlOD9n5vm8HpbWwgfbzI7ehB4Kyn47S+fpUo54w==", "RISTpm8VRIfvIJ7MNGyEGAsAdaz0YbZU3Ug9G/AOmi59UxncpayM6Lxhz2wXVOwNMy7EO44k9gVZzFjHaKf9C0dA+kzYhFqNW6nOv5Zg12piAiOGKmb7T8N7JXocP6DG5kh5Y03qlLqwTGaQnW9ojbGlTY+NlCK7rrBcvdWB4Og=", "061111120", null, "emina112" },
-                    { 11, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2000, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), "korisniktestiranje264@gmail.com", "Haris", true, null, null, null, true, null, "Hasic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111121", null, "haris1" },
-                    { 12, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 9, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), "denis2@example.com", "Denis", true, null, null, null, true, null, "Denisovic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111122", null, "denis2" },
-                    { 13, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), "alen3@example.com", "Alen", true, null, null, null, true, null, "Alenovic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111123", null, "alen3" },
-                    { 14, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1998, 7, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), "kenan4@example.com", "Kenan", true, null, null, null, true, null, "Kenanovic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111124", null, "kenan4" },
-                    { 15, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1997, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "jasmin5@example.com", "Jasmin", true, null, null, null, true, null, "Jasminovic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111125", null, "jasmin5" },
-                    { 16, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), "lejla6@example.com", "Lejla", true, null, null, null, true, null, "Lejlovic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111126", null, "lejla6" },
-                    { 17, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 5, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), "sara7@example.com", "Sara", true, null, null, null, true, null, "Saric", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111127", null, "sara7" },
-                    { 18, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 12, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "amina8@example.com", "Amina", true, null, null, null, true, null, "Aminovic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111128", null, "amina8" },
-                    { 19, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1998, 8, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), "emir9@example.com", "Emir", true, null, null, null, true, null, "Emirovic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111129", null, "emir9" },
-                    { 20, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1997, 1, 27, 0, 0, 0, 0, DateTimeKind.Unspecified), "nermin10@example.com", "Nermin", true, null, null, null, true, null, "Nerminovic", "rYYWgFu0s1P6qUMJPxdlCmENwF75JJdylfyfQKP3Rut2AJdD/BWbNDZ0pRunoaQ0iSyocRoS/ReY3oHf8sGAnw==", "Nj+Ox7DraVrCjolNQeJZTE0K7zaWhh6/oDlA0PeSVUTwLyJl7nwH4r7sbydxfhCybpX1Gggs4IfjF8RxXdTKZEvgxLuK0rHp+PFn+ZF+XlVlE6LzJPcVqDgy20tMo0AdlAWFkMAs3WEks4PgAd/pq32LG8quYtlz1ISpO14tGkw=", "061111130", null, "nermin10" }
+                    { 1, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1995, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "healthcaretest190@gmail.com", "Tarik", true, true, null, null, null, null, "Malic", "nxgnOURJ3JxT6tYeZezrmUB7nCrbI/RW8BS0U4MCvmBkVOPII+clqMWrSEXGWdsFlAvP2HhrF73GuAUpHATPKw==", "rOvI/rigU2VDKgv4B2GZHeHfCGgNXCWL7pvQQUP3PGjaQuHCAfeRSu3xUogTFnGPYfWXQoZPRo+FPfNnoKtvPAROvRaEfOrPZkhYTmdDubl4fC9lcQ4QHk4y1TzbtsQeR5ZXdWL4F9qzWDGtZwo2qLUprOkfsMNLND0pumhZUuI=", "061111111", null, "tare45" },
+                    { 2, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1994, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "amir@example.com", "Amir", true, true, null, null, null, null, "Ibrahimovic", "nxgnOURJ3JxT6tYeZezrmUB7nCrbI/RW8BS0U4MCvmBkVOPII+clqMWrSEXGWdsFlAvP2HhrF73GuAUpHATPKw==", "rOvI/rigU2VDKgv4B2GZHeHfCGgNXCWL7pvQQUP3PGjaQuHCAfeRSu3xUogTFnGPYfWXQoZPRo+FPfNnoKtvPAROvRaEfOrPZkhYTmdDubl4fC9lcQ4QHk4y1TzbtsQeR5ZXdWL4F9qzWDGtZwo2qLUprOkfsMNLND0pumhZUuI=", "061111112", null, "amir56" },
+                    { 3, "Licencirani fitness trener sa 5 godina iskustva u radu sa klijentima svih uzrasta.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1990, 7, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), "marko@example.com", "Marko", true, null, null, true, null, null, "Markovic", "CS/0BX0v0s9V10g1xGflmLQyAVMrtBs/adFSgkN0fFTG6t6ot+bwjwifkW8x0+Ls95x9CLAZ15VtjWn7UtQJPQ==", "muBI9TKvozdQRIzgSVb4N17V+gVSgOzCMo9XGSiuOL3/cNSU4vQDhMw8i7vlZYQ4zmQ84WINHkD3GMn5Dz2bblohcMM7tiJBaTeK+obRbW09rKOVZD+9JOzA120XMI1O0MFBSH2VnDqJskloMkp83k36KVw1aqj0LTY/FkVxuEw=", "061111113", null, "marko78" },
+                    { 4, "Specijalizovan za kondicionu pripremu i izgradnju mišićne mase.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1989, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "ivan@example.com", "Ivan", true, null, null, true, null, null, "Ivic", "CS/0BX0v0s9V10g1xGflmLQyAVMrtBs/adFSgkN0fFTG6t6ot+bwjwifkW8x0+Ls95x9CLAZ15VtjWn7UtQJPQ==", "muBI9TKvozdQRIzgSVb4N17V+gVSgOzCMo9XGSiuOL3/cNSU4vQDhMw8i7vlZYQ4zmQ84WINHkD3GMn5Dz2bblohcMM7tiJBaTeK+obRbW09rKOVZD+9JOzA120XMI1O0MFBSH2VnDqJskloMkp83k36KVw1aqj0LTY/FkVxuEw=", "061111114", null, "ivan11" },
+                    { 5, "Stručnjak za funkcionalne treninge i planove ishrane.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1992, 9, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "petar@example.com", "Petar", true, null, null, true, null, null, "Petrovic", "CS/0BX0v0s9V10g1xGflmLQyAVMrtBs/adFSgkN0fFTG6t6ot+bwjwifkW8x0+Ls95x9CLAZ15VtjWn7UtQJPQ==", "muBI9TKvozdQRIzgSVb4N17V+gVSgOzCMo9XGSiuOL3/cNSU4vQDhMw8i7vlZYQ4zmQ84WINHkD3GMn5Dz2bblohcMM7tiJBaTeK+obRbW09rKOVZD+9JOzA120XMI1O0MFBSH2VnDqJskloMkp83k36KVw1aqj0LTY/FkVxuEw=", "061111115", null, "petar21" },
+                    { 6, "Posvećen radu sa početnicima i personalizovanim fitness programima.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1993, 12, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "luka@example.com", "Luka", true, null, null, true, null, null, "Lukic", "CS/0BX0v0s9V10g1xGflmLQyAVMrtBs/adFSgkN0fFTG6t6ot+bwjwifkW8x0+Ls95x9CLAZ15VtjWn7UtQJPQ==", "muBI9TKvozdQRIzgSVb4N17V+gVSgOzCMo9XGSiuOL3/cNSU4vQDhMw8i7vlZYQ4zmQ84WINHkD3GMn5Dz2bblohcMM7tiJBaTeK+obRbW09rKOVZD+9JOzA120XMI1O0MFBSH2VnDqJskloMkp83k36KVw1aqj0LTY/FkVxuEw=", "061111116", null, "luka34" },
+                    { 7, "Zadužen za organizaciju termina i podršku članovima teretane.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1996, 4, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), "nedim@example.com", "Nedim", true, null, true, null, null, null, "Nedimovic", "d8iXdLpB5h5oQLbdWMWnROnyQNmkYVayUtZcWsZQLaP6AlXnJG6saiL6wnFNZEBZNhZNDWuy/FmZGSa2Se1SHw==", "SA+hgk1bKKrdsWFNQfqtc0H79fTyzNGS6BD7n7ObMQRiJ/q5/NNKtMXHsZw4oh0guFXKrfBtj8+93oCnDVVP+9yFHOxSD+IIJYqDA8Jeh57J+IspsInFEWOdKMPw1Dqv2i6F/igb6tF/vnie2LRyfwinqCTwlqN1da2yxqxhwvQ=", "061111117", null, "nedim89" },
+                    { 8, "Brine o administraciji i svakodnevnom radu fitness centra.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1997, 8, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), "amela@example.com", "Amela", true, null, true, null, null, null, "Amelovic", "d8iXdLpB5h5oQLbdWMWnROnyQNmkYVayUtZcWsZQLaP6AlXnJG6saiL6wnFNZEBZNhZNDWuy/FmZGSa2Se1SHw==", "SA+hgk1bKKrdsWFNQfqtc0H79fTyzNGS6BD7n7ObMQRiJ/q5/NNKtMXHsZw4oh0guFXKrfBtj8+93oCnDVVP+9yFHOxSD+IIJYqDA8Jeh57J+IspsInFEWOdKMPw1Dqv2i6F/igb6tF/vnie2LRyfwinqCTwlqN1da2yxqxhwvQ=", "061111118", null, "amela900" },
+                    { 9, "Odgovoran za korisničku podršku i prijem novih članova.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1995, 11, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), "tarik@example.com", "Tarik", true, null, true, null, null, null, "Tarikovic", "d8iXdLpB5h5oQLbdWMWnROnyQNmkYVayUtZcWsZQLaP6AlXnJG6saiL6wnFNZEBZNhZNDWuy/FmZGSa2Se1SHw==", "SA+hgk1bKKrdsWFNQfqtc0H79fTyzNGS6BD7n7ObMQRiJ/q5/NNKtMXHsZw4oh0guFXKrfBtj8+93oCnDVVP+9yFHOxSD+IIJYqDA8Jeh57J+IspsInFEWOdKMPw1Dqv2i6F/igb6tF/vnie2LRyfwinqCTwlqN1da2yxqxhwvQ=", "061111119", null, "tarik345" },
+                    { 10, "Koordinira raspored treninga i komunikaciju sa trenerima.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1998, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "emina@example.com", "Emina", true, null, true, null, null, null, "Eminovic", "d8iXdLpB5h5oQLbdWMWnROnyQNmkYVayUtZcWsZQLaP6AlXnJG6saiL6wnFNZEBZNhZNDWuy/FmZGSa2Se1SHw==", "SA+hgk1bKKrdsWFNQfqtc0H79fTyzNGS6BD7n7ObMQRiJ/q5/NNKtMXHsZw4oh0guFXKrfBtj8+93oCnDVVP+9yFHOxSD+IIJYqDA8Jeh57J+IspsInFEWOdKMPw1Dqv2i6F/igb6tF/vnie2LRyfwinqCTwlqN1da2yxqxhwvQ=", "061111120", null, "emina112" },
+                    { 11, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2000, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), "korisniktestiranje264@gmail.com", "Haris", true, null, null, null, true, null, "Hasic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111121", null, "haris1" },
+                    { 12, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 9, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), "denis2@example.com", "Denis", true, null, null, null, true, null, "Denisovic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111122", null, "denis2" },
+                    { 13, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), "alen3@example.com", "Alen", true, null, null, null, true, null, "Alenovic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111123", null, "alen3" },
+                    { 14, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1998, 7, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), "kenan4@example.com", "Kenan", true, null, null, null, true, null, "Kenanovic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111124", null, "kenan4" },
+                    { 15, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1997, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "jasmin5@example.com", "Jasmin", true, null, null, null, true, null, "Jasminovic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111125", null, "jasmin5" },
+                    { 16, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), "lejla6@example.com", "Lejla", true, null, null, null, true, null, "Lejlovic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111126", null, "lejla6" },
+                    { 17, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 5, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), "sara7@example.com", "Sara", true, null, null, null, true, null, "Saric", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111127", null, "sara7" },
+                    { 18, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 12, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "amina8@example.com", "Amina", true, null, null, null, true, null, "Aminovic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111128", null, "amina8" },
+                    { 19, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1998, 8, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), "emir9@example.com", "Emir", true, null, null, null, true, null, "Emirovic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111129", null, "emir9" },
+                    { 20, null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1997, 1, 27, 0, 0, 0, 0, DateTimeKind.Unspecified), "nermin10@example.com", "Nermin", true, null, null, null, true, null, "Nerminovic", "hqheAm+YcO/xjG39rullVP2jEelQak8XjAzt8DyrZCuKPyVXmVBn4DM2IssJFeQGMNPcFu4uPdg69zEy0Ghxfg==", "OgA2BBHV/0/OdP98EzPBlEOyRFFK+lshCXoJ8zyVbxJ5KwDSq+shvTgXyi3WzmDXtRVnU6BqiKtllW3OUw7PkPeEQi1q5Es3KLiXbUanFwZmU/h7W2KK7S85dsGBd3z5wboBVOzwURTkesJ7NRjMx7mOqG+fl5vLW5/PRVdBsZU=", "061111130", null, "nermin10" }
                 });
 
             migrationBuilder.InsertData(
@@ -457,16 +461,16 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "ExpirationDate", "MembershipId", "PaymentDate", "UserId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 2, 28, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6772), 2, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6650), 11 },
-                    { 2, new DateTime(2026, 6, 1, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6980), 2, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6980), 12 },
-                    { 3, new DateTime(2026, 8, 30, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6984), 3, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6983), 13 },
-                    { 4, new DateTime(2027, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6985), 4, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6985), 14 },
-                    { 5, new DateTime(2026, 2, 26, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6986), 1, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(6986), 15 },
-                    { 6, new DateTime(2026, 6, 1, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7004), 2, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7004), 16 },
-                    { 7, new DateTime(2026, 2, 21, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7005), 3, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7005), 17 },
-                    { 8, new DateTime(2026, 2, 26, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7007), 4, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7006), 18 },
-                    { 9, new DateTime(2026, 4, 2, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7008), 1, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7007), 19 },
-                    { 10, new DateTime(2026, 2, 21, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7009), 2, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(7009), 20 }
+                    { 1, new DateTime(2026, 3, 10, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(405), 2, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(267), 11 },
+                    { 2, new DateTime(2026, 6, 11, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(603), 2, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(602), 12 },
+                    { 3, new DateTime(2026, 9, 9, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(606), 3, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(606), 13 },
+                    { 4, new DateTime(2027, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(608), 4, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(607), 14 },
+                    { 5, new DateTime(2026, 3, 8, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(609), 1, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(609), 15 },
+                    { 6, new DateTime(2026, 6, 11, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(610), 2, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(610), 16 },
+                    { 7, new DateTime(2026, 3, 3, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(611), 3, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(611), 17 },
+                    { 8, new DateTime(2026, 3, 8, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(612), 4, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(612), 18 },
+                    { 9, new DateTime(2026, 4, 12, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(613), 1, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(613), 19 },
+                    { 10, new DateTime(2026, 3, 3, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(615), 2, new DateTime(2026, 3, 13, 15, 0, 32, 883, DateTimeKind.Utc).AddTicks(614), 20 }
                 });
 
             migrationBuilder.InsertData(
@@ -484,19 +488,19 @@ namespace Gymify.Services.Migrations
 
             migrationBuilder.InsertData(
                 table: "Payments",
-                columns: new[] { "Id", "Amount", "MembershipId", "PaidAt", "PaymentDate", "PaymentStatus", "StripePaymentIntentId", "UserId" },
+                columns: new[] { "Id", "Amount", "BillingPeriod", "MembershipId", "PaidAt", "PaymentDate", "PaymentStatus", "StripePaymentIntentId", "UserId" },
                 values: new object[,]
                 {
-                    { 1, 45.0, 2, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 11 },
-                    { 2, 45.0, 2, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 12 },
-                    { 3, 60.0, 3, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 13 },
-                    { 4, 80.0, 4, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 14 },
-                    { 5, 30.0, 1, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 15 },
-                    { 6, 45.0, 2, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 16 },
-                    { 7, 60.0, 3, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 17 },
-                    { 8, 80.0, 4, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 18 },
-                    { 9, 30.0, 1, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 19 },
-                    { 10, 45.0, 2, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 20 }
+                    { 1, 45m, null, 2, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 11 },
+                    { 2, 45m, null, 2, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 12 },
+                    { 3, 60m, null, 3, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 13 },
+                    { 4, 80m, null, 4, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 14 },
+                    { 5, 30m, null, 1, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 15 },
+                    { 6, 45m, null, 2, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 16 },
+                    { 7, 60m, null, 3, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 17 },
+                    { 8, 80m, null, 4, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 18 },
+                    { 9, 30m, null, 1, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 19 },
+                    { 10, 45m, null, 2, new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Paid", null, 20 }
                 });
 
             migrationBuilder.InsertData(
@@ -518,33 +522,33 @@ namespace Gymify.Services.Migrations
 
             migrationBuilder.InsertData(
                 table: "Trainings",
-                columns: new[] { "Id", "CurrentParticipants", "MaxAmountOfParticipants", "Name", "ParicipatedOfAllTime", "StartDate", "TrainingImage", "UserId" },
+                columns: new[] { "Id", "CurrentParticipants", "DurationMinutes", "IntensityLevel", "MaxAmountOfParticipants", "Name", "ParicipatedOfAllTime", "Purpose", "StartDate", "TrainingImage", "UserId" },
                 values: new object[,]
                 {
-                    { 1, 10, 15, "HIIT", 120, new DateTime(2026, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/hiit/600/400", 3 },
-                    { 2, 12, 20, "Cardio Blast", 185, new DateTime(2026, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/cardioblast/600/400", 3 },
-                    { 3, 14, 18, "CrossFit", 240, new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/crossfit/600/400", 4 },
-                    { 4, 8, 12, "Yoga Flow", 95, new DateTime(2026, 2, 28, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(8298), "https://picsum.photos/seed/yogaflow/600/400", 4 },
-                    { 5, 6, 10, "Pilates", 80, new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/pilates/600/400", 5 },
-                    { 6, 11, 16, "Strength Training", 210, new DateTime(2026, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/strength/600/400", 5 },
-                    { 7, 9, 14, "Boxing", 160, new DateTime(2026, 6, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/boxing/600/400", 6 },
-                    { 8, 7, 15, "Kickboxing", 140, new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/kickboxing/600/400", 6 },
-                    { 9, 13, 20, "Morning Fitness", 175, new DateTime(2026, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/morningfitness/600/400", 3 },
-                    { 10, 15, 18, "Evening Cardio", 190, new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/eveningcardio/600/400", 4 },
-                    { 11, 10, 17, "Body Pump", 155, new DateTime(2026, 6, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/bodypump/600/400", 5 },
-                    { 12, 8, 14, "Functional Training", 130, new DateTime(2026, 6, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/functional/600/400", 6 },
-                    { 13, 6, 12, "Stretching", 70, new DateTime(2026, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/stretching/600/400", 3 },
-                    { 14, 18, 20, "Bootcamp", 260, new DateTime(2026, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/bootcamp/600/400", 4 },
-                    { 15, 9, 15, "Abs Workout", 145, new DateTime(2026, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/absworkout/600/400", 5 },
-                    { 16, 5, 10, "Powerlifting", 110, new DateTime(2026, 6, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/powerlifting/600/400", 6 },
-                    { 17, 14, 20, "Zumba", 220, new DateTime(2026, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/zumba/600/400", 3 },
-                    { 18, 12, 18, "Aerobics", 165, new DateTime(2026, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/aerobics/600/400", 4 },
-                    { 19, 11, 16, "Circuit Training", 180, new DateTime(2026, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/circuit/600/400", 5 },
-                    { 20, 10, 15, "Core Workout", 150, new DateTime(2026, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/core/600/400", 6 },
-                    { 21, 11, 15, "HIIT (Feb)", 0, new DateTime(2026, 2, 10, 18, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/hiitfeb/600/400", 3 },
-                    { 22, 9, 12, "Yoga Flow (Feb)", 0, new DateTime(2026, 2, 14, 19, 30, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/yogafeb/600/400", 4 },
-                    { 23, 13, 16, "Strength Training (Feb)", 0, new DateTime(2026, 2, 20, 17, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/strengthfeb/600/400", 5 },
-                    { 24, 10, 14, "Boxing (Feb)", 0, new DateTime(2026, 2, 25, 20, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/boxingfeb/600/400", 6 }
+                    { 1, 10, 45, 5, 15, "HIIT", 120, "WeightLoss", new DateTime(2026, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/hiit/600/400", 3 },
+                    { 2, 12, 40, 4, 20, "Cardio Blast", 185, "Cardio", new DateTime(2026, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/cardioblast/600/400", 3 },
+                    { 3, 14, 60, 5, 18, "CrossFit", 240, "Strength", new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/crossfit/600/400", 4 },
+                    { 4, 8, 50, 2, 12, "Yoga Flow", 95, "Flexibility", new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/yogaflow/600/400", 4 },
+                    { 5, 6, 45, 2, 10, "Pilates", 80, "Flexibility", new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/pilates/600/400", 5 },
+                    { 6, 11, 55, 4, 16, "Strength Training", 210, "Strength", new DateTime(2026, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/strength/600/400", 5 },
+                    { 7, 9, 50, 5, 14, "Boxing", 160, "MartialArts", new DateTime(2026, 6, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/boxing/600/400", 6 },
+                    { 8, 7, 50, 5, 15, "Kickboxing", 140, "MartialArts", new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/kickboxing/600/400", 6 },
+                    { 9, 13, 35, 3, 20, "Morning Fitness", 175, "WeightLoss", new DateTime(2026, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/morningfitness/600/400", 3 },
+                    { 10, 15, 40, 4, 18, "Evening Cardio", 190, "Cardio", new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/eveningcardio/600/400", 4 },
+                    { 11, 10, 50, 4, 17, "Body Pump", 155, "Strength", new DateTime(2026, 6, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/bodypump/600/400", 5 },
+                    { 12, 8, 45, 4, 14, "Functional Training", 130, "Strength", new DateTime(2026, 6, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/functional/600/400", 6 },
+                    { 13, 6, 30, 1, 12, "Stretching", 70, "Flexibility", new DateTime(2026, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/stretching/600/400", 3 },
+                    { 14, 18, 60, 5, 20, "Bootcamp", 260, "WeightLoss", new DateTime(2026, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/bootcamp/600/400", 4 },
+                    { 15, 9, 35, 3, 15, "Abs Workout", 145, "WeightLoss", new DateTime(2026, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/absworkout/600/400", 5 },
+                    { 16, 5, 55, 5, 10, "Powerlifting", 110, "Strength", new DateTime(2026, 6, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/powerlifting/600/400", 6 },
+                    { 17, 14, 45, 3, 20, "Zumba", 220, "Cardio", new DateTime(2026, 6, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/zumba/600/400", 3 },
+                    { 18, 12, 40, 3, 18, "Aerobics", 165, "Cardio", new DateTime(2026, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/aerobics/600/400", 4 },
+                    { 19, 11, 50, 4, 16, "Circuit Training", 180, "Strength", new DateTime(2026, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/circuit/600/400", 5 },
+                    { 20, 10, 40, 3, 15, "Core Workout", 150, "Strength", new DateTime(2026, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/core/600/400", 6 },
+                    { 21, 11, 45, 5, 15, "HIIT (Feb)", 90, "WeightLoss", new DateTime(2026, 2, 10, 18, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/hiitfeb/600/400", 3 },
+                    { 22, 9, 50, 2, 12, "Yoga Flow (Feb)", 70, "Flexibility", new DateTime(2026, 2, 14, 19, 30, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/yogafeb/600/400", 4 },
+                    { 23, 13, 55, 4, 16, "Strength Training (Feb)", 105, "Strength", new DateTime(2026, 2, 20, 17, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/strengthfeb/600/400", 5 },
+                    { 24, 10, 50, 5, 14, "Boxing (Feb)", 88, "MartialArts", new DateTime(2026, 2, 25, 20, 0, 0, 0, DateTimeKind.Unspecified), "https://picsum.photos/seed/boxingfeb/600/400", 6 }
                 });
 
             migrationBuilder.InsertData(
@@ -552,26 +556,26 @@ namespace Gymify.Services.Migrations
                 columns: new[] { "Id", "DateAssigned", "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4028), 2, 1 },
-                    { 2, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4780), 2, 2 },
-                    { 3, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4782), 3, 3 },
-                    { 4, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4782), 3, 4 },
-                    { 5, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4783), 3, 5 },
-                    { 6, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4784), 3, 6 },
-                    { 7, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4784), 4, 7 },
-                    { 8, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4807), 4, 8 },
-                    { 9, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4808), 4, 9 },
-                    { 10, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4809), 4, 10 },
-                    { 11, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4810), 1, 11 },
-                    { 12, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4811), 1, 12 },
-                    { 13, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4811), 1, 13 },
-                    { 14, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4812), 1, 14 },
-                    { 15, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4813), 1, 15 },
-                    { 16, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4813), 1, 16 },
-                    { 17, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4814), 1, 17 },
-                    { 18, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4815), 1, 18 },
-                    { 19, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4815), 1, 19 },
-                    { 20, new DateTime(2026, 3, 3, 20, 55, 43, 366, DateTimeKind.Utc).AddTicks(4816), 1, 20 }
+                    { 1, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(7929), 2, 1 },
+                    { 2, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8306), 2, 2 },
+                    { 3, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8307), 3, 3 },
+                    { 4, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8330), 3, 4 },
+                    { 5, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8330), 3, 5 },
+                    { 6, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8331), 3, 6 },
+                    { 7, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8331), 4, 7 },
+                    { 8, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8332), 4, 8 },
+                    { 9, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8333), 4, 9 },
+                    { 10, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8333), 4, 10 },
+                    { 11, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8334), 1, 11 },
+                    { 12, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8335), 1, 12 },
+                    { 13, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8335), 1, 13 },
+                    { 14, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8336), 1, 14 },
+                    { 15, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8336), 1, 15 },
+                    { 16, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8337), 1, 16 },
+                    { 17, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8338), 1, 17 },
+                    { 18, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8338), 1, 18 },
+                    { 19, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8339), 1, 19 },
+                    { 20, new DateTime(2026, 3, 13, 15, 0, 32, 882, DateTimeKind.Utc).AddTicks(8340), 1, 20 }
                 });
 
             migrationBuilder.InsertData(

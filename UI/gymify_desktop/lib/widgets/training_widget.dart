@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymify_desktop/config/api_config.dart';
@@ -16,6 +17,14 @@ import 'package:gymify_desktop/models/user.dart';
 
 import 'package:gymify_desktop/providers/image_provider.dart';
 import 'package:gymify_desktop/providers/training_provider.dart';
+
+const List<DropdownMenuItem<String>> trainingPurposeDropdownItems = [
+  DropdownMenuItem<String>(value: "Strength", child: Text("Strength")),
+  DropdownMenuItem<String>(value: "WeightLoss", child: Text("WeightLoss")),
+  DropdownMenuItem<String>(value: "Cardio", child: Text("Cardio")),
+  DropdownMenuItem<String>(value: "MartialArts", child: Text("Martial Arts")),
+  DropdownMenuItem<String>(value: "Flexibility", child: Text("Flexibility")),
+];
 
 Future<User?> showTrainerPickDialog({required BuildContext context}) {
   return showUserPickDialog(
@@ -41,6 +50,12 @@ Future<void> _openEditTrainingDialog({
   required Training training,
 }) async {
   final nameCtrl = TextEditingController(text: training.name ?? "");
+  final durationCtrl = TextEditingController(
+    text: training.durationMinutes?.toString() ?? "",
+  );
+  final intensityCtrl = TextEditingController(
+    text: training.intensityLevel?.toString() ?? "",
+  );
   final maxCtrl = TextEditingController(
     text: training.maxAmountOfParticipants.toString(),
   );
@@ -48,19 +63,24 @@ Future<void> _openEditTrainingDialog({
     text: training.currentParticipants.toString(),
   );
   final startDateCtrl = TextEditingController(
-    text: DateHelper.format(training.startDate),
+    text: DateHelper.format(training.startDate!),
   );
   final trainerDisplayCtrl = TextEditingController(
     text: "${training.user?.firstName ?? ""} ${training.user?.lastName ?? ""}"
         .trim(),
   );
 
-  int? trainerId = training.userId; // postojeći trener
+  int? trainerId = training.userId;
+  String? selectedPurpose = training.purpose;
   File? pickedImage;
   bool saving = false;
+  bool imageChanged = false;
 
   String? errTrainer;
   String? errName;
+  String? errPurpose;
+  String? errDuration;
+  String? errIntensity;
   String? errMax;
   String? errCurrent;
   String? errStartDate;
@@ -68,12 +88,34 @@ Future<void> _openEditTrainingDialog({
   bool validate() {
     errTrainer = null;
     errName = null;
+    errPurpose = null;
+    errDuration = null;
+    errIntensity = null;
     errMax = null;
     errCurrent = null;
     errStartDate = null;
 
     if (trainerId == null) errTrainer = "Trener je obavezan.";
     if (nameCtrl.text.trim().isEmpty) errName = "Naziv je obavezan.";
+    if ((selectedPurpose ?? "").trim().isEmpty) {
+      errPurpose = "Namjena je obavezna.";
+    }
+
+    final durationText = durationCtrl.text.trim();
+    final durationVal = int.tryParse(durationText);
+    if (durationText.isEmpty) {
+      errDuration = "Trajanje je obavezno.";
+    } else if (durationVal == null || durationVal <= 0) {
+      errDuration = "Unesite validno trajanje (min 1).";
+    }
+
+    final intensityText = intensityCtrl.text.trim();
+    final intensityVal = int.tryParse(intensityText);
+    if (intensityText.isEmpty) {
+      errIntensity = "Intenzitet je obavezan.";
+    } else if (intensityVal == null || intensityVal <= 0) {
+      errIntensity = "Unesite validan intenzitet (min 1).";
+    }
 
     final maxText = maxCtrl.text.trim();
     final maxVal = int.tryParse(maxText);
@@ -108,6 +150,9 @@ Future<void> _openEditTrainingDialog({
 
     return errTrainer == null &&
         errName == null &&
+        errPurpose == null &&
+        errDuration == null &&
+        errIntensity == null &&
         errMax == null &&
         errCurrent == null &&
         errStartDate == null;
@@ -117,21 +162,30 @@ Future<void> _openEditTrainingDialog({
     if (imageChanged) return true;
 
     final newName = nameCtrl.text.trim();
+    final newDuration = int.tryParse(durationCtrl.text.trim());
+    final newIntensity = int.tryParse(intensityCtrl.text.trim());
     final newMax = int.tryParse(maxCtrl.text.trim());
     final newCur = int.tryParse(currentCtrl.text.trim());
     final newStart = startDateCtrl.text.trim();
 
     if ((newTrainerId ?? training.userId) != training.userId) return true;
     if (newName != (training.name ?? "")) return true;
+    if ((selectedPurpose ?? "") != (training.purpose ?? "")) return true;
+    if ((newDuration ?? training.durationMinutes) != training.durationMinutes) {
+      return true;
+    }
+    if ((newIntensity ?? training.intensityLevel) != training.intensityLevel) {
+      return true;
+    }
     if ((newMax ?? training.maxAmountOfParticipants) !=
-        training.maxAmountOfParticipants)
+        training.maxAmountOfParticipants) {
       return true;
+    }
     if ((newCur ?? training.currentParticipants) !=
-        training.currentParticipants)
+        training.currentParticipants) {
       return true;
-
-    // poredi UI datum sa formatom originalnog
-    if (newStart != DateHelper.format(training.startDate)) return true;
+    }
+    if (newStart != DateHelper.format(training.startDate!)) return true;
 
     return false;
   }
@@ -141,8 +195,6 @@ Future<void> _openEditTrainingDialog({
     barrierDismissible: false,
     builder: (dialogCtx) => StatefulBuilder(
       builder: (dialogCtx, setStateDialog) {
-        bool imageChanged = false;
-
         Future<void> pickTrainer() async {
           final picked = await showTrainerPickDialog(context: dialogCtx);
           if (picked == null) return;
@@ -164,7 +216,6 @@ Future<void> _openEditTrainingDialog({
         }
 
         Future<void> pickStartDate() async {
-          final now = DateTime.now();
           final picked = await showDatePicker(
             context: dialogCtx,
             initialDate: training.startDate,
@@ -176,6 +227,32 @@ Future<void> _openEditTrainingDialog({
           startDateCtrl.text =
               "${picked.day.toString().padLeft(2, '0')}.${picked.month.toString().padLeft(2, '0')}.${picked.year}";
           setStateDialog(() {});
+        }
+
+        Future<void> deleteTraining() async {
+          final confirm = await ConfirmDialogs.badGoodConfirmation(
+            dialogCtx,
+            title: "Brisanje treninga",
+            question: "Da li ste sigurni da želite obrisati ovaj trening?",
+            goodText: "Da, obriši",
+            badText: "Odustani",
+          );
+
+          if (!confirm) return;
+
+          try {
+            await dialogCtx.read<TrainingProvider>().delete(training.id);
+
+            await paging.loadPage();
+
+            if (dialogCtx.mounted) {
+              Navigator.pop(dialogCtx);
+            }
+          } catch (e) {
+            if (dialogCtx.mounted) {
+              SnackbarHelper.showError(dialogCtx, e.toString());
+            }
+          }
         }
 
         Future<void> save() async {
@@ -197,6 +274,8 @@ Future<void> _openEditTrainingDialog({
               );
             }
 
+            final durationMinutes = int.parse(durationCtrl.text.trim());
+            final intensityLevel = int.parse(intensityCtrl.text.trim());
             final maxP = int.parse(maxCtrl.text.trim());
             final curP = int.parse(currentCtrl.text.trim());
             final startIso = DateHelper.toIsoFromUi(startDateCtrl.text.trim());
@@ -205,6 +284,9 @@ Future<void> _openEditTrainingDialog({
               "id": training.id,
               "userId": trainerId,
               "name": nameCtrl.text.trim(),
+              "purpose": selectedPurpose,
+              "durationMinutes": durationMinutes,
+              "intensityLevel": intensityLevel,
               "maxAmountOfParticipants": maxP,
               "currentParticipants": curP,
               "startDate": startIso,
@@ -212,6 +294,7 @@ Future<void> _openEditTrainingDialog({
             });
 
             await paging.loadPage();
+
             if (dialogCtx.mounted) {
               SnackbarHelper.showUpdate(
                 dialogCtx,
@@ -224,7 +307,9 @@ Future<void> _openEditTrainingDialog({
               SnackbarHelper.showError(dialogCtx, e.toString());
             }
           } finally {
-            if (dialogCtx.mounted) setStateDialog(() => saving = false);
+            if (dialogCtx.mounted) {
+              setStateDialog(() => saving = false);
+            }
           }
         }
 
@@ -236,11 +321,12 @@ Future<void> _openEditTrainingDialog({
         return BaseDialog(
           title: "Detalji treninga",
           width: 640,
-          height: 680,
+          height: 780,
           onClose: () => Navigator.pop(dialogCtx),
           child: Builder(
             builder: (_) {
               final scrollCtrl = ScrollController();
+
               return PrimaryScrollController(
                 controller: scrollCtrl,
                 child: Scrollbar(
@@ -252,7 +338,6 @@ Future<void> _openEditTrainingDialog({
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Slika (opcionalno)
                         Container(
                           padding: const EdgeInsets.all(18),
                           margin: const EdgeInsets.only(bottom: 20),
@@ -347,7 +432,6 @@ Future<void> _openEditTrainingDialog({
                           ),
                         ),
 
-                        // Trener
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -379,7 +463,6 @@ Future<void> _openEditTrainingDialog({
 
                         const SizedBox(height: 12),
 
-                        // Naziv
                         TextField(
                           controller: nameCtrl,
                           decoration: InputDecoration(
@@ -396,7 +479,70 @@ Future<void> _openEditTrainingDialog({
 
                         const SizedBox(height: 12),
 
-                        // Max
+                        DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          menuMaxHeight: 260,
+                          value:
+                              trainingPurposeDropdownItems.any(
+                                (item) => item.value == selectedPurpose,
+                              )
+                              ? selectedPurpose
+                              : null,
+                          items: trainingPurposeDropdownItems,
+                          onChanged: saving
+                              ? null
+                              : (value) {
+                                  selectedPurpose = value;
+                                  setStateDialog(() {});
+                                },
+                          decoration: InputDecoration(
+                            labelText: "Namjena treninga",
+                            filled: true,
+                            fillColor: const Color(0xFFF7F7F7),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorText: errPurpose,
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        TextField(
+                          controller: durationCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: "Trajanje (minute)",
+                            filled: true,
+                            fillColor: const Color(0xFFF7F7F7),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorText: errDuration,
+                          ),
+                          onChanged: (_) => setStateDialog(() {}),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        TextField(
+                          controller: intensityCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: "Intenzitet",
+                            hintText: "npr. 1, 2, 3...",
+                            filled: true,
+                            fillColor: const Color(0xFFF7F7F7),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorText: errIntensity,
+                          ),
+                          onChanged: (_) => setStateDialog(() {}),
+                        ),
+
+                        const SizedBox(height: 12),
+
                         TextField(
                           controller: maxCtrl,
                           keyboardType: TextInputType.number,
@@ -414,7 +560,6 @@ Future<void> _openEditTrainingDialog({
 
                         const SizedBox(height: 12),
 
-                        // Current
                         TextField(
                           controller: currentCtrl,
                           keyboardType: TextInputType.number,
@@ -432,7 +577,6 @@ Future<void> _openEditTrainingDialog({
 
                         const SizedBox(height: 12),
 
-                        // Start date
                         TextField(
                           controller: startDateCtrl,
                           readOnly: true,
@@ -455,44 +599,51 @@ Future<void> _openEditTrainingDialog({
                         const SizedBox(height: 22),
 
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            OutlinedButton(
-                              onPressed: saving
-                                  ? null
-                                  : () => Navigator.pop(dialogCtx),
-                              child: const Text("Zatvori"),
-                            ),
-                            const SizedBox(width: 10),
-                            ElevatedButton(
-                              onPressed: (!canSave || saving) ? null : save,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF387EFF),
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                            OutlinedButton.icon(
+                              onPressed: saving ? null : deleteTraining,
+                              icon: const Icon(Icons.delete_outline),
+                              label: const Text("Obriši"),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
                               ),
-                              child: saving
-                                  ? const SizedBox(
-                                      height: 18,
-                                      width: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text(
-                                      "Sačuvaj",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                            ),
+
+                            Row(
+                              children: [
+                                const SizedBox(width: 10),
+                                ElevatedButton(
+                                  onPressed: (!canSave || saving) ? null : save,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF387EFF),
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
                                     ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: saving
+                                      ? const SizedBox(
+                                          height: 18,
+                                          width: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Text(
+                                          "Sačuvaj",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -545,7 +696,6 @@ Widget TrainingWidget() {
       return trainingImage;
     }
 
-    // lokalno: wwwroot/images/training/<file>
     return "${ApiConfig.apiBase}/images/training/$trainingImage";
   }
 
@@ -554,17 +704,23 @@ Widget TrainingWidget() {
     required UniversalPagingProvider<Training> paging,
   }) async {
     final nameCtrl = TextEditingController();
+    final durationCtrl = TextEditingController();
+    final intensityCtrl = TextEditingController();
     final maxCtrl = TextEditingController();
     final currentCtrl = TextEditingController(text: "0");
     final startDateCtrl = TextEditingController();
     final trainerDisplayCtrl = TextEditingController();
 
     int? trainerId;
+    String? selectedPurpose = "Strength";
     File? pickedImage;
     bool saving = false;
 
     String? errTrainer;
     String? errName;
+    String? errPurpose;
+    String? errDuration;
+    String? errIntensity;
     String? errMax;
     String? errCurrent;
     String? errStartDate;
@@ -572,12 +728,34 @@ Widget TrainingWidget() {
     bool validate() {
       errTrainer = null;
       errName = null;
+      errPurpose = null;
+      errDuration = null;
+      errIntensity = null;
       errMax = null;
       errCurrent = null;
       errStartDate = null;
 
       if (trainerId == null) errTrainer = "Trener je obavezan.";
       if (nameCtrl.text.trim().isEmpty) errName = "Naziv je obavezan.";
+      if ((selectedPurpose ?? "").trim().isEmpty) {
+        errPurpose = "Namjena je obavezna.";
+      }
+
+      final durationText = durationCtrl.text.trim();
+      final durationVal = int.tryParse(durationText);
+      if (durationText.isEmpty) {
+        errDuration = "Trajanje je obavezno.";
+      } else if (durationVal == null || durationVal <= 0) {
+        errDuration = "Unesite validno trajanje (min 1).";
+      }
+
+      final intensityText = intensityCtrl.text.trim();
+      final intensityVal = int.tryParse(intensityText);
+      if (intensityText.isEmpty) {
+        errIntensity = "Intenzitet je obavezan.";
+      } else if (intensityVal == null || intensityVal <= 0) {
+        errIntensity = "Unesite validan intenzitet (min 1).";
+      }
 
       final maxText = maxCtrl.text.trim();
       final maxVal = int.tryParse(maxText);
@@ -612,6 +790,9 @@ Widget TrainingWidget() {
 
       return errTrainer == null &&
           errName == null &&
+          errPurpose == null &&
+          errDuration == null &&
+          errIntensity == null &&
           errMax == null &&
           errCurrent == null &&
           errStartDate == null;
@@ -675,6 +856,8 @@ Widget TrainingWidget() {
                 );
               }
 
+              final durationMinutes = int.parse(durationCtrl.text.trim());
+              final intensityLevel = int.parse(intensityCtrl.text.trim());
               final maxP = int.parse(maxCtrl.text.trim());
               final curP = int.parse(currentCtrl.text.trim());
               final startIso = DateHelper.toIsoFromUi(
@@ -684,6 +867,9 @@ Widget TrainingWidget() {
               await dialogCtx.read<TrainingProvider>().insert({
                 "userId": trainerId,
                 "name": nameCtrl.text.trim(),
+                "purpose": selectedPurpose,
+                "durationMinutes": durationMinutes,
+                "intensityLevel": intensityLevel,
                 "maxAmountOfParticipants": maxP,
                 "currentParticipants": curP,
                 "startDate": startIso,
@@ -712,7 +898,7 @@ Widget TrainingWidget() {
           return BaseDialog(
             title: "Dodaj trening",
             width: 640,
-            height: 680,
+            height: 780,
             onClose: () => Navigator.pop(dialogCtx),
             child: Builder(
               builder: (ctx) {
@@ -724,13 +910,11 @@ Widget TrainingWidget() {
                     controller: scrollCtrl,
                     thumbVisibility: true,
                     child: SingleChildScrollView(
-                      primary:
-                          true, // uzima controller iz PrimaryScrollController
+                      primary: true,
                       padding: const EdgeInsets.only(right: 4),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // IMAGE PICK + PREVIEW (opcionalno)
                           Container(
                             padding: const EdgeInsets.all(18),
                             margin: const EdgeInsets.only(bottom: 20),
@@ -828,7 +1012,6 @@ Widget TrainingWidget() {
 
                           const SizedBox(height: 12),
 
-                          // TRAINER PICK
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -862,7 +1045,6 @@ Widget TrainingWidget() {
 
                           const SizedBox(height: 12),
 
-                          // NAME
                           TextField(
                             controller: nameCtrl,
                             decoration: InputDecoration(
@@ -879,7 +1061,70 @@ Widget TrainingWidget() {
 
                           const SizedBox(height: 12),
 
-                          // MAX
+                          DropdownButtonFormField<String>(
+                            isExpanded: true,
+                            menuMaxHeight: 260,
+                            value:
+                                trainingPurposeDropdownItems.any(
+                                  (item) => item.value == selectedPurpose,
+                                )
+                                ? selectedPurpose
+                                : null,
+                            items: trainingPurposeDropdownItems,
+                            onChanged: saving
+                                ? null
+                                : (value) {
+                                    selectedPurpose = value;
+                                    setStateDialog(() {});
+                                  },
+                            decoration: InputDecoration(
+                              labelText: "Namjena treninga",
+                              filled: true,
+                              fillColor: const Color(0xFFF7F7F7),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              errorText: errPurpose,
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          TextField(
+                            controller: durationCtrl,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: "Trajanje (minute)",
+                              filled: true,
+                              fillColor: const Color(0xFFF7F7F7),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              errorText: errDuration,
+                            ),
+                            onChanged: (_) => setStateDialog(() {}),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          TextField(
+                            controller: intensityCtrl,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: "Intenzitet",
+                              hintText: "npr. 1, 2, 3...",
+                              filled: true,
+                              fillColor: const Color(0xFFF7F7F7),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              errorText: errIntensity,
+                            ),
+                            onChanged: (_) => setStateDialog(() {}),
+                          ),
+
+                          const SizedBox(height: 12),
+
                           TextField(
                             controller: maxCtrl,
                             keyboardType: TextInputType.number,
@@ -897,7 +1142,6 @@ Widget TrainingWidget() {
 
                           const SizedBox(height: 12),
 
-                          // CURRENT MEMBERS
                           TextField(
                             controller: currentCtrl,
                             keyboardType: TextInputType.number,
@@ -915,7 +1159,6 @@ Widget TrainingWidget() {
 
                           const SizedBox(height: 12),
 
-                          // START DATE PICK
                           TextField(
                             controller: startDateCtrl,
                             readOnly: true,
@@ -937,7 +1180,6 @@ Widget TrainingWidget() {
 
                           const SizedBox(height: 22),
 
-                          // BUTTONS
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
@@ -968,6 +1210,7 @@ Widget TrainingWidget() {
                                         width: 18,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
+                                          color: Colors.white,
                                         ),
                                       )
                                     : const Text(
@@ -1004,8 +1247,13 @@ Widget TrainingWidget() {
         .trim();
     final trainer = trainerName.isEmpty ? "—" : trainerName;
 
+    final purpose = t.purpose ?? "—";
+    final duration = t.durationMinutes != null
+        ? "${t.durationMinutes} min"
+        : "—";
+    final intensity = t.intensityLevel?.toString() ?? "—";
     final members = t.currentParticipants;
-    final startDateText = DateHelper.format(t.startDate);
+    final startDateText = DateHelper.format(t.startDate!);
 
     final imgUrl = _trainingImageToUrl(t.trainingImage);
 
@@ -1039,8 +1287,6 @@ Widget TrainingWidget() {
                       width: double.infinity,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
-
-                        // placeholder dok se slika učitava
                         return const Center(
                           child: SizedBox(
                             height: 22,
@@ -1068,7 +1314,7 @@ Widget TrainingWidget() {
           ),
           const SizedBox(height: 14),
           Text(
-            title,
+            title!,
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -1093,6 +1339,56 @@ Widget TrainingWidget() {
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
                   ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          Row(
+            children: [
+              const Icon(Icons.flag_outlined, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  purpose,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          Row(
+            children: [
+              const Icon(Icons.timer_outlined, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                duration,
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          Row(
+            children: [
+              const Icon(Icons.local_fire_department_outlined, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                intensity,
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],

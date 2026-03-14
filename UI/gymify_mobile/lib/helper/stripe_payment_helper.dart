@@ -28,38 +28,40 @@ class StripePaymentHelper {
   }
 
   static Future<bool> payMembership(
-  BuildContext context, {
-  required int userId,
-  required int membershipId,
-  required double amount,
-}) async {
-  try {
-    FocusManager.instance.primaryFocus?.unfocus();
+    BuildContext context, {
+    required int userId,
+    required int membershipId,
+    required bool yearly,
+  }) async {
+    try {
+      FocusManager.instance.primaryFocus?.unfocus();
 
-    final provider = context.read<PaymentProvider>();
+      final provider = context.read<PaymentProvider>();
 
-    final clientSecret = await provider.createNewIntent({
-      "userId": userId,
-      "membershipId": membershipId,
-      "amount": amount,
-    });
+      final clientSecret = await provider.createNewIntent({
+        "userId": userId,
+        "membershipId": membershipId,
+        "billingPeriod": yearly ? "yearly" : "monthly",
+      });
 
-    await Stripe.instance.initPaymentSheet(
-      paymentSheetParameters: SetupPaymentSheetParameters(
-        paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: "Gymify",
-        style: ThemeMode.light,
-      ),
-    );
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: clientSecret,
+          merchantDisplayName: "Gymify",
+          style: ThemeMode.light,
+        ),
+      );
 
-    await Stripe.instance.presentPaymentSheet();
-    return true;
-  } on StripeException catch (e) {
-    debugPrint("StripeException: ${e.error.localizedMessage ?? e.error.message}");
-    return false;
-  } catch (e) {
-    debugPrint("Stripe payMembership error: $e");
-    return false;
+      await Stripe.instance.presentPaymentSheet();
+      return true;
+    } on StripeException catch (e) {
+      debugPrint(
+        "StripeException: ${e.error.localizedMessage ?? e.error.message}",
+      );
+      return false;
+    } catch (e) {
+      debugPrint("Stripe payMembership error: $e");
+      return false;
+    }
   }
-}
 }

@@ -3,13 +3,10 @@ import 'package:gymify_mobile/dialogs/confirmation_dialogs.dart';
 import 'package:provider/provider.dart';
 import 'package:gymify_mobile/models/member.dart';
 import 'package:gymify_mobile/models/membership.dart';
-import 'package:gymify_mobile/models/payment.dart'; 
 import 'package:gymify_mobile/providers/member_provider.dart';
 import 'package:gymify_mobile/providers/membership_provider.dart';
-import 'package:gymify_mobile/providers/payment_provider.dart'; 
 import 'package:gymify_mobile/utils/session.dart';
 import 'package:gymify_mobile/helper/stripe_payment_helper.dart';
-
 
 class MembershipWidget extends StatefulWidget {
   const MembershipWidget({super.key});
@@ -25,12 +22,9 @@ class _MembershipWidgetState extends State<MembershipWidget> {
   Member? _currentMember;
   List<Membership> _plans = [];
 
-  // UI state
   bool _yearly = false;
   Membership? _selectedPlan;
   bool _processing = false;
-
-  Payment? _latestPayment;
 
   @override
   void initState() {
@@ -47,18 +41,10 @@ class _MembershipWidgetState extends State<MembershipWidget> {
     try {
       final memberProvider = context.read<MemberProvider>();
       final membershipProvider = context.read<MembershipProvider>();
-      final paymentProvider = context.read<PaymentProvider>();
 
       final plansResult = await membershipProvider.get();
-      final membersResult =
-          await memberProvider.get(filter: {"IncludeMembership": true});
-
-      final paymentsResult = await paymentProvider.get(
-        filter: {
-          "UserId": Session.userId,
-          "IncludeUser": true,
-          "IncludeMembership": true
-        },
+      final membersResult = await memberProvider.get(
+        filter: {"IncludeMembership": true},
       );
 
       final plans = plansResult.items;
@@ -72,19 +58,23 @@ class _MembershipWidgetState extends State<MembershipWidget> {
         }
       }
 
-      // ✅ nađi latest payment lokalno (ako API ne sortira)
-      Payment? latest;
-      final payList = paymentsResult.items;
-      if (payList.isNotEmpty) {
-        payList.sort((a, b) => a.paymentDate.compareTo(b.paymentDate));
-        latest = payList.last;
+      Membership? selectedPlan;
+      if (plans.isNotEmpty) {
+        if (member?.membershipId != null) {
+          try {
+            selectedPlan = plans.firstWhere((p) => p.id == member!.membershipId);
+          } catch (_) {
+            selectedPlan = plans.first;
+          }
+        } else {
+          selectedPlan = plans.first;
+        }
       }
 
       setState(() {
         _plans = plans;
         _currentMember = member;
-        _selectedPlan = _plans.isNotEmpty ? _plans.first : null;
-        _latestPayment = latest;
+        _selectedPlan = selectedPlan;
         _loading = false;
       });
     } catch (e) {
@@ -111,36 +101,21 @@ class _MembershipWidgetState extends State<MembershipWidget> {
     return "${two(d.day)}.${two(d.month)}.${d.year}";
   }
 
-  double _priceFor(Membership m) => _yearly ? m.yearPrice : m.monthlyPrice;
-
-  String _periodLabel() => _yearly ? "Godišnje" : "Mjesečno";
-
-  DateTime _calcExpiration(DateTime now) {
-    return _yearly
-        ? DateTime(now.year + 1, now.month, now.day)
-        : DateTime(now.year, now.month + 1, now.day);
-  }
+  double _priceForUi(Membership m) => _yearly ? m.yearPrice : m.monthlyPrice;
 
   Future<void> _submit() async {
-  if (_selectedPlan == null) return;
+  if (_selectedPlan == null || Session.userId == null) return;
 
   setState(() => _processing = true);
 
   try {
-    final memberProvider = context.read<MemberProvider>();
-    final paymentProvider = context.read<PaymentProvider>();
-
     final selected = _selectedPlan!;
-    final now = DateTime.now();
-
-    final amount = _priceFor(selected);
-    final newExpiration = _calcExpiration(now);
 
     final stripeSuccess = await StripePaymentHelper.payMembership(
       context,
-      amount: amount,
       userId: Session.userId!,
       membershipId: selected.id,
+      yearly: _yearly,
     );
 
     if (!stripeSuccess) {
@@ -148,49 +123,19 @@ class _MembershipWidgetState extends State<MembershipWidget> {
       return;
     }
 
-    final paymentReq = <String, dynamic>{
-      "userId": Session.userId,
-      "membershipId": selected.id,
-      "amount": amount,
-      "paymentDate": now.toIso8601String(),
-    };
-
-    final isFirstPayment = (_latestPayment == null);
-    if (isFirstPayment) {
-      await paymentProvider.insert(paymentReq);
-    } else {
-      await paymentProvider.update(_latestPayment!.id, paymentReq);
-    }
-
-    if (_currentMember == null) {
-      // 1) Prvo učlanjenje
-      await memberProvider.insert({
-        "userId": Session.userId,
-        "membershipId": selected.id,
-        "paymentDate": now.toIso8601String(),
-        "expirationDate": newExpiration.toIso8601String(),
-      });
-    } else {
-      final current = _currentMember!;
-      await memberProvider.update(current.id, {
-        "membershipId": selected.id,
-        "paymentDate": now.toIso8601String(),
-        "expirationDate": newExpiration.toIso8601String(),
-      });
-    }
-
-    if (!mounted) return;
-
-    await _load();
+    await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
     await ConfirmDialogs.okConfirmation(
       context,
       title: "Uspješno",
-      message: "Plaćanje je uspješno izvršeno.",
+      message: "Plaćanje je uspješno završeno.",
       okText: "U redu",
     );
+
+    if (!mounted) return;
+    await _load();
   } catch (e) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -211,9 +156,7 @@ class _MembershipWidgetState extends State<MembershipWidget> {
   }
 
   bool _ctaEnabled() {
-    if (_selectedPlan == null) return false;
-    if (!_hasMembership) return true;
-    return true;
+    return _selectedPlan != null && !_processing;
   }
 
   @override
@@ -261,14 +204,11 @@ class _MembershipWidgetState extends State<MembershipWidget> {
               fmt: _fmtDate,
             ),
             const SizedBox(height: 14),
-
             _PeriodToggle(
               yearly: _yearly,
               onChanged: (v) => setState(() => _yearly = v),
             ),
-
             const SizedBox(height: 14),
-
             Text(
               _hasMembership ? "Odaberi plan" : "Izaberi plan za učlanjenje",
               style: theme.textTheme.titleMedium?.copyWith(
@@ -276,39 +216,34 @@ class _MembershipWidgetState extends State<MembershipWidget> {
               ),
             ),
             const SizedBox(height: 10),
-
             ..._plans.map((p) {
               final selected = _selectedPlan?.id == p.id;
               final current = _currentPlan?.id == p.id;
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: _PlanTile(
                   plan: p,
                   selected: selected,
                   isCurrent: current,
-                  price: _priceFor(p),
+                  price: _priceForUi(p),
                   yearly: _yearly,
                   onTap: () => setState(() => _selectedPlan = p),
                 ),
               );
             }),
-
             const SizedBox(height: 18),
-
             _PrimaryActionBar(
               enabled: _ctaEnabled(),
               loading: _processing,
               ctaText: _primaryCtaText(),
               onPressed: _processing ? null : _submit,
             ),
-
             const SizedBox(height: 12),
-
             if (_hasMembership && _isActive)
               const _HintBox(
                 text:
-                    "Savjet: Ako promijeniš paket dok je aktivan, period će se računati od dana promjene. "
-                    "Kasnije možeš dodati proračun (pro-rata) ako želiš realniji sistem.",
+                    "Savjet: Ako promijeniš paket dok je aktivan, backend trenutno produžava članarinu od aktivnog datuma isteka ili od dana uplate, zavisno od toga šta je kasnije.",
               ),
           ],
         ),
@@ -599,7 +534,6 @@ class _PlanTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -649,9 +583,7 @@ class _PlanTile extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(width: 12),
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [

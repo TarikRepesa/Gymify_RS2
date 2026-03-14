@@ -39,8 +39,8 @@ namespace Gymify.Services.Helpers
 
         public static string CreateJwt(User user, IConfiguration configuration)
         {
-            var jwtKey = configuration["Jwt:Key"]!;
-            var jwtIssuer = configuration["Jwt:Issuer"]!;
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET")!;
+            var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")!;
         
             var claims = new List<Claim>
             {

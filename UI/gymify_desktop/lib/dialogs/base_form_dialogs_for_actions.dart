@@ -4,7 +4,8 @@ import 'package:gymify_desktop/dialogs/user_picker_dialog.dart';
 import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
 import 'package:gymify_desktop/widgets/member_widget.dart';
-import 'package:gymify_desktop/widgets/training_widget.dart' hide showUserPickDialog;
+import 'package:gymify_desktop/widgets/training_widget.dart'
+    hide showUserPickDialog;
 import 'package:provider/provider.dart';
 
 enum BaseFieldType {
@@ -16,7 +17,7 @@ enum BaseFieldType {
   dropdown,
   password,
   userSearch,
-  trainerPick
+  trainerPick,
 }
 
 class BaseFormFieldDef {
@@ -55,7 +56,6 @@ Future<void> showBaseFormDialog({
   required String title,
   required List<BaseFormFieldDef> fieldsDef,
   required Future<void> Function(Map<String, dynamic> payload) onSubmit,
-
   Map<String, dynamic>? initialValues,
   void Function(
     String changedField,
@@ -63,7 +63,6 @@ Future<void> showBaseFormDialog({
     void Function(String field, dynamic value) setValue,
   )?
   onFieldChanged,
-
   double width = 560,
   double? height,
 }) async {
@@ -71,8 +70,8 @@ Future<void> showBaseFormDialog({
   final fields = Fields.fromNames(fieldsDef.map((e) => e.name).toList());
   final scrollController = ScrollController();
 
-  // inicijalno popunjavanje
   final values = <String, dynamic>{};
+
   for (final f in fieldsDef) {
     final v = initialValues != null ? initialValues[f.name] : null;
     values[f.name] = v ?? "";
@@ -82,14 +81,14 @@ Future<void> showBaseFormDialog({
   }
 
   if (initialValues != null) {
-  if (initialValues.containsKey("userId")) {
-    values["userId"] = initialValues["userId"];
-  }
+    if (initialValues.containsKey("userId")) {
+      values["userId"] = initialValues["userId"];
+    }
 
-  if (initialValues.containsKey("trainerId")) {
-    values["trainerId"] = initialValues["trainerId"];
+    if (initialValues.containsKey("trainerId")) {
+      values["trainerId"] = initialValues["trainerId"];
+    }
   }
-}
 
   values.putIfAbsent("userId", () => "");
   values.putIfAbsent("trainerId", () => "");
@@ -118,6 +117,7 @@ Future<void> showBaseFormDialog({
           if (!ok) return;
 
           final payload = Map<String, dynamic>.from(values);
+
           for (final f in fieldsDef) {
             payload[f.name] = fields.text(f.name).trim();
           }
@@ -125,8 +125,8 @@ Future<void> showBaseFormDialog({
           payload["trainerId"] = values["trainerId"];
           payload["userId"] = values["userId"];
 
-
           await onSubmit(payload);
+
           if (ctx.mounted) Navigator.pop(ctx);
         }
 
@@ -145,6 +145,7 @@ Future<void> showBaseFormDialog({
 
           void notifyChanged(String fieldName) {
             values[fieldName] = fields.text(fieldName);
+
             if (onFieldChanged != null) {
               onFieldChanged(
                 fieldName,
@@ -156,64 +157,74 @@ Future<void> showBaseFormDialog({
 
           switch (def.type) {
             case BaseFieldType.trainerPick:
-  final canPick = def.enabled ?? true;
+              final canPick = def.enabled ?? true;
 
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Expanded(
-        child: TextFormField(
-          controller: fields.controller(def.name),
-          enabled: false,
-          readOnly: true,
-          validator: validator,
-          decoration: InputDecoration(
-            labelText: def.label,
-            hintText: "Klikni 'Dodaj trenera' za odabir",
-            filled: true,
-            fillColor: const Color(0xFFF7F7F7),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(width: 10),
-      ElevatedButton(
-        onPressed: canPick
-            ? () async {
-                // ✅ OVDJE biraš trenera
-                final picked = await showTrainerPickDialog(context: context);
-                if (picked == null) return;
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: fields.controller(def.name),
+                      enabled: false,
+                      readOnly: true,
+                      validator: validator,
+                      decoration: InputDecoration(
+                        labelText: def.label,
+                        hintText: "Klikni 'Dodaj trenera' za odabir",
+                        filled: true,
+                        fillColor: const Color(0xFFF7F7F7),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: canPick
+                        ? () async {
+                            final picked = await showTrainerPickDialog(
+                              context: context,
+                            );
+                            if (picked == null) return;
 
-                final display =
-                    "${picked.firstName ?? ""} ${picked.lastName ?? ""}".trim();
+                            final display =
+                                "${picked.firstName ?? ""} ${picked.lastName ?? ""}"
+                                    .trim();
 
-                // prikaz u formi
-                fields.setText(def.name, display);
-                values[def.name] = display;
+                            fields.setText(def.name, display);
+                            values[def.name] = display;
+                            values["trainerId"] = picked.id;
 
-                // ✅ pravi ID koji šalješ na backend
-                values["trainerId"] = picked.id;
-
-                setStateDialog(() {});
-              }
-            : null,
-        child: const Text("Dodaj trenera"),
-      ),
-    ],
-  );
+                            setStateDialog(() {});
+                          }
+                        : null,
+                    child: const Text("Dodaj trenera"),
+                  ),
+                ],
+              );
 
             case BaseFieldType.dropdown:
+              final currentValue = fields.text(def.name).trim();
+              final dropdownItems =
+                  def.items ?? const <DropdownMenuItem<String>>[];
+
+              final hasMatchingValue = dropdownItems.any(
+                (item) => item.value == currentValue,
+              );
+
               return DropdownButtonFormField<String>(
-                value: fields.text(def.name).isEmpty
+                isExpanded: true,
+                menuMaxHeight: 260,
+                value: currentValue.isEmpty
                     ? null
-                    : fields.text(def.name),
-                items: def.items ?? const [],
+                    : (hasMatchingValue ? currentValue : null),
+                items: dropdownItems,
                 onChanged: isEnabled
                     ? (v) {
                         fields.setText(def.name, v ?? "");
                         values[def.name] = v ?? "";
+
                         if (onFieldChanged != null) {
                           onFieldChanged(
                             def.name,
@@ -221,6 +232,7 @@ Future<void> showBaseFormDialog({
                             (k, vv) => setValue(setStateDialog, k, vv),
                           );
                         }
+
                         setStateDialog(() {});
                       }
                     : null,
@@ -273,8 +285,7 @@ Future<void> showBaseFormDialog({
 
                             fields.setText(def.name, display);
                             values[def.name] = display;
-
-                            values["userId"] = picked.id; // ✅ int
+                            values["userId"] = picked.id;
 
                             setStateDialog(() {});
                           }
@@ -313,6 +324,7 @@ Future<void> showBaseFormDialog({
 
                   final text =
                       "${picked.day.toString().padLeft(2, '0')}.${picked.month.toString().padLeft(2, '0')}.${picked.year}";
+
                   fields.setText(def.name, text);
                   values[def.name] = text;
 
@@ -323,6 +335,7 @@ Future<void> showBaseFormDialog({
                       (k, v) => setValue(setStateDialog, k, v),
                     );
                   }
+
                   setStateDialog(() {});
                 },
               );
@@ -358,6 +371,7 @@ Future<void> showBaseFormDialog({
 
             default:
               TextInputType keyboard;
+
               switch (def.type) {
                 case BaseFieldType.email:
                   keyboard = TextInputType.emailAddress;
@@ -404,7 +418,7 @@ Future<void> showBaseFormDialog({
               controller: scrollController,
               child: Scrollbar(
                 controller: scrollController,
-                thumbVisibility: true, // može sad bez errora
+                thumbVisibility: true,
                 child: SingleChildScrollView(
                   controller: scrollController,
                   padding: const EdgeInsets.only(right: 8),

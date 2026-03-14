@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gymify_mobile/config/api_config.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/login_request.dart';
@@ -7,7 +8,7 @@ import '../models/login_response.dart';
 import '../utils/session.dart';
 
 class AuthProvider with ChangeNotifier {
-  static const String apiUrl = "http://10.0.2.2:5265/api/User/login";
+  static const String apiUrl = '${ApiConfig.apiBase}/api/User/login';
 
   Future<String> prijava(LoginRequest request) async {
     final url = Uri.parse(apiUrl);

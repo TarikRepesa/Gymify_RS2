@@ -1,6 +1,9 @@
-public class CreatePaymentIntentRequest
+namespace Gymify.Model.RequestObjects
 {
-    public int UserId { get; set; }
-    public int MembershipId { get; set; }
-    public double Amount { get; set; }
+    public class CreatePaymentIntentRequest
+    {
+        public int UserId { get; set; }
+        public int MembershipId { get; set; }
+        public string BillingPeriod { get; set; } = "monthly";
+    }
 }

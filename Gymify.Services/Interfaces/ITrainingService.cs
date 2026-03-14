@@ -8,5 +8,6 @@ namespace Gymify.Services.Interfaces
     {
         Task Up(int trainingId);
         Task Down(int trainingId);
+        Task<List<TrainingResponse>> GetRecommended(int userId, int take = 3);
     }
 }

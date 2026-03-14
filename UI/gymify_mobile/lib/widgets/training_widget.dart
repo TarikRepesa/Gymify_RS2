@@ -30,6 +30,9 @@ class _TrainingWidgetState extends State<TrainingWidget> {
 
   late final UniversalPagingProvider<Training> _paging;
 
+  List<Training> _recommendedTrainings = [];
+  bool _isLoadingRecommended = false;
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +62,7 @@ class _TrainingWidgetState extends State<TrainingWidget> {
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _loadRecommended();
       await _paging.loadPage(pageNumber: 0);
     });
   }
@@ -70,6 +74,34 @@ class _TrainingWidgetState extends State<TrainingWidget> {
     super.dispose();
   }
 
+  Future<void> _loadRecommended() async {
+    setState(() => _isLoadingRecommended = true);
+
+    try {
+      final provider = context.read<TrainingProvider>();
+
+      final items = await provider.getRecommended(
+        filter: {"userId": Session.userId, "take": 3},
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _recommendedTrainings = items;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _recommendedTrainings = [];
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingRecommended = false);
+      }
+    }
+  }
+
   Map<String, dynamic> _buildQuery({
     required int page,
     required int pageSize,
@@ -78,17 +110,14 @@ class _TrainingWidgetState extends State<TrainingWidget> {
     required bool includeTotalCount,
   }) {
     final q = <String, dynamic>{
-      // ✅ Ako backend koristi druga imena, promijeni OVDJE:
       "page": page,
       "pageSize": pageSize,
       "IncludeUser": true,
-
       if (includeTotalCount) "includeTotalCount": true,
       if (filter != null && filter.isNotEmpty) "filter": filter,
       ...?extra,
     };
 
-    // (Opcionalno) slanje datuma kao filter
     if (_selectedDate != null) {
       final d = _selectedDate!;
       final dd = d.day.toString().padLeft(2, '0');
@@ -105,7 +134,8 @@ class _TrainingWidgetState extends State<TrainingWidget> {
       _selectedDate = null;
       _searchCtrl.clear();
     });
-    _paging.applyExtra({});
+
+    await _paging.applyExtra({});
     await _paging.loadPage(pageNumber: 0);
   }
 
@@ -118,82 +148,80 @@ class _TrainingWidgetState extends State<TrainingWidget> {
   }
 
   Future<void> _reserveTraining(Training t) async {
-  final reservationProvider = context.read<ReservationProvider>();
-  final trainingProvider = context.read<TrainingProvider>();
-  final lpProviderH = context.read<LoyaltyPointHistoryProvider>();
-  final lpProvider = context.read<LoyaltyPointProvider>();
+    final reservationProvider = context.read<ReservationProvider>();
+    final trainingProvider = context.read<TrainingProvider>();
+    final lpProviderH = context.read<LoyaltyPointHistoryProvider>();
+    final lpProvider = context.read<LoyaltyPointProvider>();
 
-  final userId = Session.userId;
-  final trainingId = t.id;
+    final userId = Session.userId;
+    final trainingId = t.id;
 
-  final already = await reservationProvider.exists({
-    "userId": userId,
-    "trainingId": t.id
-  });
-
-  if (already) {
-    await ConfirmDialogs.okConfirmation(
-      context,
-      title: "Info",
-      message: "Već imate rezervisan ovaj trening.",
-      okText: "U redu",
-    );
-    return;
-  }
-
-  final ok = await ConfirmDialogs.yesNoConfirmation(
-    context,
-    title: "Rezervacija",
-    question:
-        "Da li ste sigurni da želite rezervisati trening:\n\n${t.name}?",
-    yesText: "Rezerviši",
-    noText: "Odustani",
-  );
-
-  if (!ok) return;
-
-  try {
-    final request = {
+    final already = await reservationProvider.exists({
       "userId": userId,
-      "trainingId": trainingId,
-      "createdAt": DateTime.now().toIso8601String(),
-    };
+      "trainingId": t.id,
+    });
 
-    await reservationProvider.insert(request);
+    if (already) {
+      await ConfirmDialogs.okConfirmation(
+        context,
+        title: "Info",
+        message: "Već imate rezervisan ovaj trening.",
+        okText: "U redu",
+      );
+      return;
+    }
 
-    await trainingProvider.up(t.id);
+    final ok = await ConfirmDialogs.yesNoConfirmation(
+      context,
+      title: "Rezervacija",
+      question:
+          "Da li ste sigurni da želite rezervisati trening:\n\n${t.name}?",
+      yesText: "Rezerviši",
+      noText: "Odustani",
+    );
 
-    await lpProvider.addPoints({
-  "userId": Session.userId,
-  "points": 1, 
-});
+    if (!ok) return;
 
-await lpProviderH.insert({
+    try {
+      final request = {
+        "userId": userId,
+        "trainingId": trainingId,
+        "createdAt": DateTime.now().toIso8601String(),
+      };
+
+      await reservationProvider.insert(request);
+
+      await trainingProvider.up(t.id);
+
+      await lpProvider.addPoints({"userId": Session.userId, "points": 1});
+
+      await lpProviderH.insert({
         "userId": Session.userId,
         "status": "Plaćanje nagrade",
         "amountPointsParticipation": 1,
-        "createdAt": DateTime.now().toIso8601String()
+        "createdAt": DateTime.now().toIso8601String(),
       });
 
-    await ConfirmDialogs.okConfirmation(
-      context,
-      title: "Uspješno",
-      message:
-          "Rezervacija je uspješno kreirana.\n\nSve rezervacije možete pogledati u sekciji 'Rezervacije'.",
-      okText: "U redu",
-    );
+      await ConfirmDialogs.okConfirmation(
+        context,
+        title: "Uspješno",
+        message:
+            "Rezervacija je uspješno kreirana.\n\nSve rezervacije možete pogledati u sekciji 'Rezervacije'.",
+        okText: "U redu",
+      );
 
-    await _paging.refresh();
-  } catch (e) {
-    await ConfirmDialogs.okConfirmation(
-      context,
-      title: "Greška",
-      message: "Nije moguće napraviti rezervaciju.\n\n$e",
-      okText: "OK",
-      danger: true,
-    );
+      await _loadRecommended();
+      await _paging.refresh();
+    } catch (e) {
+      await ConfirmDialogs.okConfirmation(
+        context,
+        title: "Greška",
+        message: "Nije moguće napraviti rezervaciju.\n\n$e",
+        okText: "OK",
+        danger: true,
+      );
+    }
   }
-}
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
@@ -212,7 +240,7 @@ await lpProviderH.insert({
 
     if (picked != null) {
       setState(() => _selectedDate = picked);
-      await _onDateSearch(); // 🔥 poziva applyExtra
+      await _onDateSearch();
     }
   }
 
@@ -226,16 +254,68 @@ await lpProviderH.insert({
     await _paging.applyExtra({"FTS": value});
   }
 
+  Widget _buildRecommendedSection() {
+    if (_isLoadingRecommended) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_recommendedTrainings.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.black12),
+        ),
+        child: const Text(
+          "Nemamo još dovoljno podataka za personalizovane preporuke. Nakon nekoliko rezervacija prikazat će se treninzi koji najviše odgovaraju vašim navikama.",
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        ),
+      );
+    }
+
+    return Column(
+      children: _recommendedTrainings.map((t) {
+        final title = (t.name ?? "Trening").toString();
+        final trainerName = _trainerName(t);
+        final isFull = _isFull(t);
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _TrainingCard(
+            title: title,
+            trainer: trainerName,
+            isFull: isFull,
+            maxParticipants: t.maxAmountOfParticipants,
+            currentParticipants: t.currentParticipants,
+            durationMinutes: t.durationMinutes,
+            intensityLevel: t.intensityLevel,
+            purpose: t.purpose,
+            trainingImage: t.trainingImage,
+            startDate: t.startDate,
+            onReserve: isFull ? null : () async => await _reserveTraining(t),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: RefreshIndicator(
-        onRefresh: _paging.refresh,
+        onRefresh: () async {
+          await _loadRecommended();
+          await _paging.refresh();
+        },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
-              // Header title
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -250,7 +330,46 @@ await lpProviderH.insert({
                 ),
               ),
 
-              // Filters
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Preporučeni za vas",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      color: gymBlueDark,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: _buildRecommendedSection(),
+              ),
+
+              const SizedBox(height: 16),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Pretraži sve treninge",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      color: gymBlueDark,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Column(
@@ -298,7 +417,6 @@ await lpProviderH.insert({
 
               const SizedBox(height: 10),
 
-              // List (paging + swipe) - bez Expanded, jer smo u scroll view
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -308,7 +426,6 @@ await lpProviderH.insert({
                   provider: _paging,
                   separatorHeight: 14,
                   itemBuilder: (context, t) {
-                    // ✅ prilagodi polja po tvom Training modelu
                     final title = (t.name ?? "Trening").toString();
                     final trainerName = _trainerName(t);
                     final isFull = _isFull(t);
@@ -320,8 +437,13 @@ await lpProviderH.insert({
                       maxParticipants: t.maxAmountOfParticipants,
                       currentParticipants: t.currentParticipants,
                       trainingImage: t.trainingImage,
+                      durationMinutes: t.durationMinutes,
+                      intensityLevel: t.intensityLevel,
+                      purpose: t.purpose,
                       startDate: t.startDate,
-                      onReserve: isFull ? null : () async => await _reserveTraining(t),
+                      onReserve: isFull
+                          ? null
+                          : () async => await _reserveTraining(t),
                     );
                   },
                 ),
@@ -335,7 +457,6 @@ await lpProviderH.insert({
     );
   }
 
-  // ✅ Helperi - prilagodi po tvom Training modelu
   String _trainerName(Training t) {
     final trainer = t.user;
     if (trainer == null) return "N/A";
@@ -343,13 +464,19 @@ await lpProviderH.insert({
     final fn = (trainer.firstName ?? "").trim();
     final ln = (trainer.lastName ?? "").trim();
     final full = "$fn $ln".trim();
+
     return full.isEmpty ? (trainer.username ?? "N/A") : full;
   }
 
   bool _isFull(Training t) {
     final cap = t.maxAmountOfParticipants;
     final reserved = t.currentParticipants;
-    if (cap != null && reserved != null) return reserved >= cap;
+
+    if (cap != null && reserved != null) {
+      return reserved >= cap;
+    }
+
+    return false;
   }
 }
 
@@ -436,10 +563,12 @@ class _TrainingCard extends StatelessWidget {
     this.currentParticipants,
     this.trainingImage,
     this.startDate,
+    this.durationMinutes,
+    this.intensityLevel,
+    this.purpose,
   });
 
   static const Color gymBlue = Color(0xFF1976D2);
-  static const Color gymBlueDark = Color(0xFF0D47A1);
   static const Color lightGrey = Color(0xFFF2F2F2);
 
   final String title;
@@ -450,6 +579,9 @@ class _TrainingCard extends StatelessWidget {
   final int? currentParticipants;
   final String? trainingImage;
   final DateTime? startDate;
+  final int? durationMinutes;
+  final int? intensityLevel;
+  final String? purpose;
 
   @override
   Widget build(BuildContext context) {
@@ -490,7 +622,7 @@ class _TrainingCard extends StatelessWidget {
                             ),
                           )
                         : Image.network(
-                            "${ApiConfig.apiBase}/images/trainings/${trainingImage}",
+                            "${ApiConfig.apiBase}/images/trainings/$trainingImage",
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Container(
                               color: lightGrey,
@@ -528,6 +660,7 @@ class _TrainingCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
+
                 Row(
                   children: [
                     const Expanded(
@@ -552,7 +685,92 @@ class _TrainingCard extends StatelessWidget {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 6),
+
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        "Namjena:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        purpose ?? "-",
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        "Trajanje:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        durationMinutes != null
+                            ? "${durationMinutes} min"
+                            : "-",
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        "Intenzitet:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        intensityLevel?.toString() ?? "-",
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+
                 Row(
                   children: [
                     const Expanded(
@@ -578,6 +796,7 @@ class _TrainingCard extends StatelessWidget {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 6),
 
                 Row(
@@ -631,6 +850,7 @@ class _TrainingCard extends StatelessWidget {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 12),
 
                 Row(
@@ -686,7 +906,9 @@ class _TrainingCard extends StatelessWidget {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 12),
+
                 Row(
                   children: [
                     const SizedBox(width: 10),

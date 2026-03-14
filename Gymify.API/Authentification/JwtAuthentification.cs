@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -9,16 +8,20 @@ namespace Gymify.WebAPI.Authentication
 {
     public static class JwtAuthentication
     {
-        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services)
         {
-            var jwtKey = configuration["Jwt:Key"];
-            var jwtIssuer = configuration["Jwt:Issuer"];
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET");
+            var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+            var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
 
             if (string.IsNullOrWhiteSpace(jwtKey))
-                throw new InvalidOperationException("Jwt:Key is not configured.");
+                throw new InvalidOperationException("JWT_SECRET nije konfigurisan u .env fajlu.");
 
             if (string.IsNullOrWhiteSpace(jwtIssuer))
-                throw new InvalidOperationException("Jwt:Issuer is not configured.");
+                throw new InvalidOperationException("JWT_ISSUER nije konfigurisan u .env fajlu.");
+
+            if (string.IsNullOrWhiteSpace(jwtAudience))
+                throw new InvalidOperationException("JWT_AUDIENCE nije konfigurisan u .env fajlu.");
 
             services.AddAuthentication(options =>
             {
@@ -35,7 +38,7 @@ namespace Gymify.WebAPI.Authentication
                     ValidateIssuerSigningKey = true,
 
                     ValidIssuer = jwtIssuer,
-                    ValidAudience = jwtIssuer, 
+                    ValidAudience = jwtAudience,
 
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtKey)

@@ -2,6 +2,7 @@ using Gymify.Model.RequestObjects;
 using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
 using Gymify.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gymify.API.Controllers
@@ -26,6 +27,13 @@ namespace Gymify.API.Controllers
         {
             await _trainingService.Down(id);
             return Ok(true);
+        }
+
+        [HttpGet("recommended")]
+        [Authorize(Roles = "Korisnik")]
+        public async Task<List<TrainingResponse>> GetRecommended([FromQuery] int userId, [FromQuery] int take = 3)
+        {
+            return await _trainingService.GetRecommended(userId, take);
         }
     }
 }

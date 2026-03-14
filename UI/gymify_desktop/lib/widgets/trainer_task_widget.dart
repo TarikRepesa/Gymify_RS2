@@ -61,7 +61,7 @@ Widget TrainerTaskWidget() {
             BaseColumn<Training>(
               title: "Datum",
               flex: 2,
-              cell: (t) => Text(DateHelper.format(t.startDate)),
+              cell: (t) => Text(DateHelper.format(t.startDate!)),
             ),
             BaseColumn<Training>(
               title: "Max učesnika",
