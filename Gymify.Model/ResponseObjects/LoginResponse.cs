@@ -1,4 +1,4 @@
-// Rentify.Model/Responses/LoginResponse.cs
+// Gymify.Model/Responses/LoginResponse.cs
 using System;
 using System.Collections.Generic;
 

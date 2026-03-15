@@ -23,7 +23,7 @@ namespace Gymify.API.Controllers
             return await _userService.LoginAsync(request);
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = "Korisnik")]
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(
         [FromBody] ForgotPasswordRequest request)
@@ -33,7 +33,7 @@ namespace Gymify.API.Controllers
             return Ok("Ako email postoji, poslan je link za reset lozinke.");
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost]
         public override Task<UserResponse> Create([FromBody] UserInsertRequest request)
         {

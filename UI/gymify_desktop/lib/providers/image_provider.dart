@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:gymify_desktop/config/api_config.dart';
+import 'package:gymify_desktop/helper/http_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
@@ -17,6 +18,8 @@ class ImageAppProvider {
 
     final request = http.MultipartRequest('POST', uri);
 
+    request.headers.addAll(HttpHelper.getHeaders());
+
     request.files.add(
       await http.MultipartFile.fromPath(
         'file',
@@ -28,11 +31,8 @@ class ImageAppProvider {
     final streamed = await request.send();
     final response = await http.Response.fromStream(streamed);
 
-    if (response.statusCode != 200) {
-      throw Exception('Upload slike nije uspio');
-    }
+    HttpHelper.checkResponse(response);
 
-    
     final json = jsonDecode(response.body);
     return json['fileName']; 
   }
@@ -46,10 +46,11 @@ class ImageAppProvider {
       '?folder=$folder&fileName=$fileName',
     );
 
-    final res = await http.delete(uri);
+    final response = await http.delete(
+      uri,
+      headers: HttpHelper.getHeaders(), 
+    );
 
-    if (res.statusCode != 200 && res.statusCode != 404) {
-      throw Exception('Brisanje slike nije uspjelo');
-    }
+    HttpHelper.checkResponse(response);
   }
 }

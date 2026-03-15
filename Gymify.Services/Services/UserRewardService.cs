@@ -2,6 +2,7 @@ using Gymify.Model.RequestObjects;
 using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
 using Gymify.Services.Database;
+using Gymify.Services.Helpers;
 using Gymify.Services.Interfaces;
 using Gymify.Services.Services;
 using MapsterMapper;
@@ -39,13 +40,8 @@ namespace Gymify.Services.Implementations
         private string GenerateCode(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            return SecureRandomHelper.GenerateString(chars, length);
         }
-
-
 
         public async Task<UserRewardResponse?> RedeemAsync(int userId, int rewardId)
         {
@@ -59,7 +55,6 @@ namespace Gymify.Services.Implementations
             if (loyalty == null || loyalty.TotalPoints < reward.RequiredPoints)
                 return null;
 
-            // Skini poene
             loyalty.TotalPoints -= reward.RequiredPoints;
 
             var userReward = new UserReward

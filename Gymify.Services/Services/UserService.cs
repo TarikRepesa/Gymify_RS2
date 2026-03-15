@@ -15,6 +15,7 @@ using System.Text.Json;
 using System.Text;
 using RabbitMQ.Client;
 using Gymify.EmailConsumer.Messages;
+using System.Security.Cryptography;
 
 namespace Gymify.Services.Services
 {
@@ -22,6 +23,7 @@ namespace Gymify.Services.Services
     {
         IConfiguration _configuration;
         private readonly IConnection _rabbitConnection;
+
         public UserService(GymifyDbContext context, IMapper mapper, IConfiguration configuration, IConnection rabbitConnection) : base(context, mapper)
         {
             _configuration = configuration;
@@ -67,8 +69,6 @@ namespace Gymify.Services.Services
 
             return query;
         }
-
-
 
         protected override User MapInsertToEntity(User entity, UserInsertRequest request)
         {
@@ -158,43 +158,49 @@ namespace Gymify.Services.Services
                 .FirstOrDefaultAsync(x => x.Email == email);
 
             if (user == null)
-                throw new Exception("Email nije povezan ni sa jednim nalogom.");
+                throw new InvalidOperationException("Email nije povezan ni sa jednim nalogom.");
 
             var newPassword = GenerateRandomPassword();
-
             UserHelper.CreatePasswordHash(newPassword, out string hash, out string salt);
 
-            user.PasswordHash = hash;
-            user.PasswordSalt = salt;
-
-            await _context.SaveChangesAsync();
-
-            var channel = await _rabbitConnection.CreateChannelAsync();
-
-            await channel.QueueDeclareAsync(
-                queue: "email.reset-password",
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null
-            );
-
-            var message = new ResetPasswordEmailMessage
+            try
             {
-                To = user.Email!,
-                UserName = user.FirstName ?? user.Username ?? "Korisnik",
-                NewPassword = newPassword
-            };
+                var channel = await _rabbitConnection.CreateChannelAsync();
 
-            var body = Encoding.UTF8.GetBytes(
-                JsonSerializer.Serialize(message)
-            );
+                await channel.QueueDeclareAsync(
+                    queue: "email.reset-password",
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null
+                );
 
-            await channel.BasicPublishAsync(
-                exchange: "",
-                routingKey: "email.reset-password",
-                body: body
-            );
+                var message = new ResetPasswordEmailMessage
+                {
+                    To = user.Email!,
+                    UserName = user.FirstName ?? user.Username ?? "Korisnik",
+                    NewPassword = newPassword
+                };
+
+                var body = Encoding.UTF8.GetBytes(
+                    JsonSerializer.Serialize(message)
+                );
+
+                await channel.BasicPublishAsync(
+                    exchange: "",
+                    routingKey: "email.reset-password",
+                    body: body
+                );
+
+                user.PasswordHash = hash;
+                user.PasswordSalt = salt;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Reset lozinke trenutno nije moguće izvršiti. Pokušajte ponovo kasnije.", ex);
+            }
         }
 
         private string GenerateRandomPassword(int length = 10)
@@ -202,12 +208,7 @@ namespace Gymify.Services.Services
             const string chars =
                 "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@$?";
 
-            var random = new Random();
-            return new string(
-                Enumerable.Repeat(chars, length)
-                    .Select(s => s[random.Next(s.Length)])
-                    .ToArray()
-            );
+            return SecureRandomHelper.GenerateString(chars, length);
         }
     }
 }

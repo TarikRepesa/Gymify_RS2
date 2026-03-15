@@ -1,4 +1,5 @@
 using DotNetEnv;
+using Gymify.EmailConsumer.Configuration;
 using Gymify.Services;
 using Gymify.Services.Database;
 using Gymify.Services.Implementations;
@@ -34,34 +35,34 @@ var rabbitVHost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST");
 
 
 if (string.IsNullOrWhiteSpace(connectionString))
-    throw new Exception("CONNECTION_STRING nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("CONNECTION_STRING nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(jwtSecret))
-    throw new Exception("JWT_SECRET nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("JWT_SECRET nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(jwtIssuer))
-    throw new Exception("JWT_ISSUER nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("JWT_ISSUER nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(jwtAudience))
-    throw new Exception("JWT_AUDIENCE nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("JWT_AUDIENCE nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(stripeSecret))
-    throw new Exception("STRIPE_SECRET_KEY nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("STRIPE_SECRET_KEY nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(stripeWebhookSecret))
-    throw new Exception("STRIPE_WEBHOOK_SECRET nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("STRIPE_WEBHOOK_SECRET nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(rabbitHost))
-    throw new Exception("RABBITMQ_HOST nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("RABBITMQ_HOST nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(rabbitPortString) || !int.TryParse(rabbitPortString, out var rabbitPort))
-    throw new Exception("RABBITMQ_PORT nije validan u .env fajlu.");
+    throw new InvalidOperationException("RABBITMQ_PORT nije validan u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(rabbitUser))
-    throw new Exception("RABBITMQ_USERNAME nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("RABBITMQ_USERNAME nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(rabbitPass))
-    throw new Exception("RABBITMQ_PASSWORD nije postavljen u .env fajlu.");
+    throw new InvalidOperationException("RABBITMQ_PASSWORD nije postavljen u .env fajlu.");
 
 if (string.IsNullOrWhiteSpace(rabbitVHost))
     rabbitVHost = "/";
@@ -122,7 +123,6 @@ builder.Services.AddTransient<IMembershipService, MembershipService>();
 builder.Services.AddTransient<IPaymentService, PaymentService>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 builder.Services.AddTransient<IReviewService, Gymify.Services.Services.ReviewService>();
-builder.Services.AddTransient<ISpecialOfferService, SpecialOfferService>();
 builder.Services.AddTransient<ITrainingService, TrainingService>();
 builder.Services.AddTransient<IWorkerTaskService, WorkerTaskService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
@@ -132,6 +132,9 @@ builder.Services.AddTransient<IRewardService, RewardService>();
 builder.Services.AddTransient<IUserRewardService, UserRewardService>();
 builder.Services.AddTransient<IReportsService, ReportService>();
 
+builder.Services.Configure<AppConfig>(
+    builder.Configuration.GetSection("AppConfig")
+);
 
 StripeConfiguration.ApiKey = stripeSecret;
 

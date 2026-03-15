@@ -13,7 +13,7 @@ namespace Gymify.Services.Database
             var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
             if (string.IsNullOrWhiteSpace(connectionString))
-                throw new Exception("CONNECTION_STRING nije postavljen u .env fajlu.");
+                throw new InvalidOperationException("CONNECTION_STRING nije postavljen u .env fajlu.");
 
             var optionsBuilder = new DbContextOptionsBuilder<GymifyDbContext>();
             optionsBuilder.UseSqlServer(

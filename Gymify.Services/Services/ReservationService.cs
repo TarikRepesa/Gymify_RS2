@@ -5,6 +5,7 @@ using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Gymify.Services.Exceptions;
 
 namespace Gymify.Services.Services
 {
@@ -15,12 +16,19 @@ namespace Gymify.Services.Services
         }
 
         protected override IQueryable<Reservation> ApplyFilter(
-    IQueryable<Reservation> query,
-    ReservationSearchObject search)
+     IQueryable<Reservation> query,
+     ReservationSearchObject search)
         {
             if (search.UserId.HasValue)
             {
                 query = query.Where(x => x.UserId == search.UserId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search.Status))
+            {
+                var status = search.Status.Trim().ToLower();
+
+                query = query.Where(x => x.Status.ToLower() == status);
             }
 
             if (!string.IsNullOrWhiteSpace(search.FTS))
@@ -55,6 +63,19 @@ namespace Gymify.Services.Services
             }
 
             return base.ApplyFilter(query, search);
+        }
+
+        protected override async Task BeforeInsert(Reservation entity, ReservationUpsertRequest request)
+        {
+            await base.BeforeInsert(entity, request);
+
+            var alreadyExists = await _context.Reservations
+                .AnyAsync(x => x.UserId == request.UserId && x.TrainingId == request.TrainingId);
+
+            if (alreadyExists)
+            {
+                throw new BusinessException("Korisnik je već rezervisao ovaj trening.");
+            }
         }
 
         protected override IQueryable<Reservation> AddInclude(IQueryable<Reservation> query, ReservationSearchObject search)

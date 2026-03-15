@@ -44,6 +44,11 @@ String? _trainingImageToUrl(String? trainingImage) {
   return "${ApiConfig.apiBase}/images/training/$trainingImage";
 }
 
+DateTime _todayOnlyDate() {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
+}
+
 Future<void> _openEditTrainingDialog({
   required BuildContext context,
   required UniversalPagingProvider<Training> paging,
@@ -57,10 +62,7 @@ Future<void> _openEditTrainingDialog({
     text: training.intensityLevel?.toString() ?? "",
   );
   final maxCtrl = TextEditingController(
-    text: training.maxAmountOfParticipants.toString(),
-  );
-  final currentCtrl = TextEditingController(
-    text: training.currentParticipants.toString(),
+    text: training.maxAmountOfParticipants?.toString() ?? "",
   );
   final startDateCtrl = TextEditingController(
     text: DateHelper.format(training.startDate!),
@@ -82,7 +84,6 @@ Future<void> _openEditTrainingDialog({
   String? errDuration;
   String? errIntensity;
   String? errMax;
-  String? errCurrent;
   String? errStartDate;
 
   bool validate() {
@@ -92,14 +93,13 @@ Future<void> _openEditTrainingDialog({
     errDuration = null;
     errIntensity = null;
     errMax = null;
-    errCurrent = null;
     errStartDate = null;
 
     if (trainerId == null) errTrainer = "Trener je obavezan.";
     if (nameCtrl.text.trim().isEmpty) errName = "Naziv je obavezan.";
-    if ((selectedPurpose ?? "").trim().isEmpty) {
-      errPurpose = "Namjena je obavezna.";
-    }
+    if (selectedPurpose == null || selectedPurpose!.trim().isEmpty) {
+  errPurpose = "Namjena treninga je obavezna.";
+}
 
     final durationText = durationCtrl.text.trim();
     final durationVal = int.tryParse(durationText);
@@ -120,21 +120,9 @@ Future<void> _openEditTrainingDialog({
     final maxText = maxCtrl.text.trim();
     final maxVal = int.tryParse(maxText);
     if (maxText.isEmpty) {
-      errMax = "Max broj učesnika je obavezan.";
+      errMax = "Maksimalan broj učesnika je obavezan.";
     } else if (maxVal == null || maxVal <= 0) {
       errMax = "Unesite validan broj (min 1).";
-    }
-
-    final curText = currentCtrl.text.trim();
-    final curVal = int.tryParse(curText);
-    if (curText.isEmpty) {
-      errCurrent = "Trenutni broj učesnika je obavezan.";
-    } else if (curVal == null || curVal < 0) {
-      errCurrent = "Unesite validan broj (min 0).";
-    }
-
-    if (maxVal != null && curVal != null && curVal > maxVal) {
-      errCurrent = "Trenutni broj ne može biti veći od max broja.";
     }
 
     final startUi = startDateCtrl.text.trim();
@@ -142,8 +130,13 @@ Future<void> _openEditTrainingDialog({
       errStartDate = "Datum početka je obavezan.";
     } else {
       try {
-        DateHelper.toIsoFromUi(startUi);
-      } catch (_) {
+  final iso = DateHelper.toIsoFromUi(startUi);
+  final selected = DateTime.parse(iso);
+
+  if (selected.isBefore(_todayOnlyDate())) {
+    errStartDate = "Možete odabrati samo današnji ili budući datum.";
+  }
+} catch (_) {
         errStartDate = "Neispravan format datuma (dd.MM.yyyy).";
       }
     }
@@ -154,7 +147,6 @@ Future<void> _openEditTrainingDialog({
         errDuration == null &&
         errIntensity == null &&
         errMax == null &&
-        errCurrent == null &&
         errStartDate == null;
   }
 
@@ -165,7 +157,6 @@ Future<void> _openEditTrainingDialog({
     final newDuration = int.tryParse(durationCtrl.text.trim());
     final newIntensity = int.tryParse(intensityCtrl.text.trim());
     final newMax = int.tryParse(maxCtrl.text.trim());
-    final newCur = int.tryParse(currentCtrl.text.trim());
     final newStart = startDateCtrl.text.trim();
 
     if ((newTrainerId ?? training.userId) != training.userId) return true;
@@ -179,10 +170,6 @@ Future<void> _openEditTrainingDialog({
     }
     if ((newMax ?? training.maxAmountOfParticipants) !=
         training.maxAmountOfParticipants) {
-      return true;
-    }
-    if ((newCur ?? training.currentParticipants) !=
-        training.currentParticipants) {
       return true;
     }
     if (newStart != DateHelper.format(training.startDate!)) return true;
@@ -216,10 +203,14 @@ Future<void> _openEditTrainingDialog({
         }
 
         Future<void> pickStartDate() async {
+          final today = _todayOnlyDate();
+          final currentStart = training.startDate ?? today;
+          final initialDate = currentStart.isBefore(today) ? today : currentStart;
+
           final picked = await showDatePicker(
             context: dialogCtx,
-            initialDate: training.startDate,
-            firstDate: DateTime(1900),
+            initialDate: initialDate,
+            firstDate: today,
             lastDate: DateTime(2100),
           );
           if (picked == null) return;
@@ -242,7 +233,6 @@ Future<void> _openEditTrainingDialog({
 
           try {
             await dialogCtx.read<TrainingProvider>().delete(training.id);
-
             await paging.loadPage();
 
             if (dialogCtx.mounted) {
@@ -277,7 +267,6 @@ Future<void> _openEditTrainingDialog({
             final durationMinutes = int.parse(durationCtrl.text.trim());
             final intensityLevel = int.parse(intensityCtrl.text.trim());
             final maxP = int.parse(maxCtrl.text.trim());
-            final curP = int.parse(currentCtrl.text.trim());
             final startIso = DateHelper.toIsoFromUi(startDateCtrl.text.trim());
 
             await dialogCtx.read<TrainingProvider>().update(training.id, {
@@ -288,7 +277,6 @@ Future<void> _openEditTrainingDialog({
               "durationMinutes": durationMinutes,
               "intensityLevel": intensityLevel,
               "maxAmountOfParticipants": maxP,
-              "currentParticipants": curP,
               "startDate": startIso,
               "trainingImage": trainingImageFileName,
             });
@@ -373,8 +361,7 @@ Future<void> _openEditTrainingDialog({
                                                 errorBuilder: (_, __, ___) =>
                                                     const Center(
                                                       child: Icon(
-                                                        Icons
-                                                            .image_not_supported,
+                                                        Icons.image_not_supported,
                                                         color: Colors.white,
                                                         size: 46,
                                                       ),
@@ -405,8 +392,8 @@ Future<void> _openEditTrainingDialog({
                                     Text(
                                       pickedImage != null
                                           ? pickedImage!.path
-                                                .split(Platform.pathSeparator)
-                                                .last
+                                              .split(Platform.pathSeparator)
+                                              .last
                                           : (training.trainingImage ?? "Nema"),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
@@ -431,7 +418,6 @@ Future<void> _openEditTrainingDialog({
                             ],
                           ),
                         ),
-
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -460,9 +446,7 @@ Future<void> _openEditTrainingDialog({
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 12),
-
                         TextField(
                           controller: nameCtrl,
                           decoration: InputDecoration(
@@ -476,16 +460,13 @@ Future<void> _openEditTrainingDialog({
                           ),
                           onChanged: (_) => setStateDialog(() {}),
                         ),
-
                         const SizedBox(height: 12),
-
                         DropdownButtonFormField<String>(
                           isExpanded: true,
                           menuMaxHeight: 260,
-                          value:
-                              trainingPurposeDropdownItems.any(
-                                (item) => item.value == selectedPurpose,
-                              )
+                          value: trainingPurposeDropdownItems.any(
+                            (item) => item.value == selectedPurpose,
+                          )
                               ? selectedPurpose
                               : null,
                           items: trainingPurposeDropdownItems,
@@ -505,9 +486,7 @@ Future<void> _openEditTrainingDialog({
                             errorText: errPurpose,
                           ),
                         ),
-
                         const SizedBox(height: 12),
-
                         TextField(
                           controller: durationCtrl,
                           keyboardType: TextInputType.number,
@@ -522,9 +501,7 @@ Future<void> _openEditTrainingDialog({
                           ),
                           onChanged: (_) => setStateDialog(() {}),
                         ),
-
                         const SizedBox(height: 12),
-
                         TextField(
                           controller: intensityCtrl,
                           keyboardType: TextInputType.number,
@@ -540,14 +517,12 @@ Future<void> _openEditTrainingDialog({
                           ),
                           onChanged: (_) => setStateDialog(() {}),
                         ),
-
                         const SizedBox(height: 12),
-
                         TextField(
                           controller: maxCtrl,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            labelText: "Max broj učesnika",
+                            labelText: "Maksimalan broj učesnika",
                             filled: true,
                             fillColor: const Color(0xFFF7F7F7),
                             border: OutlineInputBorder(
@@ -557,26 +532,7 @@ Future<void> _openEditTrainingDialog({
                           ),
                           onChanged: (_) => setStateDialog(() {}),
                         ),
-
                         const SizedBox(height: 12),
-
-                        TextField(
-                          controller: currentCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: "Trenutni broj učesnika",
-                            filled: true,
-                            fillColor: const Color(0xFFF7F7F7),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            errorText: errCurrent,
-                          ),
-                          onChanged: (_) => setStateDialog(() {}),
-                        ),
-
-                        const SizedBox(height: 12),
-
                         TextField(
                           controller: startDateCtrl,
                           readOnly: true,
@@ -595,9 +551,7 @@ Future<void> _openEditTrainingDialog({
                           ),
                           onTap: saving ? null : pickStartDate,
                         ),
-
                         const SizedBox(height: 22),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -609,7 +563,6 @@ Future<void> _openEditTrainingDialog({
                                 foregroundColor: Colors.red,
                               ),
                             ),
-
                             Row(
                               children: [
                                 const SizedBox(width: 10),
@@ -660,7 +613,16 @@ Future<void> _openEditTrainingDialog({
   );
 }
 
-Widget TrainingWidget() {
+class TrainingWidget extends StatefulWidget {
+  const TrainingWidget({super.key});
+
+  @override
+  State<TrainingWidget> createState() => _TrainingWidgetState();
+}
+
+class _TrainingWidgetState extends State<TrainingWidget> {
+  bool _showOldTrainings = false;
+
   InputDecoration _searchDecoration() {
     return InputDecoration(
       hintText: "Pretraga po nazivu",
@@ -689,16 +651,6 @@ Widget TrainingWidget() {
     );
   }
 
-  String? _trainingImageToUrl(String? trainingImage) {
-    if (!ImageHelper.hasValidImage(trainingImage)) return null;
-
-    if (ImageHelper.isHttp(trainingImage!)) {
-      return trainingImage;
-    }
-
-    return "${ApiConfig.apiBase}/images/training/$trainingImage";
-  }
-
   Future<void> _openAddTrainingDialog({
     required BuildContext context,
     required UniversalPagingProvider<Training> paging,
@@ -707,7 +659,6 @@ Widget TrainingWidget() {
     final durationCtrl = TextEditingController();
     final intensityCtrl = TextEditingController();
     final maxCtrl = TextEditingController();
-    final currentCtrl = TextEditingController(text: "0");
     final startDateCtrl = TextEditingController();
     final trainerDisplayCtrl = TextEditingController();
 
@@ -722,7 +673,6 @@ Widget TrainingWidget() {
     String? errDuration;
     String? errIntensity;
     String? errMax;
-    String? errCurrent;
     String? errStartDate;
 
     bool validate() {
@@ -732,7 +682,6 @@ Widget TrainingWidget() {
       errDuration = null;
       errIntensity = null;
       errMax = null;
-      errCurrent = null;
       errStartDate = null;
 
       if (trainerId == null) errTrainer = "Trener je obavezan.";
@@ -760,21 +709,9 @@ Widget TrainingWidget() {
       final maxText = maxCtrl.text.trim();
       final maxVal = int.tryParse(maxText);
       if (maxText.isEmpty) {
-        errMax = "Max broj učesnika je obavezan.";
+        errMax = "Maksimalan broj učesnika je obavezan.";
       } else if (maxVal == null || maxVal <= 0) {
         errMax = "Unesite validan broj (min 1).";
-      }
-
-      final curText = currentCtrl.text.trim();
-      final curVal = int.tryParse(curText);
-      if (curText.isEmpty) {
-        errCurrent = "Trenutni broj učesnika je obavezan.";
-      } else if (curVal == null || curVal < 0) {
-        errCurrent = "Unesite validan broj (min 0).";
-      }
-
-      if (maxVal != null && curVal != null && curVal > maxVal) {
-        errCurrent = "Trenutni broj ne može biti veći od max broja.";
       }
 
       final startUi = startDateCtrl.text.trim();
@@ -782,8 +719,13 @@ Widget TrainingWidget() {
         errStartDate = "Datum početka je obavezan.";
       } else {
         try {
-          DateHelper.toIsoFromUi(startUi);
-        } catch (_) {
+  final iso = DateHelper.toIsoFromUi(startUi);
+  final selected = DateTime.parse(iso);
+
+  if (selected.isBefore(_todayOnlyDate())) {
+    errStartDate = "Možete odabrati samo današnji ili budući datum.";
+  }
+} catch (_) {
           errStartDate = "Neispravan format datuma (dd.MM.yyyy).";
         }
       }
@@ -794,7 +736,6 @@ Widget TrainingWidget() {
           errDuration == null &&
           errIntensity == null &&
           errMax == null &&
-          errCurrent == null &&
           errStartDate == null;
     }
 
@@ -823,11 +764,11 @@ Widget TrainingWidget() {
           }
 
           Future<void> pickStartDate() async {
-            final now = DateTime.now();
+            final today = _todayOnlyDate();
             final picked = await showDatePicker(
               context: dialogCtx,
-              initialDate: now,
-              firstDate: DateTime(1900),
+              initialDate: today,
+              firstDate: today,
               lastDate: DateTime(2100),
             );
             if (picked == null) return;
@@ -859,7 +800,6 @@ Widget TrainingWidget() {
               final durationMinutes = int.parse(durationCtrl.text.trim());
               final intensityLevel = int.parse(intensityCtrl.text.trim());
               final maxP = int.parse(maxCtrl.text.trim());
-              final curP = int.parse(currentCtrl.text.trim());
               final startIso = DateHelper.toIsoFromUi(
                 startDateCtrl.text.trim(),
               );
@@ -871,7 +811,6 @@ Widget TrainingWidget() {
                 "durationMinutes": durationMinutes,
                 "intensityLevel": intensityLevel,
                 "maxAmountOfParticipants": maxP,
-                "currentParticipants": curP,
                 "startDate": startIso,
                 "trainingImage": trainingImageFileName,
               });
@@ -972,8 +911,8 @@ Widget TrainingWidget() {
                                       Text(
                                         pickedImage != null
                                             ? pickedImage!.path
-                                                  .split(Platform.pathSeparator)
-                                                  .last
+                                                .split(Platform.pathSeparator)
+                                                .last
                                             : "Nije odabrana slika.",
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
@@ -1009,9 +948,7 @@ Widget TrainingWidget() {
                               ],
                             ),
                           ),
-
                           const SizedBox(height: 12),
-
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -1042,9 +979,7 @@ Widget TrainingWidget() {
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 12),
-
                           TextField(
                             controller: nameCtrl,
                             decoration: InputDecoration(
@@ -1058,16 +993,13 @@ Widget TrainingWidget() {
                             ),
                             onChanged: (_) => setStateDialog(() {}),
                           ),
-
                           const SizedBox(height: 12),
-
                           DropdownButtonFormField<String>(
                             isExpanded: true,
                             menuMaxHeight: 260,
-                            value:
-                                trainingPurposeDropdownItems.any(
-                                  (item) => item.value == selectedPurpose,
-                                )
+                            value: trainingPurposeDropdownItems.any(
+                              (item) => item.value == selectedPurpose,
+                            )
                                 ? selectedPurpose
                                 : null,
                             items: trainingPurposeDropdownItems,
@@ -1087,9 +1019,7 @@ Widget TrainingWidget() {
                               errorText: errPurpose,
                             ),
                           ),
-
                           const SizedBox(height: 12),
-
                           TextField(
                             controller: durationCtrl,
                             keyboardType: TextInputType.number,
@@ -1104,9 +1034,7 @@ Widget TrainingWidget() {
                             ),
                             onChanged: (_) => setStateDialog(() {}),
                           ),
-
                           const SizedBox(height: 12),
-
                           TextField(
                             controller: intensityCtrl,
                             keyboardType: TextInputType.number,
@@ -1122,14 +1050,12 @@ Widget TrainingWidget() {
                             ),
                             onChanged: (_) => setStateDialog(() {}),
                           ),
-
                           const SizedBox(height: 12),
-
                           TextField(
                             controller: maxCtrl,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              labelText: "Max broj učesnika",
+                              labelText: "Maksimalan broj učesnika",
                               filled: true,
                               fillColor: const Color(0xFFF7F7F7),
                               border: OutlineInputBorder(
@@ -1139,26 +1065,7 @@ Widget TrainingWidget() {
                             ),
                             onChanged: (_) => setStateDialog(() {}),
                           ),
-
                           const SizedBox(height: 12),
-
-                          TextField(
-                            controller: currentCtrl,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: "Trenutni broj učesnika",
-                              filled: true,
-                              fillColor: const Color(0xFFF7F7F7),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              errorText: errCurrent,
-                            ),
-                            onChanged: (_) => setStateDialog(() {}),
-                          ),
-
-                          const SizedBox(height: 12),
-
                           TextField(
                             controller: startDateCtrl,
                             readOnly: true,
@@ -1177,9 +1084,7 @@ Widget TrainingWidget() {
                             ),
                             onTap: saving ? null : pickStartDate,
                           ),
-
                           const SizedBox(height: 22),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
@@ -1222,7 +1127,6 @@ Widget TrainingWidget() {
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 8),
                         ],
                       ),
@@ -1234,6 +1138,40 @@ Widget TrainingWidget() {
           );
         },
       ),
+    );
+  }
+
+  Widget _infoRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 13.5,
+                color: Colors.black87,
+              ),
+              children: [
+                TextSpan(
+                  text: "$label: ",
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                TextSpan(
+                  text: value,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -1252,10 +1190,13 @@ Widget TrainingWidget() {
         ? "${t.durationMinutes} min"
         : "—";
     final intensity = t.intensityLevel?.toString() ?? "—";
-    final members = t.currentParticipants;
+    final maxParticipants = t.maxAmountOfParticipants?.toString() ?? "—";
+    final currentParticipants = t.currentParticipants?.toString() ?? "0";
     final startDateText = DateHelper.format(t.startDate!);
 
     final imgUrl = _trainingImageToUrl(t.trainingImage);
+    final isOld = t.startDate != null &&
+        t.startDate!.isBefore(_todayOnlyDate());
 
     return Container(
       width: 300,
@@ -1324,112 +1265,68 @@ Widget TrainingWidget() {
               color: Colors.black87,
             ),
           ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: isOld
+                    ? Colors.orange.withOpacity(0.12)
+                    : Colors.green.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: isOld
+                      ? Colors.orange.withOpacity(0.22)
+                      : Colors.green.withOpacity(0.22),
+                ),
+              ),
+              child: Text(
+                isOld ? "STARI TRENING" : "AKTIVNI TRENING",
+                style: TextStyle(
+                  color: isOld ? Colors.orange.shade800 : Colors.green.shade800,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.6,
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 10),
           Container(height: 1, color: Colors.black.withOpacity(0.12)),
           const SizedBox(height: 12),
 
-          Row(
-            children: [
-              const Icon(Icons.person, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  trainer,
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
+          _infoRow(icon: Icons.person, label: "Trener", value: trainer),
           const SizedBox(height: 10),
-
-          Row(
-            children: [
-              const Icon(Icons.flag_outlined, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  purpose,
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
+          _infoRow(icon: Icons.flag_outlined, label: "Namjena", value: purpose),
           const SizedBox(height: 10),
-
-          Row(
-            children: [
-              const Icon(Icons.timer_outlined, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                duration,
-                style: const TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-
+          _infoRow(icon: Icons.timer_outlined, label: "Trajanje", value: duration),
           const SizedBox(height: 10),
-
-          Row(
-            children: [
-              const Icon(Icons.local_fire_department_outlined, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                intensity,
-                style: const TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+          _infoRow(
+            icon: Icons.local_fire_department_outlined,
+            label: "Intenzitet",
+            value: intensity,
           ),
-
           const SizedBox(height: 10),
-
-          Row(
-            children: [
-              const Icon(Icons.people_alt_rounded, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                "$members",
-                style: const TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+          _infoRow(
+            icon: Icons.group_outlined,
+            label: "Maksimalno učesnika",
+            value: maxParticipants,
           ),
-
           const SizedBox(height: 10),
-
-          Row(
-            children: [
-              const Icon(Icons.calendar_month_outlined, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  startDateText,
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
+          _infoRow(
+            icon: Icons.people_alt_rounded,
+            label: "Trenutno prijavljeno",
+            value: currentParticipants,
+          ),
+          const SizedBox(height: 10),
+          _infoRow(
+            icon: Icons.calendar_month_outlined,
+            label: "Datum početka",
+            value: startDateText,
           ),
 
           const SizedBox(height: 16),
-
           SizedBox(
             height: 34,
             child: ElevatedButton(
@@ -1447,7 +1344,7 @@ Widget TrainingWidget() {
                 ),
               ),
               child: const Text(
-                "PRIKAŽI DETALJE",
+                "PREPRAVI",
                 style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w800,
@@ -1486,124 +1383,186 @@ Widget TrainingWidget() {
     );
   }
 
-  return ChangeNotifierProvider<UniversalPagingProvider<Training>>(
-    create: (context) {
-      final paging = UniversalPagingProvider<Training>(
-        pageSize: 6,
-        fetcher:
-            ({
-              required int page,
-              required int pageSize,
-              String? filter,
-              bool includeTotalCount = true,
-            }) {
-              return context.read<TrainingProvider>().get(
-                filter: {
-                  "page": page,
-                  "pageSize": pageSize,
-                  "includeTotalCount": includeTotalCount,
-                  if (filter != null && filter.trim().isNotEmpty)
-                    "FTS": filter.trim(),
-                  "IncludeUser": true,
-                },
-              );
-            },
-      );
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<UniversalPagingProvider<Training>>(
+      create: (context) {
+        final paging = UniversalPagingProvider<Training>(
+          pageSize: 6,
+          fetcher: ({
+            required int page,
+            required int pageSize,
+            String? filter,
+            bool includeTotalCount = true,
+          }) {
+            return context.read<TrainingProvider>().get(
+              filter: {
+                "page": page,
+                "pageSize": pageSize,
+                "includeTotalCount": includeTotalCount,
+                if (filter != null && filter.trim().isNotEmpty)
+                  "FTS": filter.trim(),
+                "IncludeUser": true,
+                "IsOld": _showOldTrainings,
+              },
+            );
+          },
+        );
 
-      Future.microtask(() => paging.loadPage());
-      return paging;
-    },
-    child: Consumer<UniversalPagingProvider<Training>>(
-      builder: (context, paging, _) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
-          child: Column(
-            children: [
-              const Text(
-                "Grupni treninzi",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.black87,
+        Future.microtask(() => paging.loadPage());
+        return paging;
+      },
+      child: Consumer<UniversalPagingProvider<Training>>(
+        builder: (context, paging, _) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
+            child: Column(
+              children: [
+                Text(
+                  _showOldTrainings ? "Stari treninzi" : "Grupni treninzi",
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 22),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: _searchDecoration(),
-                      onChanged: (v) => paging.search(v),
-                    ),
-                  ),
-                  const SizedBox(width: 18),
-                  SizedBox(
-                    height: 36,
-                    child: ElevatedButton(
-                      onPressed: () => _openAddTrainingDialog(
-                        context: context,
-                        paging: paging,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF387EFF),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                      ),
-                      child: const Text(
-                        "DODAJ NOVI TRENING",
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
+                const SizedBox(height: 22),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: _searchDecoration(),
+                        onChanged: (v) => paging.search(v),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 22),
-              Expanded(
-                child: paging.isLoading && paging.items.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : paging.items.isEmpty
-                    ? const Center(
-                        child: Text(
-                          "Nema podataka.",
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                    const SizedBox(width: 18),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.black.withOpacity(0.08),
                         ),
-                      )
-                    : SingleChildScrollView(
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 10, bottom: 18),
-                            child: Wrap(
-                              spacing: 60,
-                              runSpacing: 30,
-                              children: paging.items
-                                  .map(
-                                    (t) => _card(
-                                      context: context,
-                                      paging: paging,
-                                      t: t,
-                                    ),
-                                  )
-                                  .toList(),
+                      ),
+                      child: Row(
+                        children: [
+                          TextButton(
+                            onPressed: () async {
+                              if (!_showOldTrainings) return;
+                              setState(() => _showOldTrainings = false);
+                              await paging.loadPage(pageNumber: 0, filter: "");
+                            },
+                            child: Text(
+                              "Aktivni",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: !_showOldTrainings
+                                    ? const Color(0xFF387EFF)
+                                    : Colors.black54,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 1,
+                            height: 24,
+                            color: Colors.black.withOpacity(0.1),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              if (_showOldTrainings) return;
+                              setState(() => _showOldTrainings = true);
+                              await paging.loadPage(pageNumber: 0, filter: "");
+                            },
+                            child: Text(
+                              "Stari",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: _showOldTrainings
+                                    ? const Color(0xFF387EFF)
+                                    : Colors.black54,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    if (!_showOldTrainings)
+                      SizedBox(
+                        height: 36,
+                        child: ElevatedButton(
+                          onPressed: () => _openAddTrainingDialog(
+                            context: context,
+                            paging: paging,
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF387EFF),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          child: const Text(
+                            "DODAJ NOVI TRENING",
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
                       ),
-              ),
-              const SizedBox(height: 10),
-              _pagingControls(paging),
-            ],
-          ),
-        );
-      },
-    ),
-  );
+                  ],
+                ),
+                const SizedBox(height: 22),
+                Expanded(
+                  child: paging.isLoading && paging.items.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : paging.items.isEmpty
+                          ? Center(
+                              child: Text(
+                                _showOldTrainings
+                                    ? "Nema starih treninga."
+                                    : "Nema aktivnih treninga.",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            )
+                          : SingleChildScrollView(
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 10,
+                                    bottom: 18,
+                                  ),
+                                  child: Wrap(
+                                    spacing: 60,
+                                    runSpacing: 30,
+                                    children: paging.items
+                                        .map(
+                                          (t) => _card(
+                                            context: context,
+                                            paging: paging,
+                                            t: t,
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                ),
+                const SizedBox(height: 10),
+                _pagingControls(paging),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

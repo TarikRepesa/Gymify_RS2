@@ -8,5 +8,6 @@ namespace Gymify.Model.SearchObjects
         public int? UserId {get; set;}
         public bool? IncludeUser {get; set;}
         public DateTime? StartDate {get; set;}
+        public bool? IsOld {get; set;}
     }
 }

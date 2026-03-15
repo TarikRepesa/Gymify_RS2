@@ -78,7 +78,7 @@ Widget WorkerTaskWidget() {
               flex: 2,
               cell: (t) {
                 final now = DateTime.now();
-                final exp = t.exparationTaskDate;
+                final exp = t.expirationTaskDate;
                 final isLate = !t.isFinished && exp.isBefore(now);
 
                 return Column(
@@ -146,7 +146,7 @@ Widget WorkerTaskWidget() {
                 "name": task.name,
                 "details": task.details,
                 "createdTaskDate": task.createdTaskDate.toIso8601String(),
-                "exparationTaskDate": task.exparationTaskDate.toIso8601String(),
+                "expirationTaskDate": task.expirationTaskDate.toIso8601String(),
                 "isFinished": !task.isFinished,
                 "userId": task.userId,
               });

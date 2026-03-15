@@ -29,9 +29,12 @@ namespace Gymify.Services.Services
             query = AddInclude(query, search);
 
             int? totalCount = null;
-            if (search.IncludeTotalCount){
+            if (search.IncludeTotalCount)
+            {
                 totalCount = await query.CountAsync();
             }
+
+            const int maxPageSize = 100;
 
             if (!search.RetrieveAll)
             {
@@ -44,10 +47,15 @@ namespace Gymify.Services.Services
                     query = query.Take(search.PageSize.Value);
                 }
             }
-            
+            else
+            {
+                query = query.Take(maxPageSize);
+            }
+
             var list = await query.ToListAsync();
+
             return new PagedResult<T>
-            {   
+            {
                 Items = list.Select(MapToResponse).ToList(),
                 TotalCount = totalCount
             };
@@ -68,13 +76,14 @@ namespace Gymify.Services.Services
             var entity = await _context.Set<TEntity>().FindAsync(id);
             if (entity == null)
                 return null;
-            
+
             return MapToResponse(entity);
         }
 
-        protected virtual T MapToResponse(TEntity entity) {
+        protected virtual T MapToResponse(TEntity entity)
+        {
             return _mapper.Map<T>(entity);
         }
-        
+
     }
-} 
+}

@@ -14,7 +14,7 @@ class StripePaymentHelper {
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
-          merchantDisplayName: "Rentify",
+          merchantDisplayName: "Gymify",
           style: ThemeMode.light,
         ),
       );
@@ -22,7 +22,6 @@ class StripePaymentHelper {
       await Stripe.instance.presentPaymentSheet();
       return true;
     } on StripeException catch (e) {
-      debugPrint("StripeException: ${e.error.localizedMessage ?? e.error.message}");
       return false;
     }
   }
@@ -55,12 +54,9 @@ class StripePaymentHelper {
       await Stripe.instance.presentPaymentSheet();
       return true;
     } on StripeException catch (e) {
-      debugPrint(
-        "StripeException: ${e.error.localizedMessage ?? e.error.message}",
-      );
+     
       return false;
     } catch (e) {
-      debugPrint("Stripe payMembership error: $e");
       return false;
     }
   }

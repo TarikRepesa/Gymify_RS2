@@ -25,5 +25,11 @@ namespace Gymify.Services.Database
 
         public DateTime CreatedAt {get; set;}
 
+        public string Status { get; set; } = "Confirmed";
+
+        public DateTime? CancelledAt { get; set; }
+    
+        public string? CancelReason { get; set; }
+
     }
 }

@@ -11,7 +11,7 @@ WorkerTask _$WorkerTaskFromJson(Map<String, dynamic> json) => WorkerTask(
   name: json['name'] as String,
   details: json['details'] as String,
   createdTaskDate: DateTime.parse(json['createdTaskDate'] as String),
-  exparationTaskDate: DateTime.parse(json['exparationTaskDate'] as String),
+  expirationTaskDate: DateTime.parse(json['expirationTaskDate'] as String),
   isFinished: json['isFinished'] as bool,
   userId: (json['userId'] as num).toInt(),
 );
@@ -22,7 +22,7 @@ Map<String, dynamic> _$WorkerTaskToJson(WorkerTask instance) =>
       'name': instance.name,
       'details': instance.details,
       'createdTaskDate': instance.createdTaskDate.toIso8601String(),
-      'exparationTaskDate': instance.exparationTaskDate.toIso8601String(),
+      'expirationTaskDate': instance.expirationTaskDate.toIso8601String(),
       'isFinished': instance.isFinished,
       'userId': instance.userId,
     };

@@ -8,7 +8,7 @@ namespace Gymify.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin,Trener,Radnik")]
     public class ReportsController : ControllerBase
     {
         private readonly IReportsService _service;
@@ -32,11 +32,11 @@ namespace Gymify.WebAPI.Controllers
         }
 
         [HttpGet("best-training-alltime")]
-    public async Task<ActionResult<TopTrainingAllTimeReportItem?>> GetBestTrainingAllTime()
-    {
-        var result = await _service.GetBestTrainingAllTimeAsync();
-        return Ok(result);
-    }
+        public async Task<ActionResult<TopTrainingAllTimeReportItem?>> GetBestTrainingAllTime()
+        {
+            var result = await _service.GetBestTrainingAllTimeAsync();
+            return Ok(result);
+        }
 
         [HttpGet("dashboard")]
         public async Task<ActionResult<DashboardReportResponse>> Dashboard(
@@ -49,6 +49,18 @@ namespace Gymify.WebAPI.Controllers
 
             var data = await _service.GetDashboardAsync(year, takeTopTrainers);
             return Ok(data);
+        }
+
+        [HttpGet("membership-revenue-summary")]
+        public ActionResult<MembershipRevenueSummaryResponse> GetMembershipRevenueSummary([FromQuery] int year)
+        {
+            return Ok(_service.GetMembershipRevenueSummary(year));
+        }
+
+        [HttpGet("income-by-month")]
+        public ActionResult<List<IncomeByMonthResponse>> GetIncomeByMonth([FromQuery] int year)
+        {
+            return Ok(_service.GetIncomeByMonth(year));
         }
     }
 }

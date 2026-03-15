@@ -5,6 +5,7 @@ using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Gymify.Services.Exceptions;
 
 namespace Gymify.Services.Services
 {
@@ -46,7 +47,7 @@ namespace Gymify.Services.Services
             .FirstOrDefaultAsync(x => x.UserId == req.UserId);
 
         if (lp == null)
-            throw new Exception("LoyaltyPoint nije pronađen za korisnika.");
+            throw new NotFoundException("LoyaltyPoint nije pronađen za korisnika.");
 
         lp.TotalPoints -= req.Points;
 

@@ -328,7 +328,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
 
               const SizedBox(height: 10),
               Text(
-                "Kod pokaži na recepciji ili unesi gdje je predviđeno u aplikaciji.",
+                "Kod mozete pokazati u bilo kojoj nasoj najblizoj teretani",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,

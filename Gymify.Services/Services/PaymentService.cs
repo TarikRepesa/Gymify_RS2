@@ -5,15 +5,20 @@ using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Gymify.EmailConsumer.Configuration;
+using Microsoft.Extensions.Options;
+using Gymify.Services.Exceptions;
 
 namespace Gymify.Services.Services
 {
     public class PaymentService : BaseCRUDService<PaymentResponse, PaymentSearchObject, Payment, PaymentUpsertRequest, PaymentUpsertRequest>, IPaymentService
     {
         private readonly IStripeService _stripeService;
-        public PaymentService(GymifyDbContext context, IMapper mapper, IStripeService st) : base(context, mapper)
+        private readonly AppConfig _config;
+        public PaymentService(GymifyDbContext context, IMapper mapper, IStripeService st, IOptions<AppConfig> config) : base(context, mapper)
         {
             _stripeService = st;
+            _config = config.Value;
         }
 
         protected override IQueryable<Payment> AddInclude(IQueryable<Payment> query, PaymentSearchObject search)
@@ -36,16 +41,16 @@ namespace Gymify.Services.Services
                 .FirstOrDefaultAsync(x => x.Id == req.MembershipId);
 
             if (membership == null)
-                throw new Exception("Membership nije pronađen.");
+                throw new NotFoundException("Membership nije pronađen.");
 
             var userExists = await _context.Users.AnyAsync(x => x.Id == req.UserId);
             if (!userExists)
-                throw new Exception("User nije pronađen.");
+                throw new NotFoundException("User nije pronađen.");
 
             var billingPeriod = (req.BillingPeriod ?? "monthly").Trim().ToLower();
 
             if (billingPeriod != "monthly" && billingPeriod != "yearly")
-                throw new Exception("BillingPeriod mora biti 'monthly' ili 'yearly'.");
+                throw new ValidationException("BillingPeriod mora biti 'monthly' ili 'yearly'.");
 
             var amount = billingPeriod == "yearly"
                 ? membership.YearPrice
@@ -80,7 +85,7 @@ namespace Gymify.Services.Services
 
             var intent = await _stripeService.CreatePaymentIntentAsync(
                 amount,
-                "bam",
+                _config.PaymentCurrency,
                 metadata
             );
 

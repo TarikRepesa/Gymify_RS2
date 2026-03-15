@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gymify_desktop/config/api_config.dart';
+import 'package:gymify_desktop/helper/http_helper.dart';
 import 'package:gymify_desktop/models/search_result.dart';
 import 'package:gymify_desktop/models/user.dart';
 import 'package:gymify_desktop/providers/base_provider.dart';
@@ -40,22 +41,16 @@ class UserProvider extends BaseProvider<User> {
 
   final response = await http.post(
     url,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HttpHelper.getHeaders(withToken: false),
     body: jsonEncode({
       "email": email,
     }),
   );
 
-  if (response.statusCode != 200) {
-    throw Exception(
-      "Greška pri slanju reset emaila: ${response.body}",
-    );
-  }
+  HttpHelper.checkResponse(response);
 
   return true;
-}
+  }
 
   Future<SearchResult<User>> getStaffPaged({
     required int page,

@@ -22,8 +22,6 @@ class AuthProvider with ChangeNotifier {
       body: jsonEncode(request.toJson()),
     );
 
-    print("STATUS: ${response.statusCode}");
-    print("BODY: ${response.body}");
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

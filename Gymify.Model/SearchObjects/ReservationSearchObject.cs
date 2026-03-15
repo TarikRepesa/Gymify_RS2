@@ -7,5 +7,6 @@ namespace Gymify.Model.SearchObjects
         public int? UserId {get; set;}
         public bool? IncludeUser {get; set;}
         public bool? IncludeTraining {get; set;}
+        public string? Status {get; set;}
     }
 }

@@ -7,6 +7,7 @@ using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
 using Gymify.Services.Recommender;
+using Gymify.Services.Exceptions;
 
 namespace Gymify.Services.Services
 {
@@ -16,10 +17,39 @@ namespace Gymify.Services.Services
         {
         }
 
+        private async Task FinalizeCompletedTrainings()
+        {
+            var now = DateTime.Now;
+
+            var completedTrainings = await _context.Trainings
+                .Where(x =>
+                    !x.IsParticipationCounted &&
+                    x.StartDate.AddMinutes(x.DurationMinutes) <= now)
+                .ToListAsync();
+
+            if (!completedTrainings.Any())
+                return;
+
+            foreach (var training in completedTrainings)
+            {
+                training.ParticipatedOfAllTime += training.CurrentParticipants;
+                training.IsParticipationCounted = true;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         protected override IQueryable<Training> ApplyFilter(IQueryable<Training> query, TrainingSearchObject search)
         {
-            var today = DateTime.Today;
-            query = query.Where(x => x.StartDate.Date >= today);
+            if (search.IsOld == true)
+            {
+                query = query.Where(x => x.StartDate.Date < DateTime.Today);
+            }
+            else if (search.IsOld == false)
+            {
+                query = query.Where(x => x.StartDate.Date >= DateTime.Today);
+            }
+
             if (search.UserId.HasValue)
             {
                 query = query.Where(x => x.UserId == search.UserId);
@@ -27,15 +57,22 @@ namespace Gymify.Services.Services
 
             if (!string.IsNullOrEmpty(search.FTS))
             {
-                query = query.Where(x => x.Name.ToLower().Contains(search.FTS));
+                var fts = search.FTS.ToLower();
+                query = query.Where(x => x.Name.ToLower().Contains(fts));
             }
 
             if (search.StartDate.HasValue)
             {
-                query = query.Where(x =>
-                    x.StartDate.Date == search.StartDate.Value.Date);
+                query = query.Where(x => x.StartDate.Date == search.StartDate.Value.Date);
             }
+
             return base.ApplyFilter(query, search);
+        }
+
+        public async override Task<PagedResult<TrainingResponse>> GetAsync(TrainingSearchObject search)
+        {
+            await FinalizeCompletedTrainings();
+            return await base.GetAsync(search);
         }
 
         protected override IQueryable<Training> AddInclude(IQueryable<Training> query, TrainingSearchObject search)
@@ -44,22 +81,29 @@ namespace Gymify.Services.Services
             {
                 query = query.Include(x => x.User);
             }
+
             return base.AddInclude(query, search);
         }
 
         public async Task Up(int trainingId)
         {
+            await FinalizeCompletedTrainings();
+
             var training = await _context.Trainings
                 .FirstOrDefaultAsync(x => x.Id == trainingId);
 
             if (training == null)
-                throw new SEHException("Trening ne postoji.");
+                throw new NotFoundException("Trening ne postoji.");
+
+            var trainingEnd = training.StartDate.AddMinutes(training.DurationMinutes);
+            if (trainingEnd <= DateTime.Now)
+                throw new BusinessException("Trening je već završen.");
 
             var current = training.CurrentParticipants;
             var max = training.MaxAmountOfParticipants;
 
             if (current >= max)
-                throw new Exception("Trening je popunjen.");
+                throw new BusinessException("Trening je popunjen.");
 
             training.CurrentParticipants = current + 1;
 
@@ -68,11 +112,17 @@ namespace Gymify.Services.Services
 
         public async Task Down(int trainingId)
         {
+            await FinalizeCompletedTrainings();
+
             var training = await _context.Trainings
                 .FirstOrDefaultAsync(x => x.Id == trainingId);
 
             if (training == null)
-                throw new Exception("Trening ne postoji.");
+                throw new NotFoundException("Trening ne postoji.");
+
+            var trainingEnd = training.StartDate.AddMinutes(training.DurationMinutes);
+            if (trainingEnd <= DateTime.Now)
+                throw new BusinessException("Trening je već završen.");
 
             var current = training.CurrentParticipants;
             training.CurrentParticipants = Math.Max(0, current - 1);
@@ -82,6 +132,8 @@ namespace Gymify.Services.Services
 
         public async Task<List<TrainingResponse>> GetRecommended(int userId, int take = 3)
         {
+            await FinalizeCompletedTrainings();
+
             var reservedTrainingIds = await _context.Reservations
                 .Where(x => x.UserId == userId)
                 .Select(x => x.TrainingId)
@@ -92,12 +144,12 @@ namespace Gymify.Services.Services
                 .Where(x => reservedTrainingIds.Contains(x.Id))
                 .ToListAsync();
 
-            // Ako korisnik nema rezervacija -> fallback
             if (!reservedTrainings.Any())
             {
                 var popular = await _context.Trainings
                     .Include(x => x.User)
-                    .OrderByDescending(x => x.ParicipatedOfAllTime)
+                    .Where(x => x.StartDate >= DateTime.Now)
+                    .OrderByDescending(x => x.ParticipatedOfAllTime)
                     .ThenByDescending(x => x.CurrentParticipants)
                     .Take(take)
                     .ToListAsync();
@@ -109,7 +161,7 @@ namespace Gymify.Services.Services
 
             var candidates = await _context.Trainings
                 .Include(x => x.User)
-                .Where(x => !reservedTrainingIds.Contains(x.Id))
+                .Where(x => !reservedTrainingIds.Contains(x.Id) && x.StartDate >= DateTime.Now)
                 .ToListAsync();
 
             var recommended = candidates
@@ -182,6 +234,21 @@ namespace Gymify.Services.Services
             return "evening";
         }
 
+
+
+        protected override Task BeforeUpdate(Training entity, TrainingUpsertRequest request)
+        {
+            var today = DateTime.Today;
+
+            bool wasOld = entity.StartDate.Date < today;
+            bool willBeFuture = request.StartDate.Date >= today;
+
+            if (wasOld && willBeFuture)
+            {
+                request.CurrentParticipants = 0;
+            }
+            return base.BeforeUpdate(entity, request);
+        }
         private double CalculateDistance(TrainingFeatureVector a, TrainingFeatureVector b)
         {
             var valuesA = new double[]

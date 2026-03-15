@@ -1,4 +1,4 @@
-// Rentify.Model/Requests/LoginRequest.cs
+// Gymify.Model/Requests/LoginRequest.cs
 using System.ComponentModel.DataAnnotations;
 
 namespace Gymify.Model.RequestObjects

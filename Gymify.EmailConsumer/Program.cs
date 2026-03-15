@@ -33,9 +33,15 @@ var smtpSettings = new SmtpSettings
 
 builder.Services.AddEmailConsumer(rabbitSettings, smtpSettings);
 
+builder.Services.Configure<AppConfig>(
+    builder.Configuration.GetSection("AppConfig")
+);
+
 var host = builder.Build();
 
 var consumer = host.Services.GetRequiredService<EmailQueueConsumer>();
+await consumer.InitializeAsync();
+
 await consumer.StartAsync();
 
 await host.RunAsync();

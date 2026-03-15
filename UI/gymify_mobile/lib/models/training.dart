@@ -15,7 +15,7 @@ class Training {
   final String? trainingImage;
   final int? maxAmountOfParticipants;
   final int? currentParticipants;
-  final int? paricipatedOfAllTime;
+  final int? participatedOfAllTime;
   final DateTime? startDate;
 
   Training({
@@ -29,7 +29,7 @@ class Training {
     this.trainingImage,
     this.maxAmountOfParticipants,
     this.currentParticipants,
-    this.paricipatedOfAllTime,
+    this.participatedOfAllTime,
     this.startDate,
   });
 

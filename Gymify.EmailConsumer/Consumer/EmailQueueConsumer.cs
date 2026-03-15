@@ -4,39 +4,48 @@ using System.Text;
 using System.Text.Json;
 using Gymify.EmailConsumer.Messages;
 using Gymify.EmailConsumer.Services;
+using Gymify.EmailConsumer.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Gymify.EmailConsumer.Consumers;
 
 public class EmailQueueConsumer
 {
-    private readonly IChannel _channel;
+    private IChannel _channel;
+    private readonly IConnection _connection;
     private readonly EmailSender _emailSender;
+    private readonly AppConfig _config;
 
     public EmailQueueConsumer(
         IConnection connection,
-        EmailSender emailSender)
+        EmailSender emailSender,
+        IOptions<AppConfig> config)
     {
+        _connection = connection;
         _emailSender = emailSender;
+        _config = config.Value;
+    }
 
-        _channel = connection.CreateChannelAsync().GetAwaiter().GetResult();
+    public async Task InitializeAsync()
+    {
+        _channel = await _connection.CreateChannelAsync();
 
-        _channel.QueueDeclareAsync(
-            queue: "email.reset-password",
+        await _channel.QueueDeclareAsync(
+            queue: _config.ResetPasswordQueue,
             durable: true,
             exclusive: false,
             autoDelete: false,
             arguments: null
-        ).Wait();
+        );
 
-
-        _channel.BasicQosAsync(0, 1, false).Wait();
+        await _channel.BasicQosAsync(0, 1, false);
     }
 
     public async Task StartAsync()
     {
-        // ===============================
-        // RESET PASSWORD CONSUMER
-        // ===============================
+        if (_channel == null)
+            throw new InvalidOperationException("Channel nije inicijalizovan. Pozovi InitializeAsync prvo.");
+
         var resetConsumer = new AsyncEventingBasicConsumer(_channel);
 
         resetConsumer.ReceivedAsync += async (sender, e) =>
@@ -47,7 +56,7 @@ public class EmailQueueConsumer
 
                 var message =
                     JsonSerializer.Deserialize<ResetPasswordEmailMessage>(json)
-                    ?? throw new Exception("Nevalidna poruka");
+                    ?? throw new InvalidOperationException("Nevalidna poruka");
 
                 await _emailSender.SendResetPasswordEmailAsync(
                     message.To,
@@ -60,6 +69,7 @@ public class EmailQueueConsumer
             catch (Exception ex)
             {
                 Console.WriteLine($"[RESET EMAIL ERROR] {ex.Message}");
+
                 await _channel.BasicNackAsync(
                     e.DeliveryTag,
                     false,
@@ -69,11 +79,9 @@ public class EmailQueueConsumer
         };
 
         await _channel.BasicConsumeAsync(
-            queue: "email.reset-password",
+            queue: _config.ResetPasswordQueue,
             autoAck: false,
             consumer: resetConsumer
         );
-
     }
 }
-

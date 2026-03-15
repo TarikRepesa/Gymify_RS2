@@ -5,6 +5,7 @@ import 'package:gymify_mobile/helper/date_helper.dart';
 import 'package:gymify_mobile/helper/image_helper.dart';
 import 'package:gymify_mobile/providers/loyalty_point_history_provider.dart';
 import 'package:gymify_mobile/providers/loyalty_point_provider.dart';
+import 'package:gymify_mobile/providers/member_provider.dart';
 import 'package:gymify_mobile/providers/reservation_provider.dart';
 import 'package:gymify_mobile/utils/session.dart';
 import 'package:gymify_mobile/widgets/swipe_widget.dart';
@@ -39,30 +40,30 @@ class _TrainingWidgetState extends State<TrainingWidget> {
 
     _paging = UniversalPagingProvider<Training>(
       pageSize: 5,
-      fetcher:
-          ({
-            required int page,
-            required int pageSize,
-            String? filter,
-            Map<String, dynamic>? extra,
-            bool includeTotalCount = true,
-          }) async {
-            final provider = context.read<TrainingProvider>();
+      fetcher: ({
+        required int page,
+        required int pageSize,
+        String? filter,
+        Map<String, dynamic>? extra,
+        bool includeTotalCount = true,
+      }) async {
+        final provider = context.read<TrainingProvider>();
 
-            final query = _buildQuery(
-              page: page,
-              pageSize: pageSize,
-              filter: filter,
-              extra: extra,
-              includeTotalCount: includeTotalCount,
-            );
+        final query = _buildQuery(
+          page: page,
+          pageSize: pageSize,
+          filter: filter,
+          extra: extra,
+          includeTotalCount: includeTotalCount,
+        );
 
-            return provider.get(filter: query);
-          },
+        return provider.get(filter: query);
+      },
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _loadRecommended();
+      await _paging.applyExtra({"IsOld": false});
       await _paging.loadPage(pageNumber: 0);
     });
   }
@@ -81,7 +82,7 @@ class _TrainingWidgetState extends State<TrainingWidget> {
       final provider = context.read<TrainingProvider>();
 
       final items = await provider.getRecommended(
-        filter: {"userId": Session.userId, "take": 3},
+        filter: {"userId": Session.userId, "take": 3, "IsOld": false},
       );
 
       if (!mounted) return;
@@ -102,6 +103,43 @@ class _TrainingWidgetState extends State<TrainingWidget> {
     }
   }
 
+  Future<bool> _hasValidMembership() async {
+  try {
+    final memberProvider = context.read<MemberProvider>();
+
+    final result = await memberProvider.get(
+      filter: {
+        "userId": Session.userId,
+        "page": 0,
+        "pageSize": 1,
+      },
+    );
+
+    if (result.items.isEmpty) {
+      return false;
+    }
+
+    final member = result.items.first;
+    final expirationDate = member.expirationDate;
+
+    if (expirationDate == null) {
+      return false;
+    }
+
+    final today = DateTime.now();
+    final todayOnly = DateTime(today.year, today.month, today.day);
+    final expirationOnly = DateTime(
+      expirationDate.year,
+      expirationDate.month,
+      expirationDate.day,
+    );
+
+    return !expirationOnly.isBefore(todayOnly);
+  } catch (_) {
+    return false;
+  }
+}
+
   Map<String, dynamic> _buildQuery({
     required int page,
     required int pageSize,
@@ -113,6 +151,7 @@ class _TrainingWidgetState extends State<TrainingWidget> {
       "page": page,
       "pageSize": pageSize,
       "IncludeUser": true,
+      "IsOld": false,
       if (includeTotalCount) "includeTotalCount": true,
       if (filter != null && filter.isNotEmpty) "filter": filter,
       ...?extra,
@@ -135,93 +174,113 @@ class _TrainingWidgetState extends State<TrainingWidget> {
       _searchCtrl.clear();
     });
 
-    await _paging.applyExtra({});
+    await _paging.applyExtra({"IsOld": false});
     await _paging.loadPage(pageNumber: 0);
   }
 
   Future<void> _onDateSearch() async {
     if (_selectedDate == null) {
-      await _paging.applyExtra({});
+      await _paging.applyExtra({"IsOld": false});
     } else {
-      await _paging.applyExtra({"StartDate": _selectedDate});
+      await _paging.applyExtra({
+        "StartDate": _selectedDate,
+        "IsOld": false,
+      });
     }
   }
 
   Future<void> _reserveTraining(Training t) async {
-    final reservationProvider = context.read<ReservationProvider>();
-    final trainingProvider = context.read<TrainingProvider>();
-    final lpProviderH = context.read<LoyaltyPointHistoryProvider>();
-    final lpProvider = context.read<LoyaltyPointProvider>();
+  final reservationProvider = context.read<ReservationProvider>();
+  final trainingProvider = context.read<TrainingProvider>();
+  final lpProviderH = context.read<LoyaltyPointHistoryProvider>();
+  final lpProvider = context.read<LoyaltyPointProvider>();
 
-    final userId = Session.userId;
-    final trainingId = t.id;
+  final userId = Session.userId;
+  final trainingId = t.id;
 
-    final already = await reservationProvider.exists({
+  final hasValidMembership = await _hasValidMembership();
+
+  if (!hasValidMembership) {
+    await ConfirmDialogs.okConfirmation(
+      context,
+      title: "Članarina istekla",
+      message:
+          "Ne možete rezervisati trening jer nemate aktivnu članarinu.\n\nMolimo vas da obnovite članarinu pa pokušate ponovo.",
+      okText: "U redu",
+      danger: true,
+    );
+    return;
+  }
+
+  final already = await reservationProvider.exists({
+    "userId": userId,
+    "trainingId": t.id,
+  });
+
+  if (already) {
+    await ConfirmDialogs.okConfirmation(
+      context,
+      title: "Info",
+      message: "Već imate rezervisan ovaj trening.",
+      okText: "U redu",
+    );
+    return;
+  }
+
+  final ok = await ConfirmDialogs.yesNoConfirmation(
+    context,
+    title: "Rezervacija",
+    question:
+        "Da li ste sigurni da želite rezervisati trening:\n\n${t.name}?",
+    yesText: "Rezerviši",
+    noText: "Odustani",
+  );
+
+  if (!ok) return;
+
+  try {
+    final request = {
       "userId": userId,
-      "trainingId": t.id,
+      "trainingId": trainingId,
+      "createdAt": DateTime.now().toIso8601String(),
+      "status": "Confirmed",
+      "cancelledAt": null,
+      "cancelReason": null,
+    };
+
+    await reservationProvider.insert(request);
+
+    await trainingProvider.up(t.id);
+
+    await lpProvider.addPoints({"userId": Session.userId, "points": 1});
+
+    await lpProviderH.insert({
+      "userId": Session.userId,
+      "status": "Plaćanje nagrade",
+      "amountPointsParticipation": 1,
+      "createdAt": DateTime.now().toIso8601String(),
     });
 
-    if (already) {
-      await ConfirmDialogs.okConfirmation(
-        context,
-        title: "Info",
-        message: "Već imate rezervisan ovaj trening.",
-        okText: "U redu",
-      );
-      return;
-    }
-
-    final ok = await ConfirmDialogs.yesNoConfirmation(
+    await ConfirmDialogs.okConfirmation(
       context,
-      title: "Rezervacija",
-      question:
-          "Da li ste sigurni da želite rezervisati trening:\n\n${t.name}?",
-      yesText: "Rezerviši",
-      noText: "Odustani",
+      title: "Uspješno",
+      message:
+          "Rezervacija je uspješno kreirana.\n\nSve rezervacije možete pogledati u sekciji 'Rezervacije'.",
+      okText: "U redu",
     );
 
-    if (!ok) return;
-
-    try {
-      final request = {
-        "userId": userId,
-        "trainingId": trainingId,
-        "createdAt": DateTime.now().toIso8601String(),
-      };
-
-      await reservationProvider.insert(request);
-
-      await trainingProvider.up(t.id);
-
-      await lpProvider.addPoints({"userId": Session.userId, "points": 1});
-
-      await lpProviderH.insert({
-        "userId": Session.userId,
-        "status": "Plaćanje nagrade",
-        "amountPointsParticipation": 1,
-        "createdAt": DateTime.now().toIso8601String(),
-      });
-
-      await ConfirmDialogs.okConfirmation(
-        context,
-        title: "Uspješno",
-        message:
-            "Rezervacija je uspješno kreirana.\n\nSve rezervacije možete pogledati u sekciji 'Rezervacije'.",
-        okText: "U redu",
-      );
-
-      await _loadRecommended();
-      await _paging.refresh();
-    } catch (e) {
-      await ConfirmDialogs.okConfirmation(
-        context,
-        title: "Greška",
-        message: "Nije moguće napraviti rezervaciju.\n\n$e",
-        okText: "OK",
-        danger: true,
-      );
-    }
+    await _loadRecommended();
+    await _paging.refresh();
+  } catch (e) {
+    await ConfirmDialogs.okConfirmation(
+      context,
+      title: "Greška",
+      message: "Nije moguće napraviti rezervaciju.\n\n$e",
+      okText: "OK",
+      danger: true,
+    );
   }
+}
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
@@ -251,7 +310,10 @@ class _TrainingWidgetState extends State<TrainingWidget> {
   }
 
   Future<void> _onSearchChanged(String value) async {
-    await _paging.applyExtra({"FTS": value});
+    await _paging.applyExtra({
+      "FTS": value,
+      "IsOld": false,
+    });
   }
 
   Widget _buildRecommendedSection() {

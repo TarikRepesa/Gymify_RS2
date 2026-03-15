@@ -8,7 +8,7 @@ class WorkerTask {
   final String name;
   final String details;
   final DateTime createdTaskDate;
-  final DateTime exparationTaskDate;
+  final DateTime expirationTaskDate;
   final bool isFinished;
   final int userId;
 
@@ -17,7 +17,7 @@ class WorkerTask {
     required this.name,
     required this.details,
     required this.createdTaskDate,
-    required this.exparationTaskDate,
+    required this.expirationTaskDate,
     required this.isFinished,
     required this.userId,
   });

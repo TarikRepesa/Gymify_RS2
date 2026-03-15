@@ -1,5 +1,6 @@
 using Gymify.Model.RequestObjects;
 using Gymify.Services.Database;
+using Konscious.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -15,27 +16,44 @@ namespace Gymify.Services.Helpers
     {
         public static void CreatePasswordHash(string password, out string hashBase64, out string saltBase64)
         {
-            using var hmac = new HMACSHA512();
-            var salt = hmac.Key;
-            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            var salt = RandomNumberGenerator.GetBytes(16);
+            var hash = HashPasswordWithArgon2id(password, salt);
 
             hashBase64 = Convert.ToBase64String(hash);
             saltBase64 = Convert.ToBase64String(salt);
         }
 
-        public static bool VerifyPassword(string password, string storedHashBase64, string storedSaltBase64)
+        private static byte[] HashPasswordWithArgon2id(string password, byte[] salt)
         {
-            if (string.IsNullOrWhiteSpace(storedHashBase64) || string.IsNullOrWhiteSpace(storedSaltBase64))
-                return false;
+            var passwordBytes = Encoding.UTF8.GetBytes(password);
 
-            var salt = Convert.FromBase64String(storedSaltBase64);
-            var storedHash = Convert.FromBase64String(storedHashBase64);
+            var argon2 = new Argon2id(passwordBytes)
+            {
+                Salt = salt,
 
-            using var hmac = new HMACSHA512(salt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                
+                DegreeOfParallelism = 1,
+                Iterations = 2,
+                MemorySize = 19456 
+            };
 
-            return CryptographicOperations.FixedTimeEquals(computedHash, storedHash);
+            return argon2.GetBytes(32);
         }
+
+       public static bool VerifyPassword(string password, string storedHashBase64, string storedSaltBase64)
+    {
+        if (string.IsNullOrWhiteSpace(password) ||
+            string.IsNullOrWhiteSpace(storedHashBase64) ||
+            string.IsNullOrWhiteSpace(storedSaltBase64))
+            return false;
+
+        var salt = Convert.FromBase64String(storedSaltBase64);
+        var storedHash = Convert.FromBase64String(storedHashBase64);
+
+        var computedHash = HashPasswordWithArgon2id(password, salt);
+
+        return CryptographicOperations.FixedTimeEquals(computedHash, storedHash);
+    }
 
         public static string CreateJwt(User user, IConfiguration configuration)
         {
@@ -48,7 +66,6 @@ namespace Gymify.Services.Helpers
                 new Claim(ClaimTypes.Name, user.Username)
             };
         
-            // Dodavanje role iz UserRoles tabele
             foreach (var userRole in user.UserRoles)
             {
                 if (!string.IsNullOrEmpty(userRole.Role?.Name))

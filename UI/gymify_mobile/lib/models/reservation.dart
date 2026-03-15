@@ -12,6 +12,9 @@ class Reservation {
   final int trainingId;
   final Training? training;
   final DateTime createdAt;
+  final String status;
+  final DateTime? cancelledAt;
+  final String? cancelReason;
 
   Reservation({
     required this.id,
@@ -20,6 +23,9 @@ class Reservation {
     required this.trainingId,
     this.training,
     required this.createdAt,
+    required this.status,
+    this.cancelledAt,
+    this.cancelReason,
   });
 
   factory Reservation.fromJson(Map<String, dynamic> json) =>

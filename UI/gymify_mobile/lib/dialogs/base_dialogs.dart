@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class RentifyBaseDialog extends StatelessWidget {
-  RentifyBaseDialog({
+class GymifyBaseDialog extends StatelessWidget {
+  GymifyBaseDialog({
     super.key,
     required this.title,
     required this.child,

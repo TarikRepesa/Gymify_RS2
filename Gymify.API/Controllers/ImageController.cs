@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Gymify.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Gymify.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/images")]
+    [Authorize]
     public class ImageController : ControllerBase
     {
         private readonly IImageService _imageService;
@@ -14,7 +16,7 @@ namespace Gymify.WebAPI.Controllers
             _imageService = imageService;
         }
 
-        // POST api/images/upload?folder=users
+
         [HttpPost("upload")]
         [RequestSizeLimit(10 * 1024 * 1024)]
         public async Task<IActionResult> Upload([FromQuery] string folder, IFormFile file, [FromQuery] string? fileName = null, CancellationToken ct = default)
@@ -31,7 +33,7 @@ namespace Gymify.WebAPI.Controllers
             });
         }
 
-        // DELETE api/images?folder=users&fileName=abc.jpg
+
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] string folder, [FromQuery] string fileName, CancellationToken ct = default)
         {

@@ -423,7 +423,7 @@ Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
       "name": "",
       "details": "",
       "createdTaskDate": DateHelper.format(DateTime.now()),
-      "exparationTaskDate": "",
+      "expirationTaskDate": "",
     },
     fieldsDef: const [
       BaseFormFieldDef(
@@ -452,7 +452,7 @@ Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
         enabled: false,
       ),
       BaseFormFieldDef(
-        name: "exparationTaskDate",
+        name: "expirationTaskDate",
         label: "Rok izvršenja",
         type: BaseFieldType.date,
         requiredField: true,
@@ -466,8 +466,8 @@ Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
           "details": payload["details"],
           "createdTaskDate":
               DateHelper.toIsoFromUi(payload["createdTaskDate"]),
-          "exparationTaskDate":
-              DateHelper.toIsoFromUi(payload["exparationTaskDate"]),
+          "expirationTaskDate":
+              DateHelper.toIsoFromUi(payload["expirationTaskDate"]),
           "isFinished": false,
         });
 

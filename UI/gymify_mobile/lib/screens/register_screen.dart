@@ -15,7 +15,6 @@ import 'package:gymify_mobile/validation/validation_model/validation_rules.dart'
 import 'package:gymify_mobile/validation/validation_use/universal_error_removal.dart';
 import 'package:gymify_mobile/validation/validation_use/universal_validator.dart';
 
-// ako imaš upload provider za sliku:
 import 'package:gymify_mobile/providers/image_provider.dart' as img_app;
 
 class RegisterScreen extends StatefulWidget {
@@ -58,7 +57,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'confirmPassword',
     ]);
 
-    // auto-remove error na unos
     for (final name in fields.map.keys) {
       ErrorAutoRemoval.removeErrorOnTextField(
         field: name,
@@ -117,13 +115,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         children: [
                           _header(),
                           const SizedBox(height: 18),
-
                           _avatarPicker(),
                           const SizedBox(height: 18),
-
                           _sectionTitle("Osnovni podaci"),
                           const SizedBox(height: 10),
-
                           _field(
                             label: "Ime",
                             controller: fields.controller('firstName'),
@@ -131,7 +126,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             textInputAction: TextInputAction.next,
                           ),
                           const SizedBox(height: 12),
-
                           _field(
                             label: "Prezime",
                             controller: fields.controller('lastName'),
@@ -139,7 +133,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             textInputAction: TextInputAction.next,
                           ),
                           const SizedBox(height: 12),
-
                           _field(
                             label: "Korisničko ime",
                             controller: fields.controller('username'),
@@ -147,7 +140,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             textInputAction: TextInputAction.next,
                           ),
                           const SizedBox(height: 12),
-
                           _field(
                             label: "Email",
                             controller: fields.controller('email'),
@@ -155,11 +147,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
                           ),
-
                           const SizedBox(height: 18),
                           _sectionTitle("Kontakt"),
                           const SizedBox(height: 10),
-
                           _field(
                             label: "Broj telefona",
                             controller: fields.controller('phoneNumber'),
@@ -167,11 +157,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             keyboardType: TextInputType.phone,
                             textInputAction: TextInputAction.next,
                           ),
-
                           const SizedBox(height: 18),
                           _sectionTitle("Sigurnost"),
                           const SizedBox(height: 10),
-
                           _field(
                             label: "Lozinka",
                             controller: fields.controller('password'),
@@ -180,7 +168,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             textInputAction: TextInputAction.next,
                           ),
                           const SizedBox(height: 12),
-
                           _field(
                             label: "Potvrdi lozinku",
                             controller: fields.controller('confirmPassword'),
@@ -188,11 +175,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             obscure: true,
                             textInputAction: TextInputAction.done,
                           ),
-
                           const SizedBox(height: 18),
                           _sectionTitle("Dodatno"),
                           const SizedBox(height: 10),
-
                           _dateTile(
                             label: "Datum rođenja",
                             valueText: _dob == null
@@ -201,7 +186,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             onTap: _pickDate,
                             errorText: fieldErrors['birthDate'],
                           ),
-
                           const SizedBox(height: 10),
                           _backToLogin(),
                         ],
@@ -210,8 +194,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
-
-              // Sticky button
               Positioned(
                 left: 0,
                 right: 0,
@@ -267,10 +249,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
-  // --------------------
-  // UI HELPERS
-  // --------------------
 
   Widget _header() {
     return Column(
@@ -403,12 +381,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
               color: const Color(0xFFF7F7F7),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: (errorText != null) ? const Color(0xFFE53935) : const Color(0xFFE9E9E9),
+                color: (errorText != null)
+                    ? const Color(0xFFE53935)
+                    : const Color(0xFFE9E9E9),
               ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_month_outlined, color: RegisterScreen.gymBlue),
+                const Icon(
+                  Icons.calendar_month_outlined,
+                  color: RegisterScreen.gymBlue,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -497,7 +480,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: (errorText != null) ? const Color(0xFFE53935) : const Color(0xFFE9E9E9),
+            color: (errorText != null)
+                ? const Color(0xFFE53935)
+                : const Color(0xFFE9E9E9),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -507,10 +492,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
-  // --------------------
-  // ACTIONS
-  // --------------------
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
@@ -526,7 +507,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(primary: RegisterScreen.gymBlueDark),
+            colorScheme: const ColorScheme.light(
+              primary: RegisterScreen.gymBlueDark,
+            ),
           ),
           child: child!,
         );
@@ -567,32 +550,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => fieldErrors.clear());
 
     final rules = <FieldRule>[
-      Rules.requiredText('firstName', fields.text('firstName'), 'Ime je obavezno.'),
-      Rules.requiredText('lastName', fields.text('lastName'), 'Prezime je obavezno.'),
-
-      Rules.requiredText('username', fields.text('username'), 'Username je obavezan.'),
-      Rules.username('username', fields.text('username')),
-
-      Rules.requiredText('email', fields.text('email'), 'Email je obavezan.'),
-      Rules.email('email', fields.text('email')),
-
-      Rules.requiredText('phoneNumber', fields.text('phoneNumber'), 'Telefon je obavezan.'),
-      FieldRule('phoneNumber', () {
-        final s = fields.text('phoneNumber').trim();
-        return s.length >= 6 ? null : 'Telefon nije ispravan.';
-      }),
-
-      Rules.requiredText('password', fields.text('password'), 'Lozinka je obavezna.'),
-      Rules.strongPassword('password', fields.text('password')),
-
-      Rules.requiredText('confirmPassword', fields.text('confirmPassword'), 'Potvrda lozinke je obavezna.'),
+      Rules.requiredText(
+        'firstName',
+        fields.text('firstName'),
+        'Ime je obavezno.',
+      ),
+      Rules.requiredText(
+        'lastName',
+        fields.text('lastName'),
+        'Prezime je obavezno.',
+      ),
+      Rules.requiredText(
+        'username',
+        fields.text('username'),
+        'Username je obavezan.',
+      ),
+      Rules.username(
+        'username',
+        fields.text('username'),
+      ),
+      Rules.requiredText(
+        'email',
+        fields.text('email'),
+        'Email je obavezan.',
+      ),
+      Rules.email(
+        'email',
+        fields.text('email'),
+      ),
+      Rules.requiredText(
+        'phoneNumber',
+        fields.text('phoneNumber'),
+        'Telefon je obavezan.',
+      ),
+      Rules.phone(
+        'phoneNumber',
+        fields.text('phoneNumber'),
+      ),
+      Rules.requiredText(
+        'password',
+        fields.text('password'),
+        'Lozinka je obavezna.',
+      ),
+      Rules.strongPassword(
+        'password',
+        fields.text('password'),
+      ),
+      Rules.requiredText(
+        'confirmPassword',
+        fields.text('confirmPassword'),
+        'Potvrda lozinke je obavezna.',
+      ),
       FieldRule('confirmPassword', () {
         return fields.text('confirmPassword') == fields.text('password')
             ? null
             : 'Lozinke se ne podudaraju.';
       }),
-
-      // ako želiš DOB kao obavezno — ostavi, ako ne želiš, izbriši ova 1-2 reda:
       Rules.requiredDate('birthDate', _dob, 'Datum rođenja je obavezan.'),
     ];
 
@@ -628,7 +641,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'dateOfBirth': DateHelper.toUtcIsoNullable(_dob),
         'isActive': true,
         'isUser': true,
-
         if (uploadedImageName != null) 'userImage': uploadedImageName,
       };
 

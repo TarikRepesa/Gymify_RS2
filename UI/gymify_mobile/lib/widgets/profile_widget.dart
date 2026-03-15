@@ -12,6 +12,7 @@ import 'package:gymify_mobile/providers/image_provider.dart';
 import 'package:gymify_mobile/providers/user_provider.dart';
 import 'package:gymify_mobile/providers/loyalty_point_provider.dart';
 import 'package:gymify_mobile/utils/session.dart';
+import 'package:gymify_mobile/validation/validation_model/validation_rules.dart';
 
 class ProfileWidget extends StatefulWidget {
   const ProfileWidget({super.key});
@@ -34,7 +35,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   bool _loading = true;
   String? _error;
 
-  // ✅ loyalty state
   bool _loyaltyLoading = false;
   int _totalPoints = 0;
 
@@ -103,7 +103,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       _isImageChanged = false;
       _initial = Map<String, String>.from(fields.values());
 
-      // ✅ load loyalty points
       await _loadLoyaltyPoints(userId);
 
       if (!mounted) return;
@@ -123,10 +122,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     });
 
     try {
-      // Najčešći pattern kod tebe: provider.get(filter: Map) -> SearchResult sa items
       final result = await _loyaltyProvider.get(
         filter: <String, dynamic>{
-          // ⚠️ Ako ti je na backendu drugačiji naziv, promijeni ovdje:
           "UserId": userId,
           "page": 0,
           "pageSize": 1,
@@ -137,13 +134,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       int points = 0;
 
       try {
-        // ako je tip SearchResult<LoyaltyPoint>
         final items = (result as dynamic).items as List<dynamic>;
         if (items.isNotEmpty) {
           points = (items.first as dynamic).totalPoints as int;
         }
       } catch (_) {
-        // fallback: ako result dođe kao lista ili nešto drugo
         try {
           final items = (result as List);
           if (items.isNotEmpty) {
@@ -160,7 +155,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         _loyaltyLoading = false;
       });
     } catch (_) {
-      // Nemoj rušiti profil zbog loyalty poziva – samo prikaži 0
       if (!mounted) return;
       setState(() {
         _totalPoints = 0;
@@ -268,63 +262,66 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : (_error != null)
-          ? _ErrorState(message: _error!, onRetry: _loadUser)
-          : (_user == null)
-          ? _ErrorState(message: "Korisnik nije učitan.", onRetry: _loadUser)
-          : CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: _ProfileHeader(
-                    user: _user!,
-                    pickedImage: _pickedImage,
-                    onChangeImage: _pickImage,
-                    onLogout: _logout,
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
-                    child: Column(
-                      children: [
-                        _LoyaltyCard(
-                          loading: _loyaltyLoading,
-                          totalPoints: _totalPoints,
-                          onRewardsTap: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const RewardsScreen(),
-                              ),
-                            );
-
-                            if (result == true) {
-                              _loadUser(); // ili _loadLoyaltyPoints();
-                              setState(() {}); // reset UI
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        _SectionCard(
-                          title: "Osnovni podaci",
-                          icon: Icons.badge_outlined,
-                          child: _ProfileForm(
-                            formKey: _formKey,
-                            fields: fields,
-                            onAnyChanged: () => setState(() {}),
+              ? _ErrorState(message: _error!, onRetry: _loadUser)
+              : (_user == null)
+                  ? _ErrorState(
+                      message: "Korisnik nije učitan.",
+                      onRetry: _loadUser,
+                    )
+                  : CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: _ProfileHeader(
+                            user: _user!,
+                            pickedImage: _pickedImage,
+                            onChangeImage: _pickImage,
+                            onLogout: _logout,
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        _MiniTipsCard(
-                          title: "Savjet",
-                          message:
-                              "Rezervacijom treninga skupljaš poene. Što više poena, veće pogodnosti 😊",
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+                            child: Column(
+                              children: [
+                                _LoyaltyCard(
+                                  loading: _loyaltyLoading,
+                                  totalPoints: _totalPoints,
+                                  onRewardsTap: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const RewardsScreen(),
+                                      ),
+                                    );
+
+                                    if (result == true) {
+                                      _loadUser();
+                                      setState(() {});
+                                    }
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                _SectionCard(
+                                  title: "Osnovni podaci",
+                                  icon: Icons.badge_outlined,
+                                  child: _ProfileForm(
+                                    formKey: _formKey,
+                                    fields: fields,
+                                    onAnyChanged: () => setState(() {}),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                const _MiniTipsCard(
+                                  title: "Savjet",
+                                  message:
+                                      "Rezervacijom treninga skupljaš poene. Što više poena, veće pogodnosti 😊",
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ],
-            ),
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
@@ -363,10 +360,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   }
 }
 
-/// =====================
-/// LOYALTY CARD
-/// =====================
-
 class _LoyaltyCard extends StatelessWidget {
   const _LoyaltyCard({
     required this.loading,
@@ -385,8 +378,6 @@ class _LoyaltyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     const threshold = 10;
     final remainder = totalPoints % threshold;
-    final toNext = remainder == 0 ? 0 : (threshold - remainder);
-    final progress = threshold == 0 ? 0.0 : (remainder / threshold);
 
     return Container(
       decoration: BoxDecoration(
@@ -498,10 +489,6 @@ class _LoyaltyCard extends StatelessWidget {
     );
   }
 }
-
-/// =====================
-/// HEADER (spušten PROFIL + logout)
-/// =====================
 
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
@@ -672,10 +659,6 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-/// =====================
-/// FORM SECTION
-/// =====================
-
 class _ProfileForm extends StatelessWidget {
   const _ProfileForm({
     required this.formKey,
@@ -692,14 +675,25 @@ class _ProfileForm extends StatelessWidget {
 
   String? _email(String? v) {
     final value = (v ?? '').trim();
-    final regex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
-    return regex.hasMatch(value) ? null : "Neispravan email.";
+    return Rules.email("email", value).validate();
   }
 
   String? _username(String? v) {
     final value = (v ?? '').trim();
-    final regex = RegExp(r'^[a-zA-Z0-9._-]{3,20}$');
-    return regex.hasMatch(value) ? null : "Username 3–20 (slova/brojevi/._-).";
+    return Rules.username(
+      "username",
+      value,
+    ).validate();
+  }
+
+  String? _phone(String? v) {
+    final value = (v ?? '').trim();
+    if (value.isEmpty) return "Telefon je obavezan.";
+
+    return Rules.phone(
+      "phoneNumber",
+      value,
+    ).validate();
   }
 
   @override
@@ -761,7 +755,7 @@ class _ProfileForm extends StatelessWidget {
             icon: Icons.phone_outlined,
             controller: fields.controller("phoneNumber"),
             keyboardType: TextInputType.phone,
-            validator: (v) => _req(v, "Telefon je obavezan."),
+            validator: _phone,
             onChanged: (_) => onAnyChanged(),
           ),
           const SizedBox(height: 12),
@@ -853,10 +847,6 @@ class _ProfileForm extends StatelessWidget {
     );
   }
 }
-
-/// =====================
-/// COMMON UI
-/// =====================
 
 class _SectionCard extends StatelessWidget {
   const _SectionCard({

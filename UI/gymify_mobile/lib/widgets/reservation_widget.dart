@@ -59,7 +59,7 @@ class _ReservationWidgetState extends State<ReservationWidget> {
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _paging.loadPage(pageNumber: 0);
+      await _paging.applyExtra({"Status": "Confirmed"});
     });
   }
 
@@ -94,7 +94,7 @@ class _ReservationWidgetState extends State<ReservationWidget> {
 
   Future<void> _onSearchChanged(String value) async {
     final v = value.trim();
-    await _paging.applyExtra({"FTS": v});
+    await _paging.applyExtra({"FTS": v, "Status": "Confirmed"});
   }
 
   Future<void> _resetFilters() async {
@@ -102,15 +102,14 @@ class _ReservationWidgetState extends State<ReservationWidget> {
       _searchCtrl.clear();
     });
 
-    await _paging.applyExtra({});
-    await _paging.loadPage(pageNumber: 0);
+    await _paging.applyExtra({"Status": "Confirmed"});
   }
 
   Future<void> _cancelReservation(Reservation r) async {
     final lpProvider = context.read<LoyaltyPointProvider>();
     final lpProviderH = context.read<LoyaltyPointHistoryProvider>();
     final trainingName = r.training?.name ?? "trening";
-    final trainingId = r.trainingId; 
+    final trainingId = r.trainingId;
     final trainingProvider = context.read<TrainingProvider>();
 
     final ok = await ConfirmDialogs.yesNoConfirmation(
@@ -127,27 +126,32 @@ class _ReservationWidgetState extends State<ReservationWidget> {
 
     try {
       final provider = context.read<ReservationProvider>();
-      await provider.delete(r.id);
+
+      await provider.update(r.id!, {
+        "userId": r.userId,
+        "trainingId": r.trainingId,
+        "createdAt": r.createdAt?.toIso8601String(),
+        "status": "Cancelled",
+        "cancelledAt": DateTime.now().toIso8601String(),
+        "cancelReason": "User cancelled",
+      });
 
       await trainingProvider.down(trainingId);
 
-      await lpProvider.subtractPoints({
-        "userId": Session.userId,
-        "points": 1
-      });
+      await lpProvider.subtractPoints({"userId": Session.userId, "points": 1});
 
       await lpProviderH.insert({
         "userId": Session.userId,
         "status": "Otkazivanje rezervacije",
         "amountPointsParticipation": 1,
-        "createdAt": DateTime.now().toIso8601String()
+        "createdAt": DateTime.now().toIso8601String(),
       });
 
       await ConfirmDialogs.okConfirmation(
         context,
         title: "Uspješno",
         message:
-            "Rezervacija je uspješno otkazana.\n\nSvoje rezervacije možete pratiti u sekciji 'Rezervacije'.",
+            "Rezervacija je uspješno otkazana.",
         okText: "U redu",
       );
 

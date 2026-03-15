@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:gymify_mobile/models/loyalty_point.dart';
 import 'package:gymify_mobile/providers/loyalty_point_history_provider.dart';
 import 'package:gymify_mobile/providers/loyalty_point_provider.dart';
 import 'package:gymify_mobile/providers/member_provider.dart';

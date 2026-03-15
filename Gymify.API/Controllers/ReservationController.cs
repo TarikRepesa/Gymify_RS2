@@ -2,6 +2,7 @@ using Gymify.Model.RequestObjects;
 using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
 using Gymify.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gymify.API.Controllers
@@ -14,6 +15,7 @@ namespace Gymify.API.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "Admin,Radnik,Korisnik")]
         [HttpGet("exists")]
         public async Task<bool> Exists([FromQuery] ReservationCheckRequets req)
         {

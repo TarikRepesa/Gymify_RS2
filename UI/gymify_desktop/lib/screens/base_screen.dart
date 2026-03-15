@@ -8,6 +8,7 @@ import 'package:gymify_desktop/helper/image_helper.dart';
 import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
 import 'package:gymify_desktop/providers/image_provider.dart';
 import 'package:gymify_desktop/routes/app_routes.dart';
+import 'package:gymify_desktop/widgets/old_reservations_widget.dart';
 import 'package:gymify_desktop/widgets/trainer_task_widget.dart';
 import 'package:gymify_desktop/widgets/worker_task_widget.dart';
 import 'package:provider/provider.dart';
@@ -64,6 +65,7 @@ class _BaseScreenState extends State<BaseScreen> {
         "Članarine",
         "Obavijesti",
         "Recenzije",
+        "Otkazane Rezervacije",
         "Izvještaj",
       ];
     }
@@ -76,6 +78,7 @@ class _BaseScreenState extends State<BaseScreen> {
         "Članarine",
         "Obavijesti",
         "Recenzije",
+        "Otkazane Rezervacije",
         "Izvještaj",
       ];
     }
@@ -175,6 +178,8 @@ class _BaseScreenState extends State<BaseScreen> {
         return NotificationWidget();
       case 'Recenzije':
         return ReviewWidget();
+      case 'Otkazane Rezervacije':
+        return CancelledReservationsWidget();
       case 'Izvještaj':
         return ReportWidget();
 

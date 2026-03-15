@@ -111,36 +111,58 @@ class Rules {
 
 
   static FieldRule phone(
-    String field,
-    String value, {
-    bool required = false,
-    int minDigits = 7,
-    int maxDigits = 15,
-  }) {
-    return FieldRule(field, () {
-      final v = value.trim();
+  String field,
+  String value, {
+  bool required = false,
+}) {
+  return FieldRule(field, () {
+    final v = value.trim();
 
-      if (!required && v.isEmpty) return null;
-      if (v.isEmpty) return 'Telefon je obavezan.';
+    if (!required && v.isEmpty) return null;
+    if (v.isEmpty) return 'Telefon je obavezan.';
 
-      final allowedChars = RegExp(r'^[0-9+\-\s()]+$');
-      if (!allowedChars.hasMatch(v)) {
-        return 'Unesi ispravan broj telefona.';
+    final allowedChars = RegExp(r'^[0-9+\-\s()]+$');
+    if (!allowedChars.hasMatch(v)) {
+      return 'Unesi ispravan broj telefona.';
+    }
+
+    if (v.contains('+') && !v.startsWith('+')) {
+      return 'Znak + može biti samo na početku.';
+    }
+
+    final digits = v.replaceAll(RegExp(r'\D'), '');
+
+    if (digits.startsWith('060')) {
+      if (digits.length != 10) {
+        return 'Broj 060 mora imati 7 cifara nakon pozivnog.';
       }
-
-      final digits = v.replaceAll(RegExp(r'\D'), '');
-
-      if (digits.length < minDigits || digits.length > maxDigits) {
-        return 'Telefon mora imati između $minDigits i $maxDigits cifara.';
-      }
-
-      if (v.contains('+') && !v.startsWith('+')) {
-        return 'Znak + može biti samo na početku.';
-      }
-
       return null;
-    });
-  }
+    }
+
+    if (digits.startsWith('061') || digits.startsWith('062')) {
+      if (digits.length != 9) {
+        return 'Broj 061/062 mora imati 6 cifara nakon pozivnog.';
+      }
+      return null;
+    }
+
+    if (digits.startsWith('38760')) {
+      if (digits.length != 12) {
+        return 'Broj 38760 mora imati 7 cifara nakon pozivnog.';
+      }
+      return null;
+    }
+
+    if (digits.startsWith('38761') || digits.startsWith('38762')) {
+      if (digits.length != 11) {
+        return 'Broj 38761/38762 mora imati 6 cifara nakon pozivnog.';
+      }
+      return null;
+    }
+
+    return 'Dozvoljeni su brojevi: 060, 061, 062 ili +387/387 varijante.';
+  });
+}
 
 
 

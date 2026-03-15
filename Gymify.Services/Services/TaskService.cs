@@ -4,7 +4,6 @@ using Gymify.Model.RequestObjects;
 using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
 using MapsterMapper;
-using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gymify.Services.Services

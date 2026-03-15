@@ -1,7 +1,7 @@
 using System.IO;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Stripe;
 
 using Gymify.Model.RequestObjects;
@@ -18,71 +18,110 @@ namespace Gymify.API.Controllers
     public class PaymentController
         : BaseCRUDController<PaymentResponse, PaymentSearchObject, PaymentUpsertRequest, PaymentUpsertRequest>
     {
-        private readonly GymifyDbContext _context;
-        private readonly IStripeService _stripeService;
         private readonly StripeSettings _stripeSettings;
         private readonly IPaymentService _paymentService;
 
         public PaymentController(
-    IPaymentService service,
-    GymifyDbContext context,
-    IStripeService stripeService,
-    StripeSettings stripeSettings
-) : base(service)
+            IPaymentService service,
+            GymifyDbContext context,
+            IStripeService stripeService,
+            StripeSettings stripeSettings
+        ) : base(service)
         {
             _paymentService = service;
-            _context = context;
-            _stripeService = stripeService;
             _stripeSettings = stripeSettings;
         }
 
+        [Authorize(Roles = "Korisnik")]
         [HttpPost("create-new-intent")]
         public async Task<IActionResult> CreateNewPaymentIntent([FromBody] CreatePaymentIntentRequest req)
         {
-            var result = await _paymentService.CreateNewPaymentIntentAsync(req);
-            return Ok(result);
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out var loggedInUserId))
+                    return Unauthorized("Neispravan token.");
+
+                var isAdmin = User.IsInRole("Admin");
+
+                if (!isAdmin && req.UserId != loggedInUserId)
+                    return Forbid("Nije dozvoljeno kreirati payment intent za drugog korisnika.");
+
+                var result = await _paymentService.CreateNewPaymentIntentAsync(req);
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (StripeException)
+            {
+                return StatusCode(500, "Greška prilikom komunikacije sa Stripe servisom.");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Došlo je do greške prilikom kreiranja payment intenta.");
+            }
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = "Korisnik")]
         [HttpPost("webhook")]
         public async Task<IActionResult> StripeWebhook()
         {
-            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-            var signatureHeader = Request.Headers["Stripe-Signature"].ToString();
+            try
+            {
+                using var reader = new StreamReader(HttpContext.Request.Body);
+                var json = await reader.ReadToEndAsync();
 
-            var stripeEvent = EventUtility.ConstructEvent(
-                json,
-                signatureHeader,
-                _stripeSettings.WebhookSecret
-            );
+                var signatureHeader = Request.Headers["Stripe-Signature"].ToString();
 
-            var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-            if (paymentIntent == null)
+                var stripeEvent = EventUtility.ConstructEvent(
+                    json,
+                    signatureHeader,
+                    _stripeSettings.WebhookSecret
+                );
+
+                var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                if (paymentIntent == null)
+                    return Ok();
+
+                if (stripeEvent.Type == "payment_intent.succeeded")
+                {
+                    await _paymentService.HandlePaymentIntentSucceededAsync(
+                        paymentIntent.Id,
+                        paymentIntent.Metadata
+                    );
+                }
+                else if (stripeEvent.Type == "payment_intent.payment_failed")
+                {
+                    await _paymentService.HandlePaymentIntentFailedAsync(
+                        paymentIntent.Id,
+                        paymentIntent.Metadata
+                    );
+                }
+                else if (stripeEvent.Type == "payment_intent.canceled")
+                {
+                    await _paymentService.HandlePaymentIntentCanceledAsync(
+                        paymentIntent.Id,
+                        paymentIntent.Metadata
+                    );
+                }
+
                 return Ok();
-
-            if (stripeEvent.Type == "payment_intent.succeeded")
-            {
-                await _paymentService.HandlePaymentIntentSucceededAsync(
-                    paymentIntent.Id,
-                    paymentIntent.Metadata
-                );
             }
-            else if (stripeEvent.Type == "payment_intent.payment_failed")
+            catch (StripeException)
             {
-                await _paymentService.HandlePaymentIntentFailedAsync(
-                    paymentIntent.Id,
-                    paymentIntent.Metadata
-                );
+                return BadRequest("Neispravan Stripe webhook potpis ili payload.");
             }
-            else if (stripeEvent.Type == "payment_intent.canceled")
+            catch (Exception)
             {
-                await _paymentService.HandlePaymentIntentCanceledAsync(
-                    paymentIntent.Id,
-                    paymentIntent.Metadata
-                );
+                return StatusCode(500, "Greška pri obradi Stripe webhook-a.");
             }
-
-            return Ok();
         }
     }
 }

@@ -15,5 +15,6 @@ namespace Gymify.Model.ResponseObjects
        public int MaxAmountOfParticipants { get; set; }
        public int CurrentParticipants { get; set; }
        public DateTime StartDate { get; set; }
+       
     }
 }

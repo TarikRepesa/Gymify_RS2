@@ -4,6 +4,7 @@ import 'package:gymify_desktop/providers/member_provider.dart';
 import 'package:gymify_desktop/providers/membership_provider.dart';
 import 'package:gymify_desktop/providers/notification_provider.dart';
 import 'package:gymify_desktop/providers/report_provider.dart';
+import 'package:gymify_desktop/providers/reservation_provider.dart';
 import 'package:gymify_desktop/providers/review_provider.dart';
 import 'package:gymify_desktop/providers/training_provider.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
@@ -27,17 +28,15 @@ void main() {
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider(create: (_) => WorkerTaskProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => WorkerTaskProvider()),
-        ChangeNotifierProvider(create: (_) => TrainingProvider())
+        ChangeNotifierProvider(create: (_) => ReservationProvider()),
       ],
-      child: const RentifyApp(),
+      child: const GymifyApp(),
     ),
   );
 }
 
-class RentifyApp extends StatelessWidget {
-  const RentifyApp({super.key});
+class GymifyApp extends StatelessWidget {
+  const GymifyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
