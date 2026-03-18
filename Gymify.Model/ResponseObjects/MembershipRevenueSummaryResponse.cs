@@ -5,7 +5,7 @@ namespace Gymify.Model.ResponseObjects
     public class MembershipRevenueSummaryResponse
     {
         public int Year { get; set; }
-        public decimal TotalIncome { get; set; }
+        public int TotalIncome { get; set; }
         public int TotalPayments { get; set; }
         public int ActiveMembers { get; set; }
         public int ExpiredMembers { get; set; }

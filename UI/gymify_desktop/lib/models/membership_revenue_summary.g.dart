@@ -10,7 +10,7 @@ MembershipRevenueSummary _$MembershipRevenueSummaryFromJson(
   Map<String, dynamic> json,
 ) => MembershipRevenueSummary(
   year: (json['year'] as num).toInt(),
-  totalIncome: (json['totalIncome'] as num).toDouble(),
+  totalIncome: (json['totalIncome'] as num).toInt(),
   totalPayments: (json['totalPayments'] as num).toInt(),
   activeMembers: (json['activeMembers'] as num).toInt(),
   expiredMembers: (json['expiredMembers'] as num).toInt(),

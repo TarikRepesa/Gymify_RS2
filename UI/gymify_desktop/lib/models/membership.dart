@@ -6,8 +6,8 @@ part 'membership.g.dart';
 class Membership {
   final int id;
   final String name;
-  final double monthlyPrice;
-  final double yearPrice;
+  final int monthlyPrice;
+  final int yearPrice;
   final DateTime createdAt;
 
   Membership({

@@ -152,6 +152,39 @@ namespace Gymify.Services.Services
             return response;
         }
 
+        public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null || !user.IsActive)
+                throw new InvalidOperationException("Korisnik nije pronađen.");
+
+            if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+                throw new InvalidOperationException("Trenutna lozinka je obavezna.");
+
+            if (string.IsNullOrWhiteSpace(request.NewPassword))
+                throw new InvalidOperationException("Nova lozinka je obavezna.");
+
+            if (request.NewPassword.Length < 8)
+                throw new InvalidOperationException("Nova lozinka mora imati najmanje 8 karaktera.");
+
+            if (request.NewPassword != request.ConfirmPassword)
+                throw new InvalidOperationException("Nova lozinka i potvrda lozinke se ne podudaraju.");
+
+            if (!UserHelper.VerifyPassword(request.CurrentPassword, user.PasswordHash, user.PasswordSalt))
+        throw new InvalidOperationException("Trenutna lozinka nije ispravna.");
+
+            if (request.CurrentPassword == request.NewPassword)
+                throw new InvalidOperationException("Nova lozinka ne može biti ista kao trenutna.");
+
+            UserHelper.CreatePasswordHash(request.NewPassword, out var hash, out var salt);
+
+            user.PasswordHash = hash;
+            user.PasswordSalt = salt;
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task ForgotPasswordAsync(string email)
         {
             var user = await _context.Users

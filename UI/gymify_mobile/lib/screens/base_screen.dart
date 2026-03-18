@@ -21,10 +21,32 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
 
   late List<_TabItem> _tabs;
 
+  GlobalKey<ProfileWidgetState> profileKey = GlobalKey<ProfileWidgetState>();
+
   @override
   void initState() {
     super.initState();
     _buildTabs();
+  }
+
+  Widget _buildTabBody(String label) {
+    switch (label) {
+      case "Početna":
+        return HomeWidget(key: UniqueKey());
+      case "Osoblje":
+        return StaffWidget(key: UniqueKey());
+      case "Treninzi":
+        return TrainingWidget(key: UniqueKey());
+      case "Članarine":
+        return MembershipWidget(key: UniqueKey());
+      case "Rezervacije":
+        return ReservationWidget(key: UniqueKey());
+      case "Profil":
+        profileKey = GlobalKey<ProfileWidgetState>();
+        return ProfileWidget(key: profileKey);
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   void _buildTabs() {
@@ -33,39 +55,50 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
         label: "Početna",
         icon: Icons.home_outlined,
         activeIcon: Icons.home,
-        body: HomeWidget(key: UniqueKey()),
+        body: _buildTabBody("Početna"),
       ),
       _TabItem(
         label: "Osoblje",
         icon: Icons.person_3_outlined,
         activeIcon: Icons.person_3,
-        body: StaffWidget(key: UniqueKey()),
+        body: _buildTabBody("Osoblje"),
       ),
       _TabItem(
         label: "Treninzi",
         icon: Icons.fitness_center_outlined,
         activeIcon: Icons.fitness_center,
-        body: TrainingWidget(key: UniqueKey()),
+        body: _buildTabBody("Treninzi"),
       ),
       _TabItem(
         label: "Članarine",
         icon: Icons.card_membership_outlined,
         activeIcon: Icons.card_membership,
-        body: MembershipWidget(key: UniqueKey()),
+        body: _buildTabBody("Članarine"),
       ),
       _TabItem(
         label: "Rezervacije",
         icon: Icons.note_alt_outlined,
         activeIcon: Icons.note_alt,
-        body: ReservationWidget(key: UniqueKey()),
+        body: _buildTabBody("Rezervacije"),
       ),
       _TabItem(
         label: "Profil",
         icon: Icons.person_outline,
         activeIcon: Icons.person,
-        body: ProfileWidget(key: UniqueKey()),
+        body: _buildTabBody("Profil"),
       ),
     ];
+  }
+
+  void _resetTab(int index) {
+    final current = _tabs[index];
+
+    _tabs[index] = _TabItem(
+      label: current.label,
+      icon: current.icon,
+      activeIcon: current.activeIcon,
+      body: _buildTabBody(current.label),
+    );
   }
 
   @override
@@ -92,10 +125,21 @@ class _BaseMobileScreenState extends State<BaseMobileScreen> {
           unselectedItemColor: const Color(0xFF8A8A8A),
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w800),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
-          onTap: (i) {
+          onTap: (index) async {
+            final profileTabIndex = _tabs.indexWhere((t) => t.label == "Profil");
+
+            if (_index == profileTabIndex) {
+              final profileState = profileKey.currentState;
+
+              if (profileState != null && profileState.hasUnsavedChanges()) {
+                final shouldLeave = await profileState.confirmLeaveDialog();
+                if (!shouldLeave) return;
+              }
+            }
+
             setState(() {
-              _index = i;
-              _buildTabs(); // 🔥 rebuild tabova -> initState opet
+              _resetTab(index);
+              _index = index;
             });
           },
           items: [

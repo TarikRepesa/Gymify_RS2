@@ -11,6 +11,8 @@ using Gymify.Services.Interfaces;
 using Gymify.Services.Database;
 using Gymify.WebAPI.StripeConfig;
 
+//Get, Create: Korisnik
+
 namespace Gymify.API.Controllers
 {
     [ApiController]
@@ -69,7 +71,7 @@ namespace Gymify.API.Controllers
             }
         }
 
-        [Authorize(Roles = "Korisnik")]
+        [AllowAnonymous]
         [HttpPost("webhook")]
         public async Task<IActionResult> StripeWebhook()
         {

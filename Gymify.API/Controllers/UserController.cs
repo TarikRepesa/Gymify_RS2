@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Gymify.Model.RequestObjects;
 using Gymify.Model.ResponseObject;
 using Gymify.Model.ResponseObjects;
@@ -23,7 +24,7 @@ namespace Gymify.API.Controllers
             return await _userService.LoginAsync(request);
         }
 
-        [Authorize(Roles = "Korisnik")]
+        [Authorize]
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(
         [FromBody] ForgotPasswordRequest request)
@@ -33,11 +34,24 @@ namespace Gymify.API.Controllers
             return Ok("Ako email postoji, poslan je link za reset lozinke.");
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin,Korisnik")]
         [HttpPost]
         public override Task<UserResponse> Create([FromBody] UserInsertRequest request)
         {
             return base.Create(request);
+        }
+
+        [Authorize(Roles = "Korisnik")]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            await _userService.ChangePasswordAsync(userId, request);
+            return Ok();
         }
     }
 }

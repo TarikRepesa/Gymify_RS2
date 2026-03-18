@@ -6,8 +6,10 @@ import 'package:gymify_desktop/providers/notification_provider.dart';
 import 'package:gymify_desktop/providers/report_provider.dart';
 import 'package:gymify_desktop/providers/reservation_provider.dart';
 import 'package:gymify_desktop/providers/review_provider.dart';
+import 'package:gymify_desktop/providers/reward_provider.dart';
 import 'package:gymify_desktop/providers/training_provider.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
+import 'package:gymify_desktop/providers/user_reward_provider.dart';
 import 'package:gymify_desktop/providers/work_task_provider.dart';
 import 'package:gymify_desktop/routes/app_routes.dart';
 import 'package:gymify_desktop/screens/login_screen.dart';
@@ -29,6 +31,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => WorkerTaskProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider()),
         ChangeNotifierProvider(create: (_) => ReservationProvider()),
+        ChangeNotifierProvider(create: (_) => RewardProvider()),
+        ChangeNotifierProvider(create: (_) => UserRewardProvider()),
       ],
       child: const GymifyApp(),
     ),

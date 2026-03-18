@@ -126,7 +126,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
       await paging.search(_searchCtrl.text.trim());
 
       if (mounted) {
-        SnackbarHelper.showUpdate(context, "Obavijest obrisana.");
+        SnackbarHelper.showDelete(context, "Obavijest obrisana.");
       }
     } catch (e) {
       if (mounted) SnackbarHelper.showError(context, e.toString());

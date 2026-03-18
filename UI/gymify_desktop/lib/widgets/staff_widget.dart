@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/base_form_dialogs_for_actions.dart';
+import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:gymify_desktop/helper/date_helper.dart';
 import 'package:gymify_desktop/helper/password_helper.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
@@ -7,6 +8,7 @@ import 'package:gymify_desktop/helper/univerzal_pagging_helper.dart';
 import 'package:gymify_desktop/models/user.dart';
 import 'package:gymify_desktop/providers/user_provider.dart';
 import 'package:gymify_desktop/providers/work_task_provider.dart';
+import 'package:gymify_desktop/validation/validation_model/validation_rules.dart';
 import 'package:gymify_desktop/widgets/base_search_and_list_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -15,19 +17,20 @@ Widget StaffWidget() {
     create: (context) {
       final provider = UniversalPagingProvider<User>(
         pageSize: 5,
-        fetcher: ({
-          required int page,
-          required int pageSize,
-          String? filter,
-          bool includeTotalCount = true,
-        }) {
-          return context.read<UserProvider>().getStaffPaged(
+        fetcher:
+            ({
+              required int page,
+              required int pageSize,
+              String? filter,
+              bool includeTotalCount = true,
+            }) {
+              return context.read<UserProvider>().getStaffPaged(
                 page: page,
                 pageSize: pageSize,
                 search: filter,
                 includeTotalCount: includeTotalCount,
               );
-        },
+            },
       );
 
       Future.microtask(() => provider.loadPage());
@@ -47,17 +50,46 @@ Widget StaffWidget() {
               initialValues: {
                 "password": generatedPass,
                 "username": "",
+                "role": "",
               },
               fieldsDef: [
-                const BaseFormFieldDef(
+                BaseFormFieldDef(
                   name: "firstName",
                   label: "Ime",
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
+                      return "Ime je obavezno.";
+                    }
+
+                    return Rules.minLength(
+                      "firstName",
+                      value,
+                      2,
+                      "Ime mora imati najmanje 2 znaka.",
+                    ).validate();
+                  },
                 ),
-                const BaseFormFieldDef(
+                BaseFormFieldDef(
                   name: "lastName",
                   label: "Prezime",
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
+                      return "Prezime je obavezno.";
+                    }
+
+                    return Rules.minLength(
+                      "lastName",
+                      value,
+                      2,
+                      "Prezime mora imati najmanje 2 znaka.",
+                    ).validate();
+                  },
                 ),
                 BaseFormFieldDef(
                   name: "username",
@@ -70,12 +102,7 @@ Widget StaffWidget() {
                       return "Username je obavezan.";
                     }
 
-                    final regex = RegExp(r'^[a-zA-Z0-9._#-]{3,30}$');
-                    if (!regex.hasMatch(value)) {
-                      return "Username mora imati 3–30 znakova (slova, brojevi, . _ - #).";
-                    }
-
-                    return null;
+                    return Rules.username("username", value).validate();
                   },
                 ),
                 BaseFormFieldDef(
@@ -84,22 +111,13 @@ Widget StaffWidget() {
                   type: BaseFieldType.password,
                   requiredField: true,
                   validator: (v) {
-                    final value = v ?? "";
+                    final value = (v ?? "").trim();
 
-                    if (value.trim().isEmpty) {
+                    if (value.isEmpty) {
                       return "Password je obavezan.";
                     }
 
-                    final hasMinLength = value.length >= 8;
-                    final hasUpper = RegExp(r'[A-Z]').hasMatch(value);
-                    final hasLower = RegExp(r'[a-z]').hasMatch(value);
-                    final hasDigit = RegExp(r'\d').hasMatch(value);
-
-                    if (!hasMinLength || !hasUpper || !hasLower || !hasDigit) {
-                      return "Min 8 znakova + veliko slovo + malo slovo + broj.";
-                    }
-
-                    return null;
+                    return Rules.strongPassword("password", value).validate();
                   },
                 ),
                 BaseFormFieldDef(
@@ -117,45 +135,98 @@ Widget StaffWidget() {
                       child: Text("Radnik"),
                     ),
                   ],
+                  validator: (v) {
+                    final value = (v ?? "").toString().trim();
+
+                    if (value.isEmpty) {
+                      return "Uloga je obavezna.";
+                    }
+
+                    return null;
+                  },
                 ),
-                const BaseFormFieldDef(
+                BaseFormFieldDef(
                   name: "email",
                   label: "Email",
                   type: BaseFieldType.email,
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
+                      return "Email je obavezan.";
+                    }
+
+                    return Rules.email(
+                      "email",
+                      value,
+                      "Unesite ispravan email.",
+                    ).validate();
+                  },
                 ),
                 BaseFormFieldDef(
                   name: "dateOfBirth",
                   label: "Datum rodjenja",
                   type: BaseFieldType.date,
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").toString().trim();
+
+                    if (value.isEmpty) {
+                      return "Datum rodjenja je obavezan.";
+                    }
+
+                    return null;
+                  },
                 ),
-                const BaseFormFieldDef(
+                BaseFormFieldDef(
                   name: "phone",
                   label: "Kontakt",
                   type: BaseFieldType.phone,
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
+                      return "Kontakt je obavezan.";
+                    }
+
+                    return Rules.phone(
+                      "phone",
+                      value,
+                      required: true,
+                    ).validate();
+                  },
                 ),
               ],
               onFieldChanged: (name, values, setValue) {
-                if (name == "firstName" || name == "lastName") {
-                  final fn = (values["firstName"] ?? "").toString();
-                  final ln = (values["lastName"] ?? "").toString();
+  // 🔒 reaguj SAMO na ime i prezime
+  if (name != "firstName" && name != "lastName") return;
 
-                  if (fn.trim().isEmpty || ln.trim().isEmpty) return;
+  final fn = (values["firstName"] ?? "").toString().trim();
+  final ln = (values["lastName"] ?? "").toString().trim();
+  final username = (values["username"] ?? "").toString().trim();
 
-                  final auto = CredentialHelper.generateUsername(
-                    firstName: fn,
-                    lastName: ln,
-                    special: "#",
-                  );
+  // ❌ ako user ručno dira username → ne diraj
+  if (name == "username") return;
 
-                  final currentUsername = (values["username"] ?? "").toString();
-                  if (currentUsername.trim().isEmpty) {
-                    setValue("username", auto);
-                  }
-                }
-              },
+  // 🔴 ako fali ime ili prezime → reset
+  if (fn.isEmpty || ln.isEmpty) {
+    setValue("username", "");
+    return;
+  }
+
+  // 🟢 generiši SAMO ako je username prazan
+  if (username.isEmpty) {
+    final generated = CredentialHelper.generateUsername(
+      firstName: fn,
+      lastName: ln,
+      special: "#",
+    );
+
+    setValue("username", generated);
+  }
+},
               onSubmit: (payload) async {
                 try {
                   await context.read<UserProvider>().insert({
@@ -163,8 +234,9 @@ Widget StaffWidget() {
                     "lastName": payload["lastName"],
                     "email": payload["email"],
                     "phoneNumber": payload["phone"],
-                    "dateOfBirth":
-                        DateHelper.toIsoFromUi(payload["dateOfBirth"]),
+                    "dateOfBirth": DateHelper.toIsoFromUi(
+                      payload["dateOfBirth"],
+                    ),
                     "username": payload["username"],
                     "isActive": true,
                     "createdAt": DateTime.now().toIso8601String(),
@@ -216,9 +288,7 @@ Widget StaffWidget() {
               flex: 2,
               cell: (u) => Text(
                 u.phoneNumber ?? "",
-                style: const TextStyle(
-                  decoration: TextDecoration.underline,
-                ),
+                style: const TextStyle(decoration: TextDecoration.underline),
               ),
             ),
             BaseColumn<User>(
@@ -270,29 +340,60 @@ Widget StaffWidget() {
                 "role": u.isTrener == true
                     ? "Trener"
                     : u.isRadnik == true
-                        ? "Radnik"
-                        : "",
+                    ? "Radnik"
+                    : "",
               },
               fieldsDef: [
-                const BaseFormFieldDef(
+                BaseFormFieldDef(
                   name: "firstName",
                   label: "Ime",
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
+                      return "Ime je obavezno.";
+                    }
+
+                    return Rules.minLength(
+                      "firstName",
+                      value,
+                      2,
+                      "Ime mora imati najmanje 2 znaka.",
+                    ).validate();
+                  },
                 ),
-                const BaseFormFieldDef(
+                BaseFormFieldDef(
                   name: "lastName",
                   label: "Prezime",
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
+                      return "Prezime je obavezno.";
+                    }
+
+                    return Rules.minLength(
+                      "lastName",
+                      value,
+                      2,
+                      "Prezime mora imati najmanje 2 znaka.",
+                    ).validate();
+                  },
                 ),
                 BaseFormFieldDef(
                   name: "username",
                   label: "Username",
                   requiredField: true,
                   validator: (v) {
-                    if ((v ?? "").trim().isEmpty) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
                       return "Username je obavezan.";
                     }
-                    return null;
+
+                    return Rules.username("username", value).validate();
                   },
                 ),
                 BaseFormFieldDef(
@@ -310,24 +411,68 @@ Widget StaffWidget() {
                       child: Text("Radnik"),
                     ),
                   ],
+                  validator: (v) {
+                    final value = (v ?? "").toString().trim();
+
+                    if (value.isEmpty) {
+                      return "Uloga je obavezna.";
+                    }
+
+                    return null;
+                  },
                 ),
-                const BaseFormFieldDef(
+                BaseFormFieldDef(
                   name: "email",
                   label: "Email",
                   type: BaseFieldType.email,
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
+                      return "Email je obavezan.";
+                    }
+
+                    return Rules.email(
+                      "email",
+                      value,
+                      "Unesite ispravan email.",
+                    ).validate();
+                  },
                 ),
                 BaseFormFieldDef(
                   name: "dateOfBirth",
                   label: "Datum rodjenja",
                   type: BaseFieldType.date,
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").toString().trim();
+
+                    if (value.isEmpty) {
+                      return "Datum rodjenja je obavezan.";
+                    }
+
+                    return null;
+                  },
                 ),
-                const BaseFormFieldDef(
+                BaseFormFieldDef(
                   name: "phone",
                   label: "Kontakt",
                   type: BaseFieldType.phone,
                   requiredField: true,
+                  validator: (v) {
+                    final value = (v ?? "").trim();
+
+                    if (value.isEmpty) {
+                      return "Kontakt je obavezan.";
+                    }
+
+                    return Rules.phone(
+                      "phone",
+                      value,
+                      required: true,
+                    ).validate();
+                  },
                 ),
               ],
               onSubmit: (payload) async {
@@ -337,8 +482,9 @@ Widget StaffWidget() {
                     "lastName": payload["lastName"],
                     "email": payload["email"],
                     "phoneNumber": payload["phone"],
-                    "dateOfBirth":
-                        DateHelper.toIsoFromUi(payload["dateOfBirth"]),
+                    "dateOfBirth": DateHelper.toIsoFromUi(
+                      payload["dateOfBirth"],
+                    ),
                     "username": payload["username"],
                     "isTrener": payload["role"] == "Trener",
                     "isRadnik": payload["role"] == "Radnik",
@@ -358,30 +504,25 @@ Widget StaffWidget() {
             );
           },
           onDelete: (u) async {
-            final ok = await showDialog<bool>(
-              context: context,
-              builder: (c) => AlertDialog(
-                title: const Text("Brisanje osoblja"),
-                content: Text(
+            final ok = await ConfirmDialogs.badGoodConfirmation(
+              context,
+              title: "Brisanje osoblja",
+              question:
                   "Jesi li siguran da želiš obrisati ${u.firstName} ${u.lastName}?",
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(c, false),
-                    child: const Text("Odustani"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(c, true),
-                    child: const Text("Obriši"),
-                  ),
-                ],
-              ),
+              goodText: "Obriši",
+              badText: "Odustani",
             );
 
             if (ok != true) return;
 
-            await context.read<UserProvider>().delete(u.id!);
-            await paging.loadPage();
+            try {
+              await context.read<UserProvider>().delete(u.id!);
+              await paging.loadPage();
+
+              SnackbarHelper.showDelete(context, "Osoblje uspješno obrisano.");
+            } catch (e) {
+              SnackbarHelper.showError(context, e.toString());
+            }
           },
           footer: _pagingControls(paging),
         );
@@ -425,8 +566,8 @@ Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
       "createdTaskDate": DateHelper.format(DateTime.now()),
       "expirationTaskDate": "",
     },
-    fieldsDef: const [
-      BaseFormFieldDef(
+    fieldsDef: [
+      const BaseFormFieldDef(
         name: "worker",
         label: "Radnik",
         requiredField: true,
@@ -437,13 +578,41 @@ Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
         name: "name",
         label: "Naziv zadatka",
         requiredField: true,
+        validator: (v) {
+          final value = (v ?? "").trim();
+
+          if (value.isEmpty) {
+            return "Naziv zadatka je obavezan.";
+          }
+
+          return Rules.minLength(
+            "name",
+            value,
+            3,
+            "Naziv zadatka mora imati najmanje 3 znaka.",
+          ).validate();
+        },
       ),
       BaseFormFieldDef(
         name: "details",
         label: "Detalji",
         requiredField: true,
+        validator: (v) {
+          final value = (v ?? "").trim();
+
+          if (value.isEmpty) {
+            return "Detalji su obavezni.";
+          }
+
+          return Rules.minLength(
+            "details",
+            value,
+            5,
+            "Detalji moraju imati najmanje 5 znakova.",
+          ).validate();
+        },
       ),
-      BaseFormFieldDef(
+      const BaseFormFieldDef(
         name: "createdTaskDate",
         label: "Datum kreiranja",
         type: BaseFieldType.date,
@@ -456,6 +625,27 @@ Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
         label: "Rok izvršenja",
         type: BaseFieldType.date,
         requiredField: true,
+        validator: (v) {
+          final value = (v ?? "").toString().trim();
+
+          if (value.isEmpty) {
+            return "Rok izvršenja je obavezan.";
+          }
+
+          final date = DateHelper.fromUi(value);
+
+          if (date == null) {
+            return "Neispravan datum.";
+          }
+
+          final now = DateTime.now();
+
+          if (!date.isAfter(now)) {
+            return "Datum mora biti u budućnosti.";
+          }
+
+          return null;
+        },
       ),
     ],
     onSubmit: (payload) async {
@@ -464,10 +654,10 @@ Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
           "userId": payload["userId"],
           "name": payload["name"],
           "details": payload["details"],
-          "createdTaskDate":
-              DateHelper.toIsoFromUi(payload["createdTaskDate"]),
-          "expirationTaskDate":
-              DateHelper.toIsoFromUi(payload["expirationTaskDate"]),
+          "createdTaskDate": DateHelper.toIsoFromUi(payload["createdTaskDate"]),
+          "expirationTaskDate": DateHelper.toIsoFromUi(
+            payload["expirationTaskDate"],
+          ),
           "isFinished": false,
         });
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gymify_mobile/config/api_config.dart';
+import 'package:gymify_mobile/helper/http_helper.dart';
 import 'package:gymify_mobile/models/payment.dart';
 
 import '../utils/session.dart';
@@ -19,19 +20,14 @@ class PaymentProvider extends BaseProvider<Payment> {
   Future<String> createStripeIntent(int paymentId) async {
   final url = "${ApiConfig.apiBase}/api/payment/$paymentId/create-intent";
 
-  final res = await http.post(
+  final response = await http.post(
     Uri.parse(url),
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer ${Session.token}",
-    },
+    headers: HttpHelper.getHeaders()
   );
 
-  if (res.statusCode < 200 || res.statusCode > 299) {
-    throw Exception("API Error: ${res.statusCode} → ${res.body}");
-  }
+  HttpHelper.checkResponse(response);
 
-  final Map<String, dynamic> data = jsonDecode(res.body);
+  final Map<String, dynamic> data = jsonDecode(response.body);
 
   return data["clientSecret"] as String;  
 }
@@ -41,16 +37,10 @@ Future<String> createNewIntent(Map<String, dynamic> request) async {
 
   final response = await http.post(
     Uri.parse(url),
-    body: jsonEncode(request),
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer ${Session.token}",
-    },
+    headers: HttpHelper.getHeaders()
   );
 
-  if (response.statusCode != 200) {
-    throw Exception("Greška pri kreiranju payment intenta: ${response.body}");
-  }
+  HttpHelper.checkResponse(response);
 
   final data = jsonDecode(response.body);
 

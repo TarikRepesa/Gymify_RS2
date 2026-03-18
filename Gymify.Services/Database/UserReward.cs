@@ -22,7 +22,6 @@ namespace Gymify.Services.Database
         public String? Code {get; set;}
 
         public DateTime RedeemedAt { get; set; } = DateTime.UtcNow;
-
-        public bool IsUsed { get; set; } = false;
+        public string Status { get; set; } = "Active";
     }
 }

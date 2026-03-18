@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gymify_mobile/config/api_config.dart';
+import 'package:gymify_mobile/helper/http_helper.dart';
 import 'package:gymify_mobile/models/training.dart';
 import 'package:gymify_mobile/utils/session.dart';
 import 'package:http/http.dart' as http;
@@ -22,15 +23,10 @@ class TrainingProvider extends BaseProvider<Training> {
 
     final response = await http.post(
       url,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders()
     );
 
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
-      return true;
-    }
+    HttpHelper.checkResponse(response);
 
     throw Exception("Up error: ${response.statusCode} → ${response.body}");
   }
@@ -54,27 +50,17 @@ class TrainingProvider extends BaseProvider<Training> {
 
     final response = await http.get(
       uri,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders()
     );
 
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
-      final data = jsonDecode(response.body);
+    HttpHelper.checkResponse(response);
 
-      if (data is List) {
-        return data
-            .map((e) => Training.fromJson(e as Map<String, dynamic>))
-            .toList();
-      }
+    final data = jsonDecode(response.body);
 
-      throw Exception("Recommended response is not a list.");
-    }
-
-    throw Exception(
-      "Get recommended error: ${response.statusCode} -> ${response.body}",
-    );
+    return data
+        .map((e) => Training.fromJson(e as Map<String, dynamic>))
+        .toList();
+      
   }
 
   Future<bool> down(int trainingId) async {
@@ -82,16 +68,11 @@ class TrainingProvider extends BaseProvider<Training> {
 
     final response = await http.post(
       url,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders()
     );
 
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
-      return true;
-    }
+    HttpHelper.checkResponse(response);
 
-    throw Exception("Down error: ${response.statusCode} → ${response.body}");
+    return true;
   }
 }

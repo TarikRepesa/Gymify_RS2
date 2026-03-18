@@ -4,7 +4,7 @@ namespace Gymify.Model.ResponseObjects
     {
         public int Month { get; set; }
         public string Label { get; set; } = string.Empty;
-        public decimal TotalIncome { get; set; }
+        public double TotalIncome { get; set; }
         public int PaymentCount { get; set; }
     }
 }

@@ -29,4 +29,12 @@ class DateHelper {
   return '${year}-${month}-${day}T00:00:00.000Z';
 }
 
+static DateTime? fromUi(String value) {
+  try {
+    return _uiFormat.parseStrict(value);
+  } catch (_) {
+    return null;
+  }
+}
+
 }

@@ -12,9 +12,9 @@ namespace Gymify.Services.Database
 
         public string Name {get; set;}
 
-        public decimal MonthlyPrice {get; set;}
+        public int MonthlyPrice {get; set;}
 
-        public decimal YearPrice {get; set;}
+        public int YearPrice {get; set;}
         public DateTime CreatedAt {get; set;}
     }
 }

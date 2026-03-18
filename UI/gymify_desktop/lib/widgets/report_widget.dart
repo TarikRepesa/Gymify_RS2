@@ -38,6 +38,11 @@ class _ReportWidgetState extends State<ReportWidget> {
 
   int get _year => _selectedYear;
 
+  String _formatKmNoTrailingZeros(num value) {
+    final formatter = NumberFormat('#,##0.##', 'en_US');
+    return formatter.format(value);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -93,7 +98,8 @@ class _ReportWidgetState extends State<ReportWidget> {
     final now = DateTime.now();
     final dateFmt = DateFormat('dd.MM.yyyy HH:mm');
 
-    final top = [...report.topTrainers]..sort((a, b) => b.count.compareTo(a.count));
+    final top = [...report.topTrainers]
+      ..sort((a, b) => b.count.compareTo(a.count));
     final best = report.bestTrainingAllTime;
 
     doc.addPage(
@@ -125,7 +131,10 @@ class _ReportWidgetState extends State<ReportWidget> {
                 ],
               ),
               pw.Container(
-                padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const pw.EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.blue50,
                   borderRadius: pw.BorderRadius.circular(8),
@@ -193,7 +202,10 @@ class _ReportWidgetState extends State<ReportWidget> {
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               headerDecoration: const pw.BoxDecoration(color: PdfColors.grey200),
               cellAlignment: pw.Alignment.centerLeft,
-              cellPadding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              cellPadding: const pw.EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 6,
+              ),
               columnWidths: {
                 0: const pw.FlexColumnWidth(1),
                 1: const pw.FlexColumnWidth(5),
@@ -265,7 +277,10 @@ class _ReportWidgetState extends State<ReportWidget> {
                 ],
               ),
               pw.Container(
-                padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const pw.EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.green50,
                   borderRadius: pw.BorderRadius.circular(8),
@@ -296,7 +311,7 @@ class _ReportWidgetState extends State<ReportWidget> {
             children: [
               _pdfKpiBox(
                 "Ukupan prihod",
-                "${summary.totalIncome.toStringAsFixed(2)} KM",
+                "${_formatKmNoTrailingZeros(summary.totalIncome)} KM",
               ),
               _pdfKpiBox("Ukupno uplata", "${summary.totalPayments}"),
               _pdfKpiBox("Aktivni clanovi", "${summary.activeMembers}"),
@@ -318,13 +333,16 @@ class _ReportWidgetState extends State<ReportWidget> {
             pw.Table.fromTextArray(
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               headerDecoration: const pw.BoxDecoration(color: PdfColors.grey200),
-              cellPadding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              cellPadding: const pw.EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 6,
+              ),
               headers: const ["Mjesec", "Prihod", "Broj uplata"],
               data: summary.monthlyIncome
                   .map(
                     (m) => [
                       m.label,
-                      "${m.totalIncome.toStringAsFixed(2)} KM",
+                      "${_formatKmNoTrailingZeros(m.totalIncome)} KM",
                       m.paymentCount.toString(),
                     ],
                   )
@@ -345,7 +363,10 @@ class _ReportWidgetState extends State<ReportWidget> {
             pw.Table.fromTextArray(
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               headerDecoration: const pw.BoxDecoration(color: PdfColors.grey200),
-              cellPadding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              cellPadding: const pw.EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 6,
+              ),
               headers: const ["#", "Paket", "Kupovina", "Prihod"],
               data: List.generate(packages.length, (i) {
                 final p = packages[i];
@@ -353,7 +374,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                   (i + 1).toString(),
                   p.membershipName,
                   p.purchaseCount.toString(),
-                  "${p.totalIncome.toStringAsFixed(2)} KM",
+                  "${_formatKmNoTrailingZeros(p.totalIncome)} KM",
                 ];
               }),
             ),
@@ -525,20 +546,19 @@ class _ReportWidgetState extends State<ReportWidget> {
       const Color(0xFF14B8A6),
     ];
 
-    final totalTrainerVisits = topTrainers.fold<double>(
+    final totalTrainerVisits = topTrainers.fold<int>(
       0,
-      (sum, e) => sum + e.count.toDouble(),
+      (sum, e) => sum + e.count,
     );
 
     final maxMonthlyIncome = monthlyIncome.isEmpty
         ? 0.0
-        : monthlyIncome
-            .map((e) => e.totalIncome)
-            .reduce((a, b) => a > b ? a : b);
+        : monthlyIncome.map((e) => e.totalIncome).reduce((a, b) => a > b ? a : b);
 
     final bestPackage = packages.isEmpty
         ? null
-        : ([...packages]..sort((a, b) => b.totalIncome.compareTo(a.totalIncome))).first;
+        : ([...packages]..sort((a, b) => b.totalIncome.compareTo(a.totalIncome)))
+            .first;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 28),
@@ -621,8 +641,10 @@ class _ReportWidgetState extends State<ReportWidget> {
                                 sections: List.generate(topTrainers.length, (i) {
                                   final item = topTrainers[i];
                                   final percent = totalTrainerVisits == 0
-                                      ? 0
-                                      : (item.count / totalTrainerVisits) * 100;
+                                      ? 0.0
+                                      : (item.count.toDouble() /
+                                              totalTrainerVisits.toDouble()) *
+                                          100;
 
                                   return PieChartSectionData(
                                     color: trainerPalette[i % trainerPalette.length],
@@ -801,7 +823,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                 ),
                 const SizedBox(height: 14),
                 const _PdfInfoRow(text: "Najefikasniji trening svih vremena"),
-                const _PdfInfoRow(text: "Ime trenera i broj ukupnih ucestvovanja"),
+                const _PdfInfoRow(
+                  text: "Ime trenera i broj ukupnih ucestvovanja",
+                ),
                 const _PdfInfoRow(text: "Top treneri po broju posjeta"),
                 const _PdfInfoRow(text: "Tabela najposjecenijih trenera"),
                 const SizedBox(height: 18),
@@ -835,7 +859,7 @@ class _ReportWidgetState extends State<ReportWidget> {
             children: [
               _KpiCard(
                 title: "Ukupan prihod",
-                value: "${membership.totalIncome.toStringAsFixed(2)} KM",
+                value: "${_formatKmNoTrailingZeros(membership.totalIncome)} KM",
                 icon: Icons.account_balance_wallet_outlined,
                 accent: financeGreen,
               ),
@@ -887,7 +911,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                           ? const _EmptyBox(text: "Nema podataka.")
                           : BarChart(
                               BarChartData(
-                                maxY: maxMonthlyIncome == 0 ? 100 : maxMonthlyIncome * 1.25,
+                                maxY: maxMonthlyIncome == 0
+                                    ? 100
+                                    : maxMonthlyIncome * 1.25,
                                 gridData: FlGridData(
                                   show: true,
                                   drawVerticalLine: false,
@@ -909,7 +935,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                       reservedSize: 54,
                                       getTitlesWidget: (value, meta) {
                                         return Text(
-                                          value.toInt().toString(),
+                                          _formatKmNoTrailingZeros(value),
                                           style: const TextStyle(fontSize: 10),
                                         );
                                       },
@@ -920,7 +946,8 @@ class _ReportWidgetState extends State<ReportWidget> {
                                       showTitles: true,
                                       getTitlesWidget: (value, meta) {
                                         final index = value.toInt();
-                                        if (index < 0 || index >= monthlyIncome.length) {
+                                        if (index < 0 ||
+                                            index >= monthlyIncome.length) {
                                           return const SizedBox.shrink();
                                         }
                                         return Padding(
@@ -986,9 +1013,12 @@ class _ReportWidgetState extends State<ReportWidget> {
                                     0,
                                     (sum, e) => sum + e.purchaseCount,
                                   );
+
                                   final percent = totalCount == 0
-                                      ? 0
-                                      : (item.purchaseCount / totalCount) * 100;
+                                      ? 0.0
+                                      : (item.purchaseCount.toDouble() /
+                                              totalCount.toDouble()) *
+                                          100;
 
                                   return PieChartSectionData(
                                     color: packagePalette[i % packagePalette.length],
@@ -1043,7 +1073,11 @@ class _ReportWidgetState extends State<ReportWidget> {
 
           const SizedBox(height: 18),
 
-          if (bestPackage != null) _BestPackageCard(package: bestPackage),
+          if (bestPackage != null)
+            _BestPackageCard(
+              package: bestPackage,
+              formattedIncome: _formatKmNoTrailingZeros(bestPackage.totalIncome),
+            ),
 
           const SizedBox(height: 18),
 
@@ -1062,7 +1096,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                const _PdfInfoRow(text: "Ukupan prihod, broj uplata i status clanarina"),
+                const _PdfInfoRow(
+                  text: "Ukupan prihod, broj uplata i status clanarina",
+                ),
                 const _PdfInfoRow(text: "Tabela prihoda po mjesecima"),
                 const _PdfInfoRow(text: "Analiza paketa clanarina"),
                 const SizedBox(height: 18),
@@ -1338,9 +1374,13 @@ class _KpiCard extends StatelessWidget {
 }
 
 class _BestPackageCard extends StatelessWidget {
-  const _BestPackageCard({required this.package});
+  const _BestPackageCard({
+    required this.package,
+    required this.formattedIncome,
+  });
 
   final MembershipPackageAnalytics package;
+  final String formattedIncome;
 
   @override
   Widget build(BuildContext context) {
@@ -1386,7 +1426,7 @@ class _BestPackageCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Kupovina: ${package.purchaseCount} • Prihod: ${package.totalIncome.toStringAsFixed(2)} KM",
+                  "Kupovina: ${package.purchaseCount} • Prihod: $formattedIncome KM",
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     color: Colors.black87,

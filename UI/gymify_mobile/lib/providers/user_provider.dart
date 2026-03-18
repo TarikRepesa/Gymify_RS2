@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:gymify_mobile/config/api_config.dart';
+import 'package:gymify_mobile/helper/http_helper.dart';
 import 'package:gymify_mobile/models/user.dart';
-import '../utils/session.dart';
 import 'package:http/http.dart' as http;
 
 import 'base_provider.dart';
@@ -21,20 +21,26 @@ class UserProvider extends BaseProvider<User> {
 
   final response = await http.post(
     url,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HttpHelper.getHeaders(),
     body: jsonEncode({
       "email": email,
     }),
   );
 
-  if (response.statusCode != 200) {
-    throw Exception(
-      "Greška pri slanju reset emaila: ${response.body}",
-    );
-  }
+  HttpHelper.checkResponse(response);
 
   return true;
+}
+
+Future<void> changePassword(Map<String, dynamic> request) async {
+  final url = Uri.parse("${ApiConfig.apiBase}/api/User/change-password");
+
+  final response = await http.post(
+    url,
+    headers: HttpHelper.getHeaders(),
+    body: jsonEncode(request),
+  );
+
+  HttpHelper.checkResponse(response);
 }
 }

@@ -89,32 +89,32 @@ namespace Gymify.Services.Database
                 {
                     Id = 1,
                     Name = "Basic",
-                    MonthlyPrice = 30m,
-                    YearPrice = 300m,
+                    MonthlyPrice = 30,
+                    YearPrice = 300,
                     CreatedAt = new DateTime(2025, 1, 1)
                 },
                 new Membership
                 {
                     Id = 2,
                     Name = "Standard",
-                    MonthlyPrice = 45m,
-                    YearPrice = 450m,
+                    MonthlyPrice = 45,
+                    YearPrice = 450,
                     CreatedAt = new DateTime(2025, 1, 1)
                 },
                 new Membership
                 {
                     Id = 3,
                     Name = "Premium",
-                    MonthlyPrice = 60m,
-                    YearPrice = 600m,
+                    MonthlyPrice = 60,
+                    YearPrice = 600,
                     CreatedAt = new DateTime(2025, 1, 1)
                 },
                 new Membership
                 {
                     Id = 4,
                     Name = "VIP",
-                    MonthlyPrice = 80m,
-                    YearPrice = 800m,
+                    MonthlyPrice = 80,
+                    YearPrice = 800,
                     CreatedAt = new DateTime(2025, 1, 1)
                 }
             );
@@ -276,7 +276,7 @@ namespace Gymify.Services.Database
                     Name = "Provjera opreme",
                     Details = "Izvršiti dnevnu provjeru sprava u sali 1.",
                     CreatedTaskDate = new DateTime(2026, 2, 1),
-                    "ExpirationTaskDate = new DateTime(2026, 2, 2),
+                    ExpirationTaskDate = new DateTime(2026, 2, 2),
                     IsFinished = false,
                     UserId = 7
                 },
@@ -286,7 +286,7 @@ namespace Gymify.Services.Database
                     Name = "Čišćenje svlačionice",
                     Details = "Detaljno čišćenje muške svlačionice.",
                     CreatedTaskDate = new DateTime(2026, 2, 3),
-                    "ExpirationTaskDate = new DateTime(2026, 2, 3),
+                    ExpirationTaskDate = new DateTime(2026, 2, 3),
                     IsFinished = true,
                     UserId = 7
                 },
@@ -296,7 +296,7 @@ namespace Gymify.Services.Database
                     Name = "Inventura šanka",
                     Details = "Provjeriti stanje proteinskih napitaka.",
                     CreatedTaskDate = new DateTime(2026, 2, 5),
-                    "ExpirationTaskDate = new DateTime(2026, 2, 6),
+                    ExpirationTaskDate = new DateTime(2026, 2, 6),
                     IsFinished = false,
                     UserId = 8
                 },
@@ -306,7 +306,7 @@ namespace Gymify.Services.Database
                     Name = "Organizacija termina",
                     Details = "Rasporediti termine za nove članove.",
                     CreatedTaskDate = new DateTime(2026, 2, 7),
-                    "ExpirationTaskDate = new DateTime(2026, 2, 8),
+                    ExpirationTaskDate = new DateTime(2026, 2, 8),
                     IsFinished = false,
                     UserId = 8
                 },
@@ -316,7 +316,7 @@ namespace Gymify.Services.Database
                     Name = "Ažuriranje članova",
                     Details = "Provjeriti članarine koje ističu ove sedmice.",
                     CreatedTaskDate = new DateTime(2026, 2, 10),
-                    "ExpirationTaskDate = new DateTime(2026, 2, 12),
+                    ExpirationTaskDate = new DateTime(2026, 2, 12),
                     IsFinished = true,
                     UserId = 9
                 },
@@ -326,7 +326,7 @@ namespace Gymify.Services.Database
                     Name = "Priprema sale",
                     Details = "Pripremiti salu za večernji grupni trening.",
                     CreatedTaskDate = new DateTime(2026, 2, 11),
-                    "ExpirationTaskDate = new DateTime(2026, 2, 11),
+                    ExpirationTaskDate = new DateTime(2026, 2, 11),
                     IsFinished = false,
                     UserId = 9
                 },
@@ -336,7 +336,7 @@ namespace Gymify.Services.Database
                     Name = "Marketing objava",
                     Details = "Objaviti promociju na društvenim mrežama.",
                     CreatedTaskDate = new DateTime(2026, 2, 13),
-                    "ExpirationTaskDate = new DateTime(2026, 2, 14),
+                    ExpirationTaskDate = new DateTime(2026, 2, 14),
                     IsFinished = false,
                     UserId = 10
                 },
@@ -346,7 +346,7 @@ namespace Gymify.Services.Database
                     Name = "Pregled rezervacija",
                     Details = "Provjeriti rezervacije za vikend termine.",
                     CreatedTaskDate = new DateTime(2026, 2, 15),
-                    "ExpirationTaskDate = new DateTime(2026, 2, 16),
+                    ExpirationTaskDate = new DateTime(2026, 2, 16),
                     IsFinished = true,
                     UserId = 10
                 }
@@ -359,7 +359,12 @@ namespace Gymify.Services.Database
                     Name = "Besplatan proteinski shake",
                     Description = "Dobij besplatan proteinski shake u gym baru.",
                     RequiredPoints = 100,
-                    IsActive = true
+                    Status = "Active",
+                    ValidFrom = new DateTime(2026, 1, 1),
+                    ValidTo = new DateTime(2026, 12, 31),
+                    IsLockedForEdit = true,
+                    CanDelete = false,
+                    RedemptionCount = 4
                 },
                 new Reward
                 {
@@ -367,7 +372,12 @@ namespace Gymify.Services.Database
                     Name = "1 dan besplatne članarine",
                     Description = "Jedan dan besplatnog treninga.",
                     RequiredPoints = 250,
-                    IsActive = true
+                    Status = "Active",
+                    ValidFrom = new DateTime(2026, 2, 1),
+                    ValidTo = new DateTime(2026, 11, 30),
+                    IsLockedForEdit = true,
+                    CanDelete = false,
+                    RedemptionCount = 2
                 },
                 new Reward
                 {
@@ -375,7 +385,12 @@ namespace Gymify.Services.Database
                     Name = "Personalni trening - 30 min",
                     Description = "Besplatan personalni trening u trajanju 30 minuta.",
                     RequiredPoints = 500,
-                    IsActive = true
+                    Status = "Planned",
+                    ValidFrom = new DateTime(2026, 5, 1),
+                    ValidTo = new DateTime(2026, 9, 30),
+                    IsLockedForEdit = false,
+                    CanDelete = true,
+                    RedemptionCount = 0
                 },
                 new Reward
                 {
@@ -383,7 +398,12 @@ namespace Gymify.Services.Database
                     Name = "20% popusta na članarinu",
                     Description = "Popust od 20% na narednu članarinu.",
                     RequiredPoints = 750,
-                    IsActive = true
+                    Status = "Planned",
+                    ValidFrom = new DateTime(2026, 6, 1),
+                    ValidTo = new DateTime(2026, 12, 31),
+                    IsLockedForEdit = false,
+                    CanDelete = true,
+                    RedemptionCount = 0
                 },
                 new Reward
                 {
@@ -391,7 +411,77 @@ namespace Gymify.Services.Database
                     Name = "Gymify premium majica",
                     Description = "Ekskluzivna Gymify majica.",
                     RequiredPoints = 1000,
-                    IsActive = true
+                    Status = "SoftDeleted",
+                    ValidFrom = new DateTime(2026, 1, 15),
+                    ValidTo = new DateTime(2026, 7, 31),
+                    IsLockedForEdit = false,
+                    CanDelete = true,
+                    RedemptionCount = 1
+                },
+                new Reward
+                {
+                    Id = 6,
+                    Name = "Besplatan smoothie",
+                    Description = "Akcijska nagrada koja je bila dostupna ograničeno vrijeme.",
+                    RequiredPoints = 150,
+                    Status = "Expired",
+                    ValidFrom = new DateTime(2025, 1, 1),
+                    ValidTo = new DateTime(2025, 3, 31),
+                    IsLockedForEdit = false,
+                    CanDelete = true,
+                    RedemptionCount = 0
+                },
+                new Reward
+                {
+                    Id = 7,
+                    Name = "2 dana besplatne članarine",
+                    Description = "Promotivna nagrada iz prethodne sezone.",
+                    RequiredPoints = 300,
+                    Status = "Expired",
+                    ValidFrom = new DateTime(2025, 2, 1),
+                    ValidTo = new DateTime(2025, 5, 31),
+                    IsLockedForEdit = false,
+                    CanDelete = true,
+                    RedemptionCount = 3
+                },
+                new Reward
+                {
+                    Id = 8,
+                    Name = "Gymify peškir",
+                    Description = "Posebna nagrada iz stare loyalty ponude.",
+                    RequiredPoints = 600,
+                    Status = "Expired",
+                    ValidFrom = new DateTime(2025, 4, 1),
+                    ValidTo = new DateTime(2025, 8, 31),
+                    IsLockedForEdit = false,
+                    CanDelete = true,
+                    RedemptionCount = 1
+                },
+                new Reward
+                {
+                    Id = 9,
+                    Name = "Besplatan proteinski bar",
+                    Description = "Jedan proteinski bar gratis uz posjetu teretani.",
+                    RequiredPoints = 120,
+                    Status = "Active",
+                    ValidFrom = new DateTime(2026, 3, 1),
+                    ValidTo = new DateTime(2026, 8, 31),
+                    IsLockedForEdit = true,
+                    CanDelete = false,
+                    RedemptionCount = 5
+                },
+                new Reward
+                {
+                    Id = 10,
+                    Name = "Mjesec dana locker ormarića",
+                    Description = "Besplatno korištenje ormarića u trajanju od mjesec dana.",
+                    RequiredPoints = 450,
+                    Status = "Planned",
+                    ValidFrom = new DateTime(2026, 7, 1),
+                    ValidTo = new DateTime(2026, 10, 31),
+                    IsLockedForEdit = false,
+                    CanDelete = true,
+                    RedemptionCount = 0
                 }
             );
 
@@ -997,122 +1087,122 @@ namespace Gymify.Services.Database
         }
 
         private static List<Training> GenerateTrainings()
-{
-    var random = new Random(20260315);
-    var trainings = new List<Training>();
+        {
+            var random = new Random(20260315);
+            var trainings = new List<Training>();
 
-    var trainerIds = new List<int> { 3, 4, 5, 6 };
+            var trainerIds = new List<int> { 3, 4, 5, 6 };
 
-    var names = new[]
-    {
+            var names = new[]
+            {
         "HIIT","CrossFit","Yoga Flow","Pilates","Cardio Blast",
         "Bootcamp","Boxing","Kickboxing","Strength Training",
         "Zumba","Morning Fitness","Evening Cardio",
         "Functional Training","Circuit Training","Powerlifting"
     };
 
-    int id = 1;
+            int id = 1;
 
-    // 2025 treninzi
-    for (int i = 0; i < 60; i++)
-    {
-        int trainerId = trainerIds[random.Next(trainerIds.Count)];
-        int month = random.Next(1, 13);
-        int day = random.Next(1, 25);
-        int duration = random.Next(35, 61);
-
-        var startDate = new DateTime(2025, month, day, random.Next(6, 21), 0, 0);
-
-        trainings.Add(new Training
-        {
-            Id = id++,
-            UserId = trainerId,
-            Name = names[random.Next(names.Length)],
-            DurationMinutes = duration,
-            IntensityLevel = random.Next(1, 6),
-            Purpose = "Fitness",
-            MaxAmountOfParticipants = random.Next(10, 20),
-            CurrentParticipants = 0,
-            ParticipatedOfAllTime = random.Next(50, 300),
-            IsParticipationCounted = true,
-            StartDate = startDate,
-            TrainingImage = $"https://picsum.photos/seed/training{id}/600/400"
-        });
-    }
-
-    // 2026 treninzi
-    for (int i = 0; i < 60; i++)
-    {
-        int trainerId = trainerIds[random.Next(trainerIds.Count)];
-        int month = random.Next(1, 13);
-        int day = random.Next(1, 25);
-        int duration = random.Next(35, 61);
-
-        var startDate = new DateTime(2026, month, day, random.Next(6, 21), 0, 0);
-
-        trainings.Add(new Training
-        {
-            Id = id++,
-            UserId = trainerId,
-            Name = names[random.Next(names.Length)],
-            DurationMinutes = duration,
-            IntensityLevel = random.Next(1, 6),
-            Purpose = "Fitness",
-            MaxAmountOfParticipants = random.Next(10, 20),
-            CurrentParticipants = 0,
-            ParticipatedOfAllTime = 0,
-            IsParticipationCounted = false,
-            StartDate = startDate,
-            TrainingImage = $"https://picsum.photos/seed/training{id}/600/400"
-        });
-    }
-
-    return trainings;
-}
-
-private static List<Reservation> GenerateReservations(
-    List<Training> trainings,
-    int startUserId,
-    int endUserId)
-{
-    var random = new Random(20260316);
-    var reservations = new List<Reservation>();
-
-    int id = 1;
-
-    foreach (var training in trainings)
-    {
-        int maxPossible = Math.Min(training.MaxAmountOfParticipants, endUserId - startUserId + 1);
-        int reservationsForTraining = random.Next(5, Math.Min(12, maxPossible + 1));
-
-        var usedUserIds = new HashSet<int>();
-
-        for (int i = 0; i < reservationsForTraining; i++)
-        {
-            int userId;
-            do
+            // 2025 treninzi
+            for (int i = 0; i < 60; i++)
             {
-                userId = random.Next(startUserId, endUserId + 1);
+                int trainerId = trainerIds[random.Next(trainerIds.Count)];
+                int month = random.Next(1, 13);
+                int day = random.Next(1, 25);
+                int duration = random.Next(35, 61);
+
+                var startDate = new DateTime(2025, month, day, random.Next(6, 21), 0, 0);
+
+                trainings.Add(new Training
+                {
+                    Id = id++,
+                    UserId = trainerId,
+                    Name = names[random.Next(names.Length)],
+                    DurationMinutes = duration,
+                    IntensityLevel = random.Next(1, 6),
+                    Purpose = "Fitness",
+                    MaxAmountOfParticipants = random.Next(10, 20),
+                    CurrentParticipants = 0,
+                    ParticipatedOfAllTime = random.Next(50, 300),
+                    IsParticipationCounted = true,
+                    StartDate = startDate,
+                    TrainingImage = $"https://picsum.photos/seed/training{id}/600/400"
+                });
             }
-            while (!usedUserIds.Add(userId));
 
-            reservations.Add(new Reservation
+            // 2026 treninzi
+            for (int i = 0; i < 60; i++)
             {
-                Id = id++,
-                UserId = userId,
-                TrainingId = training.Id,
-                CreatedAt = training.StartDate.AddDays(-random.Next(1, 10)),
-                Status = "Confirmed",
-    CancelledAt = null,
-    CancelReason = null
+                int trainerId = trainerIds[random.Next(trainerIds.Count)];
+                int month = random.Next(1, 13);
+                int day = random.Next(1, 25);
+                int duration = random.Next(35, 61);
 
-            });
+                var startDate = new DateTime(2026, month, day, random.Next(6, 21), 0, 0);
+
+                trainings.Add(new Training
+                {
+                    Id = id++,
+                    UserId = trainerId,
+                    Name = names[random.Next(names.Length)],
+                    DurationMinutes = duration,
+                    IntensityLevel = random.Next(1, 6),
+                    Purpose = "Fitness",
+                    MaxAmountOfParticipants = random.Next(10, 20),
+                    CurrentParticipants = 0,
+                    ParticipatedOfAllTime = 0,
+                    IsParticipationCounted = false,
+                    StartDate = startDate,
+                    TrainingImage = $"https://picsum.photos/seed/training{id}/600/400"
+                });
+            }
+
+            return trainings;
         }
 
-        training.CurrentParticipants = reservationsForTraining;
-    }
+        private static List<Reservation> GenerateReservations(
+            List<Training> trainings,
+            int startUserId,
+            int endUserId)
+        {
+            var random = new Random(20260316);
+            var reservations = new List<Reservation>();
 
-    return reservations;
-}
+            int id = 1;
+
+            foreach (var training in trainings)
+            {
+                int maxPossible = Math.Min(training.MaxAmountOfParticipants, endUserId - startUserId + 1);
+                int reservationsForTraining = random.Next(5, Math.Min(12, maxPossible + 1));
+
+                var usedUserIds = new HashSet<int>();
+
+                for (int i = 0; i < reservationsForTraining; i++)
+                {
+                    int userId;
+                    do
+                    {
+                        userId = random.Next(startUserId, endUserId + 1);
+                    }
+                    while (!usedUserIds.Add(userId));
+
+                    reservations.Add(new Reservation
+                    {
+                        Id = id++,
+                        UserId = userId,
+                        TrainingId = training.Id,
+                        CreatedAt = training.StartDate.AddDays(-random.Next(1, 10)),
+                        Status = "Confirmed",
+                        CancelledAt = null,
+                        CancelReason = null
+
+                    });
+                }
+
+                training.CurrentParticipants = reservationsForTraining;
+            }
+
+            return reservations;
+        }
     }
 }

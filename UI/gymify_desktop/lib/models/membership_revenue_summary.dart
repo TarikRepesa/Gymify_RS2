@@ -7,7 +7,7 @@ part 'membership_revenue_summary.g.dart';
 @JsonSerializable(explicitToJson: true)
 class MembershipRevenueSummary {
   final int year;
-  final double totalIncome;
+  final int totalIncome;
   final int totalPayments;
   final int activeMembers;
   final int expiredMembers;

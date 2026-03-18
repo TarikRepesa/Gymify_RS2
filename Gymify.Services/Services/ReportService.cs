@@ -64,11 +64,11 @@ public class ReportService : IReportsService
             .Include(r => r.Training)
                 .ThenInclude(t => t.User)
             .Where(r =>
-        r.Status == "Confirmed" &&
-        r.Training != null &&
-        r.Training.User != null &&
-        r.Training.StartDate.Year == year &&
-        r.Training.StartDate <= cutoffDate)
+                r.Status == "Confirmed" &&
+                r.Training != null &&
+                r.Training.User != null &&
+                r.Training.StartDate.Year == year &&
+                r.Training.StartDate <= cutoffDate)
             .GroupBy(r => new
             {
                 TrainerId = r.Training!.UserId,
@@ -113,7 +113,7 @@ public class ReportService : IReportsService
             return new MembershipRevenueSummaryResponse
             {
                 Year = year,
-                TotalIncome = 0m,
+                TotalIncome = 0,
                 TotalPayments = 0,
                 ActiveMembers = 0,
                 ExpiredMembers = 0,
@@ -130,7 +130,9 @@ public class ReportService : IReportsService
                 p.PaymentDate.Year == year &&
                 p.PaymentDate.Month <= maxMonth);
 
-        var totalIncome = paidPayments.Sum(p => (decimal?)p.Amount) ?? 0m;
+        var totalIncomeRaw = paidPayments.Sum(p => (decimal?)p.Amount) ?? 0m;
+        var totalIncome = (int)totalIncomeRaw;
+
         var totalPayments = paidPayments.Count();
 
         var cutoffDate = GetReportCutoffDate(year);
@@ -144,14 +146,25 @@ public class ReportService : IReportsService
         var activeMembers = filteredMembers.Count(m => m.ExpirationDate >= cutoffDate);
         var expiredMembers = filteredMembers.Count(m => m.ExpirationDate < cutoffDate);
 
-        var packageAnalytics = paidPayments
+        var packageAnalyticsRaw = paidPayments
             .GroupBy(p => new { p.MembershipId, p.Membership.Name })
-            .Select(g => new MembershipPackageAnalyticsResponse
+            .Select(g => new
             {
                 MembershipId = g.Key.MembershipId,
                 MembershipName = g.Key.Name,
                 PurchaseCount = g.Count(),
                 TotalIncome = g.Sum(x => x.Amount)
+            })
+            .OrderByDescending(x => x.TotalIncome)
+            .ToList();
+
+        var packageAnalytics = packageAnalyticsRaw
+            .Select(g => new MembershipPackageAnalyticsResponse
+            {
+                MembershipId = g.MembershipId,
+                MembershipName = g.MembershipName,
+                PurchaseCount = g.PurchaseCount,
+                TotalIncome = (int)g.TotalIncome
             })
             .OrderByDescending(x => x.TotalIncome)
             .ToList();
@@ -196,6 +209,7 @@ public class ReportService : IReportsService
             return new List<IncomeByMonthResponse>();
 
         var result = _context.Payments
+            .AsNoTracking()
             .Where(p =>
                 p.PaymentStatus == "Paid" &&
                 p.PaymentDate.Year == year &&
@@ -204,7 +218,7 @@ public class ReportService : IReportsService
             .Select(g => new IncomeByMonthResponse
             {
                 Month = g.Key,
-                TotalIncome = g.Sum(x => x.Amount),
+                TotalIncome = g.Sum(x => (double)x.Amount),
                 PaymentCount = g.Count()
             })
             .OrderBy(x => x.Month)
@@ -221,7 +235,7 @@ public class ReportService : IReportsService
             {
                 Month = month,
                 Label = monthLabels[month],
-                TotalIncome = result.FirstOrDefault(x => x.Month == month)?.TotalIncome ?? 0m,
+                TotalIncome = result.FirstOrDefault(x => x.Month == month)?.TotalIncome ?? 0d,
                 PaymentCount = result.FirstOrDefault(x => x.Month == month)?.PaymentCount ?? 0
             })
             .ToList();

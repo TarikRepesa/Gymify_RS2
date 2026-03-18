@@ -9,5 +9,6 @@ namespace Gymify.Services.Interfaces
     {
         Task<LoginResponse> LoginAsync(LoginRequest request);
         Task ForgotPasswordAsync(string email);
+        Task ChangePasswordAsync(int userId, ChangePasswordRequest request);
     }
 }

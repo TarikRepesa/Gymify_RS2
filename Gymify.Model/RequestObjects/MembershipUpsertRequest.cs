@@ -7,10 +7,10 @@ namespace Gymify.Model.RequestObjects
         [Required]
         public string Name { get; set; }
 
-        [Range(0.01, double.MaxValue)]
-        public double MonthlyPrice { get; set; }
+        [Required]
+        public int MonthlyPrice { get; set; }
 
-        [Range(0.01, double.MaxValue)]
-        public double YearPrice { get; set; }
+        [Required]
+        public int YearPrice { get; set; }
     }
 }

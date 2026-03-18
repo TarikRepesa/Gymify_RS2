@@ -126,7 +126,7 @@ class _ReviewWidgetState extends State<ReviewWidget> {
       await paging.search(_searchCtrl.text.trim());
 
       if (mounted) {
-        SnackbarHelper.showUpdate(context, "Recenzija obrisana.");
+        SnackbarHelper.showDelete(context, "Recenzija obrisana.");
       }
     } catch (e) {
       if (mounted) SnackbarHelper.showError(context, e.toString());

@@ -98,23 +98,27 @@ Future<void> _openEditTrainingDialog({
     if (trainerId == null) errTrainer = "Trener je obavezan.";
     if (nameCtrl.text.trim().isEmpty) errName = "Naziv je obavezan.";
     if (selectedPurpose == null || selectedPurpose!.trim().isEmpty) {
-  errPurpose = "Namjena treninga je obavezna.";
-}
+      errPurpose = "Namjena treninga je obavezna.";
+    }
 
     final durationText = durationCtrl.text.trim();
     final durationVal = int.tryParse(durationText);
     if (durationText.isEmpty) {
       errDuration = "Trajanje je obavezno.";
-    } else if (durationVal == null || durationVal <= 0) {
-      errDuration = "Unesite validno trajanje (min 1).";
+    } else if (durationVal == null) {
+      errDuration = "Neispravan unos trajanja.";
+    } else if (durationVal < 30 || durationVal > 90) {
+      errDuration = "Trajanje mora biti između 30 i 90 minuta.";
     }
 
     final intensityText = intensityCtrl.text.trim();
     final intensityVal = int.tryParse(intensityText);
     if (intensityText.isEmpty) {
       errIntensity = "Intenzitet je obavezan.";
-    } else if (intensityVal == null || intensityVal <= 0) {
-      errIntensity = "Unesite validan intenzitet (min 1).";
+    } else if (intensityVal == null) {
+      errIntensity = "Neispravan unos intenziteta.";
+    } else if (intensityVal < 1 || intensityVal > 5) {
+      errIntensity = "Intenzitet mora biti između 1 i 5.";
     }
 
     final maxText = maxCtrl.text.trim();
@@ -130,13 +134,13 @@ Future<void> _openEditTrainingDialog({
       errStartDate = "Datum početka je obavezan.";
     } else {
       try {
-  final iso = DateHelper.toIsoFromUi(startUi);
-  final selected = DateTime.parse(iso);
+        final iso = DateHelper.toIsoFromUi(startUi);
+        final selected = DateTime.parse(iso);
 
-  if (selected.isBefore(_todayOnlyDate())) {
-    errStartDate = "Možete odabrati samo današnji ili budući datum.";
-  }
-} catch (_) {
+        if (selected.isBefore(_todayOnlyDate())) {
+          errStartDate = "Možete odabrati samo današnji ili budući datum.";
+        }
+      } catch (_) {
         errStartDate = "Neispravan format datuma (dd.MM.yyyy).";
       }
     }
@@ -507,7 +511,7 @@ Future<void> _openEditTrainingDialog({
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             labelText: "Intenzitet",
-                            hintText: "npr. 1, 2, 3...",
+                            hintText: "npr. 1, 2, 3, 4 ili 5",
                             filled: true,
                             fillColor: const Color(0xFFF7F7F7),
                             border: OutlineInputBorder(
@@ -694,16 +698,20 @@ class _TrainingWidgetState extends State<TrainingWidget> {
       final durationVal = int.tryParse(durationText);
       if (durationText.isEmpty) {
         errDuration = "Trajanje je obavezno.";
-      } else if (durationVal == null || durationVal <= 0) {
-        errDuration = "Unesite validno trajanje (min 1).";
+      } else if (durationVal == null) {
+        errDuration = "Neispravan unos trajanja.";
+      } else if (durationVal < 30 || durationVal > 90) {
+        errDuration = "Trajanje mora biti između 30 i 90 minuta.";
       }
 
       final intensityText = intensityCtrl.text.trim();
       final intensityVal = int.tryParse(intensityText);
       if (intensityText.isEmpty) {
         errIntensity = "Intenzitet je obavezan.";
-      } else if (intensityVal == null || intensityVal <= 0) {
-        errIntensity = "Unesite validan intenzitet (min 1).";
+      } else if (intensityVal == null) {
+        errIntensity = "Neispravan unos intenziteta.";
+      } else if (intensityVal < 1 || intensityVal > 5) {
+        errIntensity = "Intenzitet mora biti između 1 i 5.";
       }
 
       final maxText = maxCtrl.text.trim();
@@ -719,13 +727,13 @@ class _TrainingWidgetState extends State<TrainingWidget> {
         errStartDate = "Datum početka je obavezan.";
       } else {
         try {
-  final iso = DateHelper.toIsoFromUi(startUi);
-  final selected = DateTime.parse(iso);
+          final iso = DateHelper.toIsoFromUi(startUi);
+          final selected = DateTime.parse(iso);
 
-  if (selected.isBefore(_todayOnlyDate())) {
-    errStartDate = "Možete odabrati samo današnji ili budući datum.";
-  }
-} catch (_) {
+          if (selected.isBefore(_todayOnlyDate())) {
+            errStartDate = "Možete odabrati samo današnji ili budući datum.";
+          }
+        } catch (_) {
           errStartDate = "Neispravan format datuma (dd.MM.yyyy).";
         }
       }
@@ -1040,7 +1048,7 @@ class _TrainingWidgetState extends State<TrainingWidget> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               labelText: "Intenzitet",
-                              hintText: "npr. 1, 2, 3...",
+                              hintText: "npr. 1, 2, 3, 4 ili 5",
                               filled: true,
                               fillColor: const Color(0xFFF7F7F7),
                               border: OutlineInputBorder(

@@ -380,7 +380,7 @@ Widget MemberWidget() {
             try {
               await context.read<MemberProvider>().delete(m.id);
               await paging.loadPage();
-              SnackbarHelper.showSuccess(context, "Član uspješno obrisan.");
+              SnackbarHelper.showDelete(context, "Član uspješno obrisan.");
             } catch (e) {
               SnackbarHelper.showError(context, e.toString());
             }

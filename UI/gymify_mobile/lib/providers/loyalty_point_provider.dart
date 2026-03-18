@@ -1,6 +1,6 @@
 import 'dart:convert';
-
 import 'package:gymify_mobile/config/api_config.dart';
+import 'package:gymify_mobile/helper/http_helper.dart';
 import 'package:gymify_mobile/models/loyalty_point.dart';
 import 'package:gymify_mobile/utils/session.dart';
 import 'base_provider.dart';
@@ -19,16 +19,12 @@ class LoyaltyPointProvider extends BaseProvider<LoyaltyPoint> {
 
     final response = await http.post(
       url,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders(),
       body: jsonEncode(request),
     );
 
-    if (response.statusCode == 200) {
-      return LoyaltyPoint.fromJson(jsonDecode(response.body));
-    }
+    HttpHelper.checkResponse(response);
+
     throw Exception("Greška (${response.statusCode}): ${response.body}");
   }
 
@@ -37,16 +33,12 @@ class LoyaltyPointProvider extends BaseProvider<LoyaltyPoint> {
 
     final response = await http.post(
       url,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders(),
       body: jsonEncode(request),
     );
 
-    if (response.statusCode == 200) {
-      return LoyaltyPoint.fromJson(jsonDecode(response.body));
-    }
+    HttpHelper.checkResponse(response);
+
     throw Exception("Greška (${response.statusCode}): ${response.body}");
   }
 }

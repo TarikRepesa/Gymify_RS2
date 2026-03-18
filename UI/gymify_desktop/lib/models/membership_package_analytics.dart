@@ -7,7 +7,7 @@ class MembershipPackageAnalytics {
   final int membershipId;
   final String membershipName;
   final int purchaseCount;
-  final double totalIncome;
+  final int totalIncome;
 
   MembershipPackageAnalytics({
     required this.membershipId,

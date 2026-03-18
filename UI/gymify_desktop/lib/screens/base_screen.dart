@@ -9,7 +9,9 @@ import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
 import 'package:gymify_desktop/providers/image_provider.dart';
 import 'package:gymify_desktop/routes/app_routes.dart';
 import 'package:gymify_desktop/widgets/old_reservations_widget.dart';
+import 'package:gymify_desktop/widgets/reward_widget.dart';
 import 'package:gymify_desktop/widgets/trainer_task_widget.dart';
+import 'package:gymify_desktop/widgets/user_reward_widget.dart';
 import 'package:gymify_desktop/widgets/worker_task_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:gymify_desktop/models/user.dart';
@@ -32,7 +34,6 @@ class BaseScreen extends StatefulWidget {
 }
 
 class _BaseScreenState extends State<BaseScreen> {
-  // NOTE: _activeItem se sada postavlja po roli (u initState)
   String _activeItem = 'Obavijesti';
   late Widget _bodyWidget;
 
@@ -66,6 +67,8 @@ class _BaseScreenState extends State<BaseScreen> {
         "Obavijesti",
         "Recenzije",
         "Otkazane Rezervacije",
+        "Pregled Nagrada",
+        "Kupljene Nagrade",
         "Izvještaj",
       ];
     }
@@ -79,6 +82,8 @@ class _BaseScreenState extends State<BaseScreen> {
         "Obavijesti",
         "Recenzije",
         "Otkazane Rezervacije",
+        "Pregled Nagrada",
+        "Kupljene Nagrade",
         "Izvještaj",
       ];
     }
@@ -180,6 +185,10 @@ class _BaseScreenState extends State<BaseScreen> {
         return ReviewWidget();
       case 'Otkazane Rezervacije':
         return CancelledReservationsWidget();
+      case 'Pregled Nagrada' :
+        return RewardWidget();
+      case 'Kupljene Nagrade' :
+        return UserRewardWidget();
       case 'Izvještaj':
         return ReportWidget();
 

@@ -23,7 +23,7 @@ namespace Gymify.Services.Database
 
         public DateTime CreatedTaskDate {get; set;}
 
-        public DateTime "ExpirationTaskDate {get; set;}
+        public DateTime ExpirationTaskDate {get; set;}
 
         public bool IsFinished {get; set;}
     

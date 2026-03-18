@@ -1,5 +1,4 @@
 using System;
-using Gymify.Model.SearchObjects;
 
 namespace Gymify.Model.SearchObjects
 {
@@ -8,7 +7,9 @@ namespace Gymify.Model.SearchObjects
         public int? UserId { get; set; }
         public int? RewardId { get; set; }
         public bool? IsUsed { get; set; }
-        public DateTime? RedeemedFrom { get; set; }
-        public DateTime? RedeemedTo { get; set; }
+        public string? Status {get; set;}
+        public DateTime? FromRedeemedAt { get; set; }
+        public DateTime? ToRedeemedAt { get; set; }
+        public string? Code { get; set; }
     }
 }

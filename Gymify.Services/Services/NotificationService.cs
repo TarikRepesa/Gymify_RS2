@@ -65,5 +65,11 @@ namespace Gymify.Services.Services
 
             return query;
         }
+
+        protected override Task BeforeInsert(Notification entity, NotificationUpsertRequest request)
+        {
+            entity.CreatedAt = DateTime.Now;
+            return base.BeforeInsert(entity, request);
+        }
     }
 }

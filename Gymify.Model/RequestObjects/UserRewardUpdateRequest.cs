@@ -4,7 +4,7 @@ namespace Gymify.Model.RequestObjects
 {
     public class UserRewardUpdateRequest
     {
-        public bool IsUsed { get; set; }
-        public DateTime? RedeemedAt { get; set; } 
+        public bool? IsUsed { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 }

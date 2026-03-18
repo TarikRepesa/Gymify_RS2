@@ -22,7 +22,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     final response = await http.get(
       Uri.parse(url),
-      headers: _headers(),
+      headers: HttpHelper.getHeaders(),
     );
 
     HttpHelper.checkResponse(response);
@@ -54,7 +54,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     final response = await http.get(
       Uri.parse(url),
-      headers: _headers(),
+      headers: HttpHelper.getHeaders(),
     );
 
     HttpHelper.checkResponse(response);
@@ -68,7 +68,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     final response = await http.post(
       Uri.parse(url),
-      headers: _headers(),
+      headers: HttpHelper.getHeaders(),
       body: jsonEncode(request),
     );
 
@@ -83,7 +83,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     final response = await http.put(
       Uri.parse(url),
-      headers: _headers(),
+      headers: HttpHelper.getHeaders(),
       body: jsonEncode(request),
     );
 
@@ -98,7 +98,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     final response = await http.delete(
       Uri.parse(url),
-      headers: _headers(),
+      headers: HttpHelper.getHeaders(),
     );
 
     HttpHelper.checkResponse(response);
@@ -107,14 +107,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
   // Parse JSON into model
   T fromJson(dynamic data);
-
-  // JWT headers
-  Map<String, String> _headers() {
-    return {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer ${Session.token}",
-    };
-  }
 
   // Query builder
   String _buildQuery(Map<String, dynamic> params) {

@@ -4,6 +4,6 @@ namespace Gymify.Model.RequestObjects
     {
         public int UserId { get; set; }
         public int RewardId { get; set; }
-        public bool IsUsed { get; set; } = false;
+
     }
 }

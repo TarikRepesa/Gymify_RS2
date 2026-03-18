@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gymify_mobile/dialogs/confirmation_dialogs.dart';
 import 'package:gymify_mobile/screens/login_screen.dart';
 import 'package:gymify_mobile/screens/reward_screen.dart';
 import 'package:provider/provider.dart';
@@ -18,10 +19,10 @@ class ProfileWidget extends StatefulWidget {
   const ProfileWidget({super.key});
 
   @override
-  State<ProfileWidget> createState() => _ProfileWidgetState();
+  State<ProfileWidget> createState() => ProfileWidgetState();
 }
 
-class _ProfileWidgetState extends State<ProfileWidget> {
+class ProfileWidgetState extends State<ProfileWidget> {
   static const Color gymBlue = Color(0xFF1976D2);
   static const Color gymBlueDark = Color(0xFF0D47A1);
 
@@ -42,6 +43,19 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   bool _isImageChanged = false;
 
   Map<String, String> _initial = {};
+
+  bool hasUnsavedChanges() => _hasChanges();
+
+  Future<bool> confirmLeaveDialog() async {
+    return await ConfirmDialogs.badGoodConfirmation(
+      context,
+      title: "Nesačuvane izmjene",
+      question:
+          "Imate nesačuvane izmjene. Ako nastavite, izgubit ćete unesene podatke.",
+      goodText: "Napusti",
+      badText: "Ostani",
+    );
+  }
 
   @override
   void initState() {
@@ -80,17 +94,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
       final u = await _userProvider.getById(userId);
 
-      fields.setText('firstName', u.firstName);
-      fields.setText('lastName', u.lastName);
-      fields.setText('email', u.email);
-      fields.setText('username', u.username);
+      fields.setText('firstName', u.firstName ?? '');
+      fields.setText('lastName', u.lastName ?? '');
+      fields.setText('email', u.email ?? '');
+      fields.setText('username', u.username ?? '');
       fields.setText('phoneNumber', u.phoneNumber ?? '');
-
-      try {
-        fields.setText('aboutMe', (u.aboutMe ?? '').toString());
-      } catch (_) {
-        fields.setText('aboutMe', '');
-      }
+      fields.setText('aboutMe', u.aboutMe ?? '');
 
       if (u.dateOfBirth != null) {
         fields.setText('birthDate', DateHelper.format(u.dateOfBirth!));
@@ -161,6 +170,21 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         _loyaltyLoading = false;
       });
     }
+  }
+
+  Future<bool> _confirmLeaveIfDirty() async {
+    if (!_hasChanges()) return true;
+
+    final shouldLeave = await ConfirmDialogs.badGoodConfirmation(
+      context,
+      title: "Nesačuvane izmjene",
+      question:
+          "Imate nesačuvane izmjene. Ako nastavite, izgubit ćete unesene podatke.",
+      goodText: "Napusti",
+      badText: "Ostani",
+    );
+
+    return shouldLeave;
   }
 
   bool _hasChanges() {
@@ -242,6 +266,20 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     }
   }
 
+  Future<void> _openChangePasswordDialog() async {
+    final changed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _ChangePasswordDialog(),
+    );
+
+    if (changed == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Lozinka je uspješno promijenjena.")),
+      );
+    }
+  }
+
   void _logout() {
     Session.odjava();
 
@@ -252,109 +290,120 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
+  // 🔥 SAMO BITNI DIJELOVI SU IZMIJENJENI (ostatak ostaje isti)
+
   @override
   Widget build(BuildContext context) {
     final canSave =
         !_loading && _error == null && _user != null && _hasChanges();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : (_error != null)
-              ? _ErrorState(message: _error!, onRetry: _loadUser)
-              : (_user == null)
-                  ? _ErrorState(
-                      message: "Korisnik nije učitan.",
-                      onRetry: _loadUser,
-                    )
-                  : CustomScrollView(
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: _ProfileHeader(
-                            user: _user!,
-                            pickedImage: _pickedImage,
-                            onChangeImage: _pickImage,
-                            onLogout: _logout,
+    return WillPopScope(
+      onWillPop: _confirmLeaveIfDirty,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F7FB),
+        body: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : (_error != null)
+            ? _ErrorState(message: _error!, onRetry: _loadUser)
+            : (_user == null)
+            ? _ErrorState(message: "Korisnik nije učitan.", onRetry: _loadUser)
+            : CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: _ProfileHeader(
+                      user: _user!,
+                      pickedImage: _pickedImage,
+                      onChangeImage: _pickImage,
+                      onLogout: _logout,
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                      child: Column(
+                        children: [
+                          _LoyaltyCard(
+                            loading: _loyaltyLoading,
+                            totalPoints: _totalPoints,
+                            onRewardsTap: () async {
+                              final canLeave = await _confirmLeaveIfDirty();
+                              if (!canLeave) return;
+
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const RewardsScreen(),
+                                ),
+                              );
+
+                              if (result == true) {
+                                await _loadUser();
+                                if (mounted) setState(() {});
+                              }
+                            },
                           ),
-                        ),
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+                          const SizedBox(height: 12),
+
+                          // 🔥 OSNOVNI PODACI + SAVE
+                          _SectionCard(
+                            title: "Osnovni podaci",
+                            icon: Icons.badge_outlined,
                             child: Column(
                               children: [
-                                _LoyaltyCard(
-                                  loading: _loyaltyLoading,
-                                  totalPoints: _totalPoints,
-                                  onRewardsTap: () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const RewardsScreen(),
-                                      ),
-                                    );
-
-                                    if (result == true) {
-                                      _loadUser();
-                                      setState(() {});
-                                    }
+                                _ProfileForm(
+                                  formKey: _formKey,
+                                  fields: fields,
+                                  onAnyChanged: () {
+                                    setState(() {});
+                                    _formKey.currentState
+                                        ?.validate(); // 🔥 LIVE VALIDACIJA
                                   },
                                 ),
                                 const SizedBox(height: 12),
-                                _SectionCard(
-                                  title: "Osnovni podaci",
-                                  icon: Icons.badge_outlined,
-                                  child: _ProfileForm(
-                                    formKey: _formKey,
-                                    fields: fields,
-                                    onAnyChanged: () => setState(() {}),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 48,
+                                  child: ElevatedButton(
+                                    onPressed: canSave ? _save : null,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: gymBlueDark,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "Sačuvaj izmjene",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 12),
-                                const _MiniTipsCard(
-                                  title: "Savjet",
-                                  message:
-                                      "Rezervacijom treninga skupljaš poene. Što više poena, veće pogodnosti 😊",
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
+
+                          const SizedBox(height: 12),
+                          _SectionCard(
+                            title: "Sigurnost",
+                            icon: Icons.lock_outline,
+                            child: _SecuritySection(
+                              onChangePassword: _openChangePasswordDialog,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          const _MiniTipsCard(
+                            title: "Savjet",
+                            message:
+                                "Rezervacijom treninga skupljaš poene. Što više poena, veće pogodnosti 😊",
+                          ),
+                        ],
+                      ),
                     ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.07),
-                blurRadius: 18,
-                offset: const Offset(0, -8),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: SizedBox(
-            height: 48,
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: canSave ? _save : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: gymBlueDark,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              child: const Text(
-                "Sačuvaj promjene",
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -376,9 +425,6 @@ class _LoyaltyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const threshold = 10;
-    final remainder = totalPoints % threshold;
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
@@ -508,7 +554,7 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = "${user.firstName} ${user.lastName}".trim();
+    final name = "${user.firstName ?? ''} ${user.lastName ?? ''}".trim();
     final username = (user.username ?? "").toString();
     final email = (user.email ?? "").toString();
 
@@ -680,20 +726,14 @@ class _ProfileForm extends StatelessWidget {
 
   String? _username(String? v) {
     final value = (v ?? '').trim();
-    return Rules.username(
-      "username",
-      value,
-    ).validate();
+    return Rules.username("username", value).validate();
   }
 
   String? _phone(String? v) {
     final value = (v ?? '').trim();
     if (value.isEmpty) return "Telefon je obavezan.";
 
-    return Rules.phone(
-      "phoneNumber",
-      value,
-    ).validate();
+    return Rules.phone("phoneNumber", value).validate();
   }
 
   @override
@@ -844,6 +884,317 @@ class _ProfileForm extends StatelessWidget {
       validator: validator,
       onChanged: onChanged,
       decoration: _decoration(label, icon),
+    );
+  }
+}
+
+class _SecuritySection extends StatelessWidget {
+  const _SecuritySection({required this.onChangePassword});
+
+  final VoidCallback onChangePassword;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: const Row(
+            children: [
+              Icon(Icons.shield_outlined, size: 18, color: Color(0xFF0D47A1)),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "Radi sigurnosti naloga, promjena lozinke se vrši kroz posebnu provjeru trenutne lozinke.",
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF374151),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: OutlinedButton.icon(
+            onPressed: onChangePassword,
+            icon: const Icon(Icons.password_outlined),
+            label: const Text(
+              "Promijeni lozinku",
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF0D47A1),
+              side: const BorderSide(color: Color(0xFF1976D2)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChangePasswordDialog extends StatefulWidget {
+  const _ChangePasswordDialog();
+
+  @override
+  State<_ChangePasswordDialog> createState() => _ChangePasswordDialogState();
+}
+
+class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  bool _submitting = false;
+  bool _hideCurrent = true;
+  bool _hideNew = true;
+  bool _hideConfirm = true;
+  bool _isFormValid = false;
+
+  @override
+  void dispose() {
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  String? _required(String? value, String message) {
+    if (value == null || value.trim().isEmpty) return message;
+    return null;
+  }
+
+  String? _password(
+    String? value,
+    String emptyMessage, {
+    String field = "password",
+  }) {
+    final v = (value ?? '').trim();
+
+    final requiredError = _required(v, emptyMessage);
+    if (requiredError != null) return requiredError;
+
+    return Rules.strongPassword(field, v).validate();
+  }
+
+  String? _validateCurrentPassword(String? value) {
+    return _password(
+      value,
+      "Trenutna lozinka je obavezna.",
+      field: "currentPassword",
+    );
+  }
+
+  String? _validateNewPassword(String? value) {
+    return _password(value, "Nova lozinka je obavezna.", field: "newPassword");
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    final v = (value ?? '').trim();
+
+    final passwordError = _password(
+      v,
+      "Ponovljena lozinka je obavezna.",
+      field: "confirmPassword",
+    );
+    if (passwordError != null) return passwordError;
+
+    if (v != _newPasswordController.text.trim()) {
+      return "Lozinke se ne podudaraju.";
+    }
+
+    return null;
+  }
+
+  void _refreshFormValidity() {
+    final isValid = _formKey.currentState?.validate() ?? false;
+
+    if (_isFormValid != isValid) {
+      setState(() {
+        _isFormValid = isValid;
+      });
+    }
+  }
+
+  Future<void> _submit() async {
+    final ok = _formKey.currentState?.validate() ?? false;
+    if (!ok) return;
+
+    setState(() => _submitting = true);
+
+    try {
+      final userProvider = context.read<UserProvider>();
+
+      await userProvider.changePassword({
+        "currentPassword": _currentPasswordController.text.trim(),
+        "newPassword": _newPasswordController.text.trim(),
+        "confirmPassword": _confirmPasswordController.text.trim(),
+      });
+
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Greška: $e")));
+
+      setState(() => _submitting = false);
+    }
+  }
+
+  InputDecoration _decoration({
+    required String label,
+    required IconData icon,
+    required bool hidden,
+    required VoidCallback onToggle,
+    String? helperText,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      helperText: helperText,
+      prefixIcon: Icon(icon, size: 20),
+      suffixIcon: IconButton(
+        onPressed: onToggle,
+        icon: Icon(hidden ? Icons.visibility_off : Icons.visibility),
+      ),
+      filled: true,
+      fillColor: const Color(0xFFF7F8FA),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0x11000000)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(
+          color: LoginScreen.gymBlueDark,
+          width: 1.6,
+        ),
+      ),
+      errorMaxLines: 3,
+      helperMaxLines: 3,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: const Row(
+        children: [
+          Icon(Icons.lock_outline),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              "Promjena lozinke",
+              style: TextStyle(fontWeight: FontWeight.w900),
+            ),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 380,
+        child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _currentPasswordController,
+                obscureText: _hideCurrent,
+                validator: _validateCurrentPassword,
+                onChanged: (_) => _refreshFormValidity(),
+                decoration: _decoration(
+                  label: "Trenutna lozinka",
+                  icon: Icons.lock_clock_outlined,
+                  hidden: _hideCurrent,
+                  helperText:
+                      "8+ znakova, veliko, malo, broj i specijalni znak.",
+                  onToggle: () => setState(() => _hideCurrent = !_hideCurrent),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _newPasswordController,
+                obscureText: _hideNew,
+                validator: _validateNewPassword,
+                onChanged: (_) => _refreshFormValidity(),
+                decoration: _decoration(
+                  label: "Nova lozinka",
+                  icon: Icons.lock_reset_outlined,
+                  hidden: _hideNew,
+                  helperText:
+                      "8+ znakova, veliko, malo, broj i specijalni znak.",
+                  onToggle: () => setState(() => _hideNew = !_hideNew),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _confirmPasswordController,
+                obscureText: _hideConfirm,
+                validator: _validateConfirmPassword,
+                onChanged: (_) => _refreshFormValidity(),
+                decoration: _decoration(
+                  label: "Ponovi novu lozinku",
+                  icon: Icons.verified_user_outlined,
+                  hidden: _hideConfirm,
+                  onToggle: () => setState(() => _hideConfirm = !_hideConfirm),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _submitting
+              ? null
+              : () => Navigator.of(context).pop(false),
+          child: const Text("Odustani"),
+        ),
+        ElevatedButton(
+          onPressed: (_submitting || !_isFormValid) ? null : _submit,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: LoginScreen.gymBlueDark,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: _submitting
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text(
+                  "Promijeni",
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
+        ),
+      ],
     );
   }
 }

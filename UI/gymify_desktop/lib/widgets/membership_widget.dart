@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/base_form_dialogs_for_actions.dart';
 import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
-import 'package:gymify_desktop/helper/date_helper.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
 import 'package:gymify_desktop/models/membership.dart';
 import 'package:gymify_desktop/providers/membership_provider.dart';
@@ -9,16 +8,20 @@ import 'package:gymify_desktop/widgets/base_search_and_list_widget.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymify_desktop/helper/univerzal_pagging_helper.dart';
+import 'package:gymify_desktop/helper/date_helper.dart';
 
-double _parsePrice(String? s) {
-  final normalized = (s ?? "").trim().replaceAll(',', '.');
-  return double.tryParse(normalized) ?? 0;
+int _parseIntPrice(String? s) {
+  return int.tryParse((s ?? "").trim()) ?? 0;
 }
 
-String _priceToUi(num? v) {
-  final value = (v ?? 0).toDouble();
-  // za input vrati "12.50" (tačka je OK, ti opet parsiraš i zarez/tačku)
-  return value.toStringAsFixed(2);
+String _intPriceToUi(num? v) {
+  return (v ?? 0).toInt().toString();
+}
+
+String _calculateYearPriceFromMonthly(String? monthlyValue) {
+  final monthly = int.tryParse((monthlyValue ?? "").trim());
+  if (monthly == null || monthly <= 0) return "";
+  return (monthly * 12).toString();
 }
 
 Widget MembershipWidget() {
@@ -26,23 +29,22 @@ Widget MembershipWidget() {
     create: (context) {
       final paging = UniversalPagingProvider<Membership>(
         pageSize: 5,
-        fetcher:
-            ({
-              required int page,
-              required int pageSize,
-              String? filter,
-              bool includeTotalCount = true,
-            }) {
-              return context.read<MembershipProvider>().get(
-                filter: {
-                  "page": page,
-                  "pageSize": pageSize,
-                  "includeTotalCount": includeTotalCount,
-                  if (filter != null && filter.trim().isNotEmpty)
-                    "FTS": filter.trim(),
-                },
-              );
+        fetcher: ({
+          required int page,
+          required int pageSize,
+          String? filter,
+          bool includeTotalCount = true,
+        }) {
+          return context.read<MembershipProvider>().get(
+            filter: {
+              "page": page,
+              "pageSize": pageSize,
+              "includeTotalCount": includeTotalCount,
+              if (filter != null && filter.trim().isNotEmpty)
+                "FTS": filter.trim(),
             },
+          );
+        },
       );
 
       Future.microtask(() => paging.loadPage());
@@ -54,11 +56,15 @@ Widget MembershipWidget() {
           title: "Članarine",
           addButtonText: "Dodaj članarinu",
 
-          // ---------------- ADD ----------------
           onAdd: () async {
             await showBaseFormDialog(
               context: context,
               title: "Dodaj članarinu",
+              initialValues: {
+                "name": "",
+                "monthlyPrice": "",
+                "yearPrice": "",
+              },
               fieldsDef: [
                 BaseFormFieldDef(
                   name: "name",
@@ -79,8 +85,15 @@ Widget MembershipWidget() {
                   validator: (v) {
                     final value = (v ?? "").trim();
                     if (value.isEmpty) return "Mjesečna cijena je obavezna.";
-                    final p = _parsePrice(value);
-                    if (p <= 0) return "Mjesečna cijena mora biti veća od 0.";
+
+                    final p = int.tryParse(value);
+                    if (p == null) {
+                      return "Mjesečna cijena mora biti cijeli broj.";
+                    }
+                    if (p <= 0) {
+                      return "Mjesečna cijena mora biti veća od 0.";
+                    }
+
                     return null;
                   },
                 ),
@@ -89,42 +102,42 @@ Widget MembershipWidget() {
                   label: "Godišnja cijena (KM)",
                   type: BaseFieldType.number,
                   requiredField: true,
+                  readOnly: true,
                   validator: (v) {
                     final value = (v ?? "").trim();
                     if (value.isEmpty) return "Godišnja cijena je obavezna.";
-                    final p = _parsePrice(value);
-                    if (p <= 0) return "Godišnja cijena mora biti veća od 0.";
+
+                    final p = int.tryParse(value);
+                    if (p == null) {
+                      return "Godišnja cijena mora biti cijeli broj.";
+                    }
+                    if (p <= 0) {
+                      return "Godišnja cijena mora biti veća od 0.";
+                    }
+
                     return null;
                   },
                 ),
-                BaseFormFieldDef(
-                  name: "createdAt",
-                  label: "Datum nastanka",
-                  type: BaseFieldType.date,
-                  requiredField: true,
-                  validator: (v) {
-                    final value = (v ?? "").trim();
-                    if (value.isEmpty) return "Datum nastanka je obavezan.";
-                    try {
-                      DateHelper.toIsoFromUi(value);
-                      return null;
-                    } catch (_) {
-                      return "Neispravan format datuma (dd.MM.yyyy).";
-                    }
-                  },
-                ),
               ],
+              onFieldChanged: (name, values, setValue) {
+                if (name == "monthlyPrice") {
+                  final yearly = _calculateYearPriceFromMonthly(
+                    values["monthlyPrice"]?.toString(),
+                  );
+                  setValue("yearPrice", yearly);
+                }
+              },
               onSubmit: (payload) async {
                 try {
                   await context.read<MembershipProvider>().insert({
                     "name": (payload["name"] ?? "").toString().trim(),
-                    "monthlyPrice": _parsePrice(
+                    "monthlyPrice": _parseIntPrice(
                       payload["monthlyPrice"]?.toString(),
                     ),
-                    "yearPrice": _parsePrice(payload["yearPrice"]?.toString()),
-                    "createdAt": DateHelper.toIsoFromUi(
-                      (payload["createdAt"] ?? "").toString(),
+                    "yearPrice": _parseIntPrice(
+                      payload["yearPrice"]?.toString(),
                     ),
+                    "createdAt": DateTime.now().toIso8601String(),
                   });
 
                   await paging.loadPage();
@@ -142,7 +155,6 @@ Widget MembershipWidget() {
 
           onSearchChanged: (value) => paging.search(value),
           onClearSearch: () => paging.search(""),
-
           isLoading: paging.isLoading,
           items: paging.items,
 
@@ -155,33 +167,34 @@ Widget MembershipWidget() {
             BaseColumn<Membership>(
               title: "Mjesečna cijena",
               flex: 2,
-              cell: (m) =>
-                  Text("${(m.monthlyPrice ?? 0).toStringAsFixed(2)} KM"),
+              cell: (m) => Text("${(m.monthlyPrice ?? 0).toInt()} KM"),
             ),
             BaseColumn<Membership>(
               title: "Godišnja cijena",
               flex: 2,
-              cell: (m) => Text("${(m.yearPrice ?? 0).toStringAsFixed(2)} KM"),
+              cell: (m) => Text("${(m.yearPrice ?? 0).toInt()} KM"),
             ),
             BaseColumn<Membership>(
               title: "Datum nastanka",
               flex: 2,
               cell: (m) => Text(
-                m.createdAt == null ? "" : DateHelper.format(m.createdAt!),
+                m.createdAt == null || m.createdAt!.year == 1
+                    ? ""
+                    : DateHelper.format(m.createdAt!),
               ),
             ),
           ],
 
-          // ---------------- EDIT ----------------
           onEdit: (m) async {
             await showBaseFormDialog(
               context: context,
               title: "Uredi članarinu",
               initialValues: {
                 "name": m.name ?? "",
-                "monthlyPrice": _priceToUi(m.monthlyPrice),
-                "yearPrice": _priceToUi(m.yearPrice),
-                "createdAt": DateHelper.formatNullable(m.createdAt) ?? "",
+                "monthlyPrice": _intPriceToUi(m.monthlyPrice),
+                "yearPrice": _intPriceToUi(
+                  (m.monthlyPrice ?? 0).toInt() * 12,
+                ),
               },
               fieldsDef: [
                 BaseFormFieldDef(
@@ -203,8 +216,15 @@ Widget MembershipWidget() {
                   validator: (v) {
                     final value = (v ?? "").trim();
                     if (value.isEmpty) return "Mjesečna cijena je obavezna.";
-                    final p = _parsePrice(value);
-                    if (p <= 0) return "Mjesečna cijena mora biti veća od 0.";
+
+                    final p = int.tryParse(value);
+                    if (p == null) {
+                      return "Mjesečna cijena mora biti cijeli broj.";
+                    }
+                    if (p <= 0) {
+                      return "Mjesečna cijena mora biti veća od 0.";
+                    }
+
                     return null;
                   },
                 ),
@@ -213,41 +233,40 @@ Widget MembershipWidget() {
                   label: "Godišnja cijena (KM)",
                   type: BaseFieldType.number,
                   requiredField: true,
+                  readOnly: true,
                   validator: (v) {
                     final value = (v ?? "").trim();
                     if (value.isEmpty) return "Godišnja cijena je obavezna.";
-                    final p = _parsePrice(value);
-                    if (p <= 0) return "Godišnja cijena mora biti veća od 0.";
+
+                    final p = int.tryParse(value);
+                    if (p == null) {
+                      return "Godišnja cijena mora biti cijeli broj.";
+                    }
+                    if (p <= 0) {
+                      return "Godišnja cijena mora biti veća od 0.";
+                    }
+
                     return null;
                   },
                 ),
-                BaseFormFieldDef(
-                  name: "createdAt",
-                  label: "Datum nastanka",
-                  type: BaseFieldType.date,
-                  requiredField: true,
-                  validator: (v) {
-                    final value = (v ?? "").trim();
-                    if (value.isEmpty) return "Datum nastanka je obavezan.";
-                    try {
-                      DateHelper.toIsoFromUi(value);
-                      return null;
-                    } catch (_) {
-                      return "Neispravan format datuma (dd.MM.yyyy).";
-                    }
-                  },
-                ),
               ],
+              onFieldChanged: (name, values, setValue) {
+                if (name == "monthlyPrice") {
+                  final yearly = _calculateYearPriceFromMonthly(
+                    values["monthlyPrice"]?.toString(),
+                  );
+                  setValue("yearPrice", yearly);
+                }
+              },
               onSubmit: (payload) async {
                 try {
                   await context.read<MembershipProvider>().update(m.id!, {
                     "name": (payload["name"] ?? "").toString().trim(),
-                    "monthlyPrice": _parsePrice(
+                    "monthlyPrice": _parseIntPrice(
                       payload["monthlyPrice"]?.toString(),
                     ),
-                    "yearPrice": _parsePrice(payload["yearPrice"]?.toString()),
-                    "createdAt": DateHelper.toIsoFromUi(
-                      (payload["createdAt"] ?? "").toString(),
+                    "yearPrice": _parseIntPrice(
+                      payload["yearPrice"]?.toString(),
                     ),
                   });
 
@@ -264,7 +283,6 @@ Widget MembershipWidget() {
             );
           },
 
-          // ---------------- DELETE ----------------
           onDelete: (m) async {
             final ok = await ConfirmDialogs.badGoodConfirmation(
               context,
@@ -280,7 +298,7 @@ Widget MembershipWidget() {
             try {
               await context.read<MembershipProvider>().delete(m.id!);
               await paging.loadPage();
-              SnackbarHelper.showSuccess(context, "Članarina obrisana.");
+              SnackbarHelper.showDelete(context, "Članarina obrisana.");
             } catch (e) {
               SnackbarHelper.showError(context, e.toString());
             }

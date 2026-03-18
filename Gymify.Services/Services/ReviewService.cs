@@ -57,7 +57,17 @@ namespace Gymify.Services.Services
             {
                 query = query.Include(x => x.User);
             }
+
             return query;
+        }
+
+        protected override async Task BeforeInsert(
+            Review entity,
+            ReviewUpsertRequest request)
+        {
+            entity.CreatedAt = DateTime.Now;
+
+            await base.BeforeInsert(entity, request);
         }
     }
 }

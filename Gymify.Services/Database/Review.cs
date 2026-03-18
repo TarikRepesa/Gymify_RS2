@@ -20,6 +20,7 @@ namespace Gymify.Services.Database
         public string Message {get; set;}
 
         public int StarNumber {get; set;}
+        public DateTime CreatedAt {get; set;} = DateTime.Now;
 
     }
 }

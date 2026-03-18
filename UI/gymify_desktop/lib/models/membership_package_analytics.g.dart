@@ -12,7 +12,7 @@ MembershipPackageAnalytics _$MembershipPackageAnalyticsFromJson(
   membershipId: (json['membershipId'] as num).toInt(),
   membershipName: json['membershipName'] as String,
   purchaseCount: (json['purchaseCount'] as num).toInt(),
-  totalIncome: (json['totalIncome'] as num).toDouble(),
+  totalIncome: (json['totalIncome'] as num).toInt(),
 );
 
 Map<String, dynamic> _$MembershipPackageAnalyticsToJson(

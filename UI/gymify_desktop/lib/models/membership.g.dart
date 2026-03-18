@@ -9,8 +9,8 @@ part of 'membership.dart';
 Membership _$MembershipFromJson(Map<String, dynamic> json) => Membership(
   id: (json['id'] as num).toInt(),
   name: json['name'] as String,
-  monthlyPrice: (json['monthlyPrice'] as num).toDouble(),
-  yearPrice: (json['yearPrice'] as num).toDouble(),
+  monthlyPrice: (json['monthlyPrice'] as num).toInt(),
+  yearPrice: (json['yearPrice'] as num).toInt(),
   createdAt: DateTime.parse(json['createdAt'] as String),
 );
 

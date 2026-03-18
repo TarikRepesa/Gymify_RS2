@@ -18,7 +18,7 @@ class UserReward {
 
   final DateTime redeemedAt;
 
-  final bool isUsed;
+  final String status;
 
   UserReward({
     required this.id,
@@ -28,8 +28,14 @@ class UserReward {
     this.reward,
     this.code,
     required this.redeemedAt,
-    required this.isUsed,
+    required this.status,
   });
+
+  bool get isUsed => status == "Used";
+
+  bool get isExpired => status == "Expired";
+
+  bool get isActive => status == "Active";
 
   factory UserReward.fromJson(Map<String, dynamic> json) =>
       _$UserRewardFromJson(json);

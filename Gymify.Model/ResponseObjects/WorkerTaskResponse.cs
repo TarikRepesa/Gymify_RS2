@@ -10,7 +10,7 @@ namespace Gymify.Model.ResponseObjects
         public string Name { get; set; }
         public string Details { get; set; }
         public DateTime CreatedTaskDate { get; set; }
-        public DateTime "ExpirationTaskDate { get; set; }
+        public DateTime ExpirationTaskDate { get; set; }
         public bool IsFinished { get; set; }
     }
 }
