@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/forgot_password_dialog.dart';
+import 'package:gymify_desktop/helper/exception_read_helper.dart';
 import 'package:gymify_desktop/utils/session.dart';
 import 'package:provider/provider.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
@@ -50,9 +51,13 @@ class _LoginScreenState extends State<LoginScreen> {
   );
 }
 
-  Future<void> login() async {
+ Future<void> login() async {
+  try {
     final result = await _authProvider.prijava(
-      LoginRequest(username: _username.text.trim(), password: _password.text),
+      LoginRequest(
+        username: _username.text.trim(),
+        password: _password.text,
+      ),
     );
 
     if (result == "ZABRANJENO") {
@@ -64,31 +69,37 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (result != "OK") {
-      SnackbarHelper.showError(context, 'Pogrešno korisničko ime ili lozinka');
+      SnackbarHelper.showError(
+        context,
+        'Pogrešno korisničko ime ili lozinka',
+      );
       return;
     }
 
-    if (result == "OK") {
-      final allowed = Session.roles.any(
-        (r) => [
-          "Admin",
-          "Radnik",
-          "Trener",
-        ].any((x) => x.toLowerCase() == r.toLowerCase()),
+    final allowed = Session.roles.any(
+      (r) => ["Admin", "Radnik", "Trener"]
+          .any((x) => x.toLowerCase() == r.toLowerCase()),
+    );
+
+    if (!allowed) {
+      Session.odjava();
+      SnackbarHelper.showError(
+        context,
+        'Nemate privilegije za pristup aplikaciji',
       );
-
-      if (!allowed) {
-        Session.odjava();
-        SnackbarHelper.showError(
-          context,
-          'Nemate privilegije za pristup aplikaciji',
-        );
-        return;
-      }
-
-      Navigator.pushReplacementNamed(context, AppRoutes.base);
+      return;
     }
+
+    Navigator.pushReplacementNamed(context, AppRoutes.base);
+  } catch (e) {
+    if (!mounted) return;
+
+    SnackbarHelper.showError(
+      context,
+      extractErrorMessage(e),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

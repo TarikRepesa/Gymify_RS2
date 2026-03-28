@@ -16,6 +16,9 @@ using System.Text;
 using RabbitMQ.Client;
 using Gymify.EmailConsumer.Messages;
 using System.Security.Cryptography;
+using Gymify.Services.Exceptions;
+using Gymify.EmailConsumer.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Gymify.Services.Services
 {
@@ -23,11 +26,13 @@ namespace Gymify.Services.Services
     {
         IConfiguration _configuration;
         private readonly IConnection _rabbitConnection;
+        private readonly AppConfig _appConfig;
 
-        public UserService(GymifyDbContext context, IMapper mapper, IConfiguration configuration, IConnection rabbitConnection) : base(context, mapper)
+        public UserService(GymifyDbContext context, IMapper mapper, IConfiguration configuration, IConnection rabbitConnection, IOptions<AppConfig> appConfig) : base(context, mapper)
         {
             _configuration = configuration;
             _rabbitConnection = rabbitConnection;
+            _appConfig = appConfig.Value;
         }
 
         protected override IQueryable<User> ApplyFilter(IQueryable<User> query, UserSearchObject search)
@@ -107,7 +112,7 @@ namespace Gymify.Services.Services
                 x.Username == entity.Username || x.Email == entity.Email);
 
             if (exists)
-                throw new InvalidOperationException("Korisnik sa istim username/email već postoji.");
+                throw new UserException("Korisnik sa istim username/email već postoji.");
 
             await UserHelper.AssignRoleByFlagsAsync(entity, request, _context);
         }
@@ -118,7 +123,7 @@ namespace Gymify.Services.Services
                 x.Id != entity.Id && (x.Username == request.Username || x.Email == request.Email));
 
             if (exists)
-                throw new InvalidOperationException("Korisnik sa istim username/email već postoji.");
+                throw new UserException("Korisnik sa istim username/email već postoji.");
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -129,10 +134,10 @@ namespace Gymify.Services.Services
                 .FirstOrDefaultAsync(x => x.Username == request.Username);
 
             if (user == null || !user.IsActive)
-                throw new UnauthorizedAccessException("Pogrešan username ili password.");
+                throw new UserException("Pogrešan username ili password.");
 
             if (!UserHelper.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt))
-                throw new UnauthorizedAccessException("Pogrešan username ili password.");
+                throw new UserException("Pogrešan username ili password.");
 
             var token = UserHelper.CreateJwt(user, _configuration);
 
@@ -157,25 +162,25 @@ namespace Gymify.Services.Services
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
             if (user == null || !user.IsActive)
-                throw new InvalidOperationException("Korisnik nije pronađen.");
+                throw new NotFoundException("Korisnik nije pronađen.");
 
             if (string.IsNullOrWhiteSpace(request.CurrentPassword))
-                throw new InvalidOperationException("Trenutna lozinka je obavezna.");
+                throw new UserException("Trenutna lozinka je obavezna.");
 
             if (string.IsNullOrWhiteSpace(request.NewPassword))
-                throw new InvalidOperationException("Nova lozinka je obavezna.");
+                throw new UserException("Nova lozinka je obavezna.");
 
             if (request.NewPassword.Length < 8)
-                throw new InvalidOperationException("Nova lozinka mora imati najmanje 8 karaktera.");
+                throw new UserException("Nova lozinka mora imati najmanje 8 karaktera.");
 
             if (request.NewPassword != request.ConfirmPassword)
-                throw new InvalidOperationException("Nova lozinka i potvrda lozinke se ne podudaraju.");
+                throw new UserException("Nova lozinka i potvrda lozinke se ne podudaraju.");
 
             if (!UserHelper.VerifyPassword(request.CurrentPassword, user.PasswordHash, user.PasswordSalt))
-        throw new InvalidOperationException("Trenutna lozinka nije ispravna.");
+        throw new UserException("Trenutna lozinka nije ispravna.");
 
             if (request.CurrentPassword == request.NewPassword)
-                throw new InvalidOperationException("Nova lozinka ne može biti ista kao trenutna.");
+                throw new UserException("Nova lozinka ne može biti ista kao trenutna.");
 
             UserHelper.CreatePasswordHash(request.NewPassword, out var hash, out var salt);
 
@@ -191,7 +196,7 @@ namespace Gymify.Services.Services
                 .FirstOrDefaultAsync(x => x.Email == email);
 
             if (user == null)
-                throw new InvalidOperationException("Email nije povezan ni sa jednim nalogom.");
+                throw new NotFoundException("Email nije povezan ni sa jednim nalogom.");
 
             var newPassword = GenerateRandomPassword();
             UserHelper.CreatePasswordHash(newPassword, out string hash, out string salt);
@@ -201,7 +206,7 @@ namespace Gymify.Services.Services
                 var channel = await _rabbitConnection.CreateChannelAsync();
 
                 await channel.QueueDeclareAsync(
-                    queue: "email.reset-password",
+                    queue: _appConfig.ResetPasswordQueue,
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
@@ -221,7 +226,7 @@ namespace Gymify.Services.Services
 
                 await channel.BasicPublishAsync(
                     exchange: "",
-                    routingKey: "email.reset-password",
+                    routingKey: _appConfig.ResetPasswordQueue,
                     body: body
                 );
 
@@ -230,7 +235,7 @@ namespace Gymify.Services.Services
 
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
                 throw new InvalidOperationException("Reset lozinke trenutno nije moguće izvršiti. Pokušajte ponovo kasnije.", ex);
             }

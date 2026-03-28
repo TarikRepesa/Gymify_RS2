@@ -1,7 +1,11 @@
 using Gymify.Services.Database;
 
-public class MembershipSeedBundle
+namespace Gymify.Services.Seed
 {
-    public List<Member> Members { get; set; } = new();
-    public List<Payment> Payments { get; set; } = new();
+    public class MembershipSeedBundle
+    {
+        public List<Member> Members { get; set; } = new();
+        public List<Payment> Payments { get; set; } = new();
+    }
+
 }

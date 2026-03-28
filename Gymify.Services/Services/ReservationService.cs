@@ -74,7 +74,7 @@ namespace Gymify.Services.Services
 
             if (alreadyExists)
             {
-                throw new BusinessException("Korisnik je već rezervisao ovaj trening.");
+                throw new UserException("Korisnik je već rezervisao ovaj trening.");
             }
         }
 

@@ -6,8 +6,6 @@ import 'package:gymify_mobile/models/training.dart';
 import 'package:gymify_mobile/utils/session.dart';
 import 'package:http/http.dart' as http;
 
-
-
 import 'base_provider.dart';
 
 class TrainingProvider extends BaseProvider<Training> {
@@ -21,19 +19,14 @@ class TrainingProvider extends BaseProvider<Training> {
   Future<bool> up(int trainingId) async {
     final url = Uri.parse("${ApiConfig.apiBase}/api/Training/$trainingId/up");
 
-    final response = await http.post(
-      url,
-      headers: HttpHelper.getHeaders()
-    );
+    final response = await http.post(url, headers: HttpHelper.getHeaders());
 
     HttpHelper.checkResponse(response);
 
-    throw Exception("Up error: ${response.statusCode} → ${response.body}");
+    return true;
   }
 
-  Future<List<Training>> getRecommended({
-    Map<String, dynamic>? filter,
-  }) async {
+  Future<List<Training>> getRecommended({Map<String, dynamic>? filter}) async {
     final queryParams = <String, String>{};
 
     if (filter != null) {
@@ -48,28 +41,19 @@ class TrainingProvider extends BaseProvider<Training> {
       "${ApiConfig.apiBase}/api/Training/recommended",
     ).replace(queryParameters: queryParams);
 
-    final response = await http.get(
-      uri,
-      headers: HttpHelper.getHeaders()
-    );
+    final response = await http.get(uri, headers: HttpHelper.getHeaders());
 
     HttpHelper.checkResponse(response);
 
     final data = jsonDecode(response.body);
 
-    return data
-        .map((e) => Training.fromJson(e as Map<String, dynamic>))
-        .toList();
-      
+    return List<Training>.from(data.map((e) => Training.fromJson(e)));
   }
 
   Future<bool> down(int trainingId) async {
     final url = Uri.parse("${ApiConfig.apiBase}/api/Training/$trainingId/down");
 
-    final response = await http.post(
-      url,
-      headers: HttpHelper.getHeaders()
-    );
+    final response = await http.post(url, headers: HttpHelper.getHeaders());
 
     HttpHelper.checkResponse(response);
 

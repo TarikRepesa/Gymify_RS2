@@ -5,12 +5,12 @@ part 'worker_task.g.dart';
 @JsonSerializable()
 class WorkerTask {
   final int id;
+  final int userId;
   final String name;
   final String details;
   final DateTime createdTaskDate;
   final DateTime expirationTaskDate;
   final bool isFinished;
-  final int userId;
 
   WorkerTask({
     required this.id,

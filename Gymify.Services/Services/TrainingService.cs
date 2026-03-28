@@ -97,13 +97,13 @@ namespace Gymify.Services.Services
 
             var trainingEnd = training.StartDate.AddMinutes(training.DurationMinutes);
             if (trainingEnd <= DateTime.Now)
-                throw new BusinessException("Trening je već završen.");
+                throw new InvalidOperationException("Trening je već završen.");
 
             var current = training.CurrentParticipants;
             var max = training.MaxAmountOfParticipants;
 
             if (current >= max)
-                throw new BusinessException("Trening je popunjen.");
+                throw new InvalidOperationException("Trening je popunjen.");
 
             training.CurrentParticipants = current + 1;
 
@@ -122,7 +122,7 @@ namespace Gymify.Services.Services
 
             var trainingEnd = training.StartDate.AddMinutes(training.DurationMinutes);
             if (trainingEnd <= DateTime.Now)
-                throw new BusinessException("Trening je već završen.");
+                throw new InvalidOperationException("Trening je već završen.");
 
             var current = training.CurrentParticipants;
             training.CurrentParticipants = Math.Max(0, current - 1);
@@ -234,8 +234,6 @@ namespace Gymify.Services.Services
             return "evening";
         }
 
-
-
         protected override Task BeforeUpdate(Training entity, TrainingUpsertRequest request)
         {
             var today = DateTime.Today;
@@ -248,6 +246,20 @@ namespace Gymify.Services.Services
                 request.CurrentParticipants = 0;
             }
             return base.BeforeUpdate(entity, request);
+        }
+
+        protected override async Task BeforeDelete(Training entity)
+        {
+            var today = DateTime.Today;
+
+            bool isOldTraining = entity.StartDate.Date < today;
+
+            if (!isOldTraining)
+            {
+                throw new UserException("Aktivan ili budući trening se ne može obrisati. Dozvoljeno je brisanje samo starih treninga.");
+            }
+
+            await base.BeforeDelete(entity);
         }
         private double CalculateDistance(TrainingFeatureVector a, TrainingFeatureVector b)
         {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/base_dialogs_frame.dart';
+import 'package:gymify_desktop/dialogs/user_picker_dialog.dart';
 import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
-
 
 enum BaseFieldType {
   text,
@@ -24,7 +24,7 @@ class BaseFormFieldDef {
   final List<DropdownMenuItem<String>>? items;
   final String? Function(String?)? validator;
   final String? Function(String? value, Map<String, dynamic> values)?
-      crossValidator;
+  crossValidator;
 
   final bool? readOnly;
   final bool? enabled;
@@ -68,22 +68,25 @@ Future<void> showBaseFormDialog({
   final fields = Fields.fromNames(fieldsDef.map((e) => e.name).toList());
   final scrollController = ScrollController();
 
-  final values = <String, dynamic>{};
-  final manuallyEditedFields = <String>{};
+  final values = <String, dynamic>{
+  ...?initialValues,
+};
+final manuallyEditedFields = <String>{};
 
-  bool isFormValid = false;
-  bool didRunInitialValidation = false;
+bool isFormValid = false;
+bool didRunInitialValidation = false;
 
-  for (final f in fieldsDef) {
-    final v = initialValues != null ? initialValues[f.name] : null;
-    values[f.name] = v ?? "";
-    if (v != null) {
-      fields.setText(f.name, v.toString());
-    }
+for (final f in fieldsDef) {
+  final v = values[f.name];
+  if (v != null) {
+    fields.setText(f.name, v.toString());
+  } else {
+    values[f.name] = "";
   }
+}
 
-  values.putIfAbsent("userId", () => "");
-  values.putIfAbsent("trainerId", () => "");
+values.putIfAbsent("userId", () => "");
+values.putIfAbsent("trainerId", () => "");
 
   final obscure = <String, bool>{};
   for (final f in fieldsDef) {
@@ -99,7 +102,10 @@ Future<void> showBaseFormDialog({
       builder: (ctx, setStateDialog) {
         void setValueInternal(String name, dynamic value) {
           values[name] = value ?? "";
-          fields.setText(name, (value ?? "").toString());
+
+          if (fields.hasController(name)) {
+            fields.setText(name, (value ?? "").toString());
+          }
         }
 
         void setValue(String name, dynamic value) {
@@ -165,119 +171,179 @@ Future<void> showBaseFormDialog({
         }
 
         Widget buildField(BaseFormFieldDef def) {
-  final isEnabled = def.enabled ?? true;
-  final isReadOnly = def.readOnly ?? false;
+          final isEnabled = def.enabled ?? true;
+          final isReadOnly = def.readOnly ?? false;
 
-  switch (def.type) {
-    case BaseFieldType.dropdown:
-      final currentValue = fields.text(def.name).trim();
-      final dropdownItems = def.items ?? [];
+          switch (def.type) {
+            case BaseFieldType.dropdown:
+              final currentValue = fields.text(def.name).trim();
+              final dropdownItems = def.items ?? [];
 
-      final hasMatchingValue = dropdownItems.any(
-        (item) => item.value == currentValue,
-      );
+              final hasMatchingValue = dropdownItems.any(
+                (item) => item.value == currentValue,
+              );
 
-      return DropdownButtonFormField<String>(
-        isExpanded: true,
-        value: currentValue.isEmpty
-            ? null
-            : (hasMatchingValue ? currentValue : null),
-        items: dropdownItems,
-        onChanged: isEnabled
-            ? (v) {
-                fields.setText(def.name, v ?? "");
-                values[def.name] = v ?? "";
+              return DropdownButtonFormField<String>(
+                isExpanded: true,
+                value: currentValue.isEmpty
+                    ? null
+                    : (hasMatchingValue ? currentValue : null),
+                items: dropdownItems,
+                onChanged: isEnabled
+                    ? (v) {
+                        fields.setText(def.name, v ?? "");
+                        values[def.name] = v ?? "";
 
-                if (onFieldChanged != null) {
-                  onFieldChanged(
-                    def.name,
-                    Map<String, dynamic>.from(values),
-                    (k, vv) => setValueInternal(k, vv),
+                        if (onFieldChanged != null) {
+                          onFieldChanged(
+                            def.name,
+                            Map<String, dynamic>.from(values),
+                            (k, vv) => setValueInternal(k, vv),
+                          );
+                        }
+
+                        setStateDialog(() {});
+                        validateForm();
+                      }
+                    : null,
+                validator: (v) => composedValidator(def, v),
+                decoration: InputDecoration(
+                  labelText: def.label,
+                  filled: true,
+                  fillColor: const Color(0xFFF7F7F7),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
+            case BaseFieldType.date:
+              return TextFormField(
+                controller: fields.controller(def.name),
+                readOnly: true,
+                enabled: isEnabled,
+                validator: (v) => composedValidator(def, v),
+                decoration: InputDecoration(
+                  labelText: def.label,
+                  filled: true,
+                  fillColor: const Color(0xFFF7F7F7),
+                  suffixIcon: const Icon(Icons.calendar_month_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onTap: () async {
+                  if (!isEnabled) return;
+
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: now,
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2100),
                   );
-                }
 
-                setStateDialog(() {});
-                validateForm();
-              }
-            : null,
-        validator: (v) => composedValidator(def, v),
-        decoration: InputDecoration(
-          labelText: def.label,
-          filled: true,
-          fillColor: const Color(0xFFF7F7F7),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
-    case BaseFieldType.date:
-  return TextFormField(
-    controller: fields.controller(def.name),
-    readOnly: true,
-    enabled: isEnabled,
-    validator: (v) => composedValidator(def, v),
-    decoration: InputDecoration(
-      labelText: def.label,
-      filled: true,
-      fillColor: const Color(0xFFF7F7F7),
-      suffixIcon: const Icon(Icons.calendar_month_outlined),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ),
-    onTap: () async {
-      if (!isEnabled) return;
+                  if (picked == null) return;
 
-      final now = DateTime.now();
-      final picked = await showDatePicker(
-        context: context,
-        initialDate: now,
-        firstDate: DateTime(1900),
-        lastDate: DateTime(2100),
-      );
+                  final text =
+                      "${picked.day.toString().padLeft(2, '0')}.${picked.month.toString().padLeft(2, '0')}.${picked.year}";
 
-      if (picked == null) return;
+                  fields.setText(def.name, text);
+                  values[def.name] = text;
 
-      final text =
-          "${picked.day.toString().padLeft(2, '0')}.${picked.month.toString().padLeft(2, '0')}.${picked.year}";
+                  if (onFieldChanged != null) {
+                    onFieldChanged(
+                      def.name,
+                      Map<String, dynamic>.from(values),
+                      (k, v) => setValueInternal(k, v),
+                    );
+                  }
 
-      fields.setText(def.name, text);
-      values[def.name] = text;
+                  setStateDialog(() {});
+                  validateForm();
+                },
+              );
 
-      if (onFieldChanged != null) {
-        onFieldChanged(
-          def.name,
-          Map<String, dynamic>.from(values),
-          (k, v) => setValueInternal(k, v),
-        );
-      }
+            case BaseFieldType.userSearch:
+              return TextFormField(
+                controller: fields.controller(def.name),
+                readOnly: true,
+                enabled: isEnabled,
+                validator: (v) => composedValidator(def, v),
+                decoration: InputDecoration(
+                  labelText: def.label,
+                  filled: true,
+                  fillColor: const Color(0xFFF7F7F7),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: !isEnabled
+                        ? null
+                        : () async {
+                            final picked = await showUserPickDialog(
+                              context: context,
+                              mode:
+                                  PickMode.user, // možeš kasnije parametrisati
+                            );
 
-      setStateDialog(() {});
-      validateForm();
-    },
-  );
+                            if (picked != null) {
+                              setValue(
+                                def.name,
+                                "${picked.firstName ?? ""} ${picked.lastName ?? ""}"
+                                    .trim(),
+                              );
 
-    default:
-      return TextFormField(
-        controller: fields.controller(def.name),
-        enabled: isEnabled,
-        readOnly: isReadOnly,
-        validator: (v) => composedValidator(def, v),
-        onChanged: (_) {
-          notifyChanged(def.name);
-          validateForm();
-        },
-        decoration: InputDecoration(
-          labelText: def.label,
-          filled: true,
-          fillColor: const Color(0xFFF7F7F7),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
-  }
-}
+                              setValue("userId", picked.id);
+                            }
+
+                            validateForm();
+                          },
+                  ),
+                ),
+                onTap: !isEnabled
+                    ? null
+                    : () async {
+                        final picked = await showUserPickDialog(
+                          context: context,
+                          mode: PickMode.user,
+                        );
+
+                        if (picked != null) {
+                          setValue(
+                            def.name,
+                            "${picked.firstName ?? ""} ${picked.lastName ?? ""}"
+                                .trim(),
+                          );
+
+                          setValue("userId", picked.id);
+                        }
+
+                        validateForm();
+                      },
+              );
+
+            default:
+              return TextFormField(
+                controller: fields.controller(def.name),
+                enabled: isEnabled,
+                readOnly: isReadOnly,
+                validator: (v) => composedValidator(def, v),
+                onChanged: (_) {
+                  notifyChanged(def.name);
+                  validateForm();
+                },
+                decoration: InputDecoration(
+                  labelText: def.label,
+                  filled: true,
+                  fillColor: const Color(0xFFF7F7F7),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
+          }
+        }
 
         if (!didRunInitialValidation) {
           didRunInitialValidation = true;

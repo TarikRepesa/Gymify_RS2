@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Gymify.Model;
 using Gymify.Services.Helpers;
+using Gymify.Services.Seed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -40,6 +41,236 @@ namespace Gymify.Services.Database
                 w.Ignore(RelationalEventId.PendingModelChangesWarning));
         }
 
+        private static readonly string[] FirstNames =
+        {
+            "Haris", "Amar", "Kenan", "Nermin", "Adnan", "Emir", "Denis",
+            "Alen", "Mahir", "Anel", "Samir", "Jasmin", "Nedim", "Damir",
+            "Eldar", "Mirza", "Husein", "Selmir", "Armin", "Ismar",
+            "Faruk", "Edin", "Sead", "Zlatan", "Irfan", "Vedad",
+            "Emina", "Amina", "Lejla", "Sara", "Adna", "Amila", "Azra",
+            "Lamija", "Selma", "Mirela", "Sanela", "Jasmina", "Arijana",
+            "Dina", "Elma", "Medina", "Belma", "Nermina", "Ilma",
+            "Hana", "Naida", "Melisa", "Anisa", "Sabina", "Alma"
+        };
+
+        private static readonly string[] LastNames =
+        {
+            "Hodzic", "Kovacevic", "Basic", "Halilovic", "Memic",
+            "Delic", "Smajic", "Hadzic", "Imamovic", "Dedic",
+            "Jahic", "Zukic", "Alic", "Sehic", "Mujic",
+            "Kadic", "Ibric", "Avdic", "Terzic", "Begovic",
+            "Sabanovic", "Mesic", "Kurtovic", "Latic", "Salihovic",
+            "Turkovic", "Brankovic", "Maric", "Jovic", "Radic"
+        };
+
+        private static readonly List<TrainingSeedBundle> TrainingSeedItems = new()
+        {
+            new() { Name = "Power Forge", Purpose = "Strength" },
+            new() { Name = "Iron Core", Purpose = "Strength" },
+            new() { Name = "Muscle Pulse", Purpose = "Strength" },
+            new() { Name = "Heavy Lift Lab", Purpose = "Strength" },
+            new() { Name = "Strength Zone", Purpose = "Strength" },
+            new() { Name = "Titan Force", Purpose = "Strength" },
+            new() { Name = "Barbell Basics", Purpose = "Strength" },
+            new() { Name = "Steel Motion", Purpose = "Strength" },
+            new() { Name = "Upper Body Burn", Purpose = "Strength" },
+            new() { Name = "Lower Body Power", Purpose = "Strength" },
+            new() { Name = "Core Crusher", Purpose = "Strength" },
+            new() { Name = "Strength Builder", Purpose = "Strength" },
+            new() { Name = "Mass Gain Session", Purpose = "Strength" },
+            new() { Name = "Explosive Power", Purpose = "Strength" },
+            new() { Name = "Strong Start", Purpose = "Strength" },
+            new() { Name = "Total Strength", Purpose = "Strength" },
+            new() { Name = "Functional Power", Purpose = "Strength" },
+            new() { Name = "Lift and Drive", Purpose = "Strength" },
+            new() { Name = "Peak Force", Purpose = "Strength" },
+            new() { Name = "Strength Fusion", Purpose = "Strength" },
+            new() { Name = "Power Circuit X", Purpose = "Strength" },
+            new() { Name = "Muscle Mechanics", Purpose = "Strength" },
+            new() { Name = "Body Armor", Purpose = "Strength" },
+            new() { Name = "Rep Revolution", Purpose = "Strength" },
+            new() { Name = "Forge Fitness", Purpose = "Strength" },
+            new() { Name = "Bench and Burn", Purpose = "Strength" },
+            new() { Name = "Deadlift Dynamics", Purpose = "Strength" },
+            new() { Name = "Strength Reloaded", Purpose = "Strength" },
+            new() { Name = "Power Pulse Pro", Purpose = "Strength" },
+            new() { Name = "Elite Strength Camp", Purpose = "Strength" },
+            new() { Name = "Bodyweight Strength", Purpose = "Strength" },
+            new() { Name = "Dumbbell Domination", Purpose = "Strength" },
+            new() { Name = "Strongline Session", Purpose = "Strength" },
+            new() { Name = "Force Factory", Purpose = "Strength" },
+            new() { Name = "Solid Core Strength", Purpose = "Strength" },
+            new() { Name = "Dynamic Strength", Purpose = "Strength" },
+            new() { Name = "Power Hour Max", Purpose = "Strength" },
+            new() { Name = "Strength Matrix", Purpose = "Strength" },
+            new() { Name = "Lift Lab 360", Purpose = "Strength" },
+            new() { Name = "Engineered Strength", Purpose = "Strength" },
+
+            new() { Name = "Slim Start", Purpose = "WeightLoss" },
+            new() { Name = "Burn Zone", Purpose = "WeightLoss" },
+            new() { Name = "Fat Melt Express", Purpose = "WeightLoss" },
+            new() { Name = "Lean Motion", Purpose = "WeightLoss" },
+            new() { Name = "Shred Session", Purpose = "WeightLoss" },
+            new() { Name = "Weight Loss Blast", Purpose = "WeightLoss" },
+            new() { Name = "Calorie Crusher", Purpose = "WeightLoss" },
+            new() { Name = "Sweat Factory", Purpose = "WeightLoss" },
+            new() { Name = "Lean Body Lab", Purpose = "WeightLoss" },
+            new() { Name = "Burn and Tone", Purpose = "WeightLoss" },
+            new() { Name = "Metabolic Fire", Purpose = "WeightLoss" },
+            new() { Name = "Shape Up", Purpose = "WeightLoss" },
+            new() { Name = "Rapid Burn", Purpose = "WeightLoss" },
+            new() { Name = "Trim and Fit", Purpose = "WeightLoss" },
+            new() { Name = "Sweat Storm", Purpose = "WeightLoss" },
+            new() { Name = "Body Burn Flow", Purpose = "WeightLoss" },
+            new() { Name = "Fat Burn Circuit", Purpose = "WeightLoss" },
+            new() { Name = "Burn Boost", Purpose = "WeightLoss" },
+            new() { Name = "Lean Up Session", Purpose = "WeightLoss" },
+            new() { Name = "Sweat and Sculpt", Purpose = "WeightLoss" },
+            new() { Name = "Weight Cut Cardio", Purpose = "WeightLoss" },
+            new() { Name = "Thermo Burn", Purpose = "WeightLoss" },
+            new() { Name = "Body Reset", Purpose = "WeightLoss" },
+            new() { Name = "Shred Factory", Purpose = "WeightLoss" },
+            new() { Name = "Slim Body Fusion", Purpose = "WeightLoss" },
+            new() { Name = "Burn Mode", Purpose = "WeightLoss" },
+            new() { Name = "Cardio Slim", Purpose = "WeightLoss" },
+            new() { Name = "Lean Shape Studio", Purpose = "WeightLoss" },
+            new() { Name = "Drop Zone", Purpose = "WeightLoss" },
+            new() { Name = "Weight Loss Ignite", Purpose = "WeightLoss" },
+            new() { Name = "Sweat Focus", Purpose = "WeightLoss" },
+            new() { Name = "Metafit Burn", Purpose = "WeightLoss" },
+            new() { Name = "Shred Lab", Purpose = "WeightLoss" },
+            new() { Name = "Body Trim Camp", Purpose = "WeightLoss" },
+            new() { Name = "Burn Flex", Purpose = "WeightLoss" },
+            new() { Name = "Lean Form", Purpose = "WeightLoss" },
+            new() { Name = "Thermic Motion", Purpose = "WeightLoss" },
+            new() { Name = "Fit Burn Express", Purpose = "WeightLoss" },
+            new() { Name = "Sculpt and Sweat", Purpose = "WeightLoss" },
+            new() { Name = "Zero In Burn", Purpose = "WeightLoss" },
+
+            new() { Name = "Cardio Rush", Purpose = "Cardio" },
+            new() { Name = "Endurance Flow", Purpose = "Cardio" },
+            new() { Name = "Heart Beat Session", Purpose = "Cardio" },
+            new() { Name = "Cardio Pulse", Purpose = "Cardio" },
+            new() { Name = "Aerobic Energy", Purpose = "Cardio" },
+            new() { Name = "Run and Burn", Purpose = "Cardio" },
+            new() { Name = "Cycle Motion", Purpose = "Cardio" },
+            new() { Name = "Cardio Core Mix", Purpose = "Cardio" },
+            new() { Name = "Fast Lane Fitness", Purpose = "Cardio" },
+            new() { Name = "Endurance Builder", Purpose = "Cardio" },
+            new() { Name = "Sweat Ride", Purpose = "Cardio" },
+            new() { Name = "Pulse Ride", Purpose = "Cardio" },
+            new() { Name = "Cardio Drive", Purpose = "Cardio" },
+            new() { Name = "Heart Pump", Purpose = "Cardio" },
+            new() { Name = "Fit Endurance", Purpose = "Cardio" },
+            new() { Name = "Speed Step", Purpose = "Cardio" },
+            new() { Name = "Energy Sprint", Purpose = "Cardio" },
+            new() { Name = "Endurance Circuit", Purpose = "Cardio" },
+            new() { Name = "Cardio Challenge", Purpose = "Cardio" },
+            new() { Name = "Motion Boost", Purpose = "Cardio" },
+            new() { Name = "Aerofit Session", Purpose = "Cardio" },
+            new() { Name = "Pulse and Pace", Purpose = "Cardio" },
+            new() { Name = "Cardio Engine", Purpose = "Cardio" },
+            new() { Name = "Speed Burner", Purpose = "Cardio" },
+            new() { Name = "Step Blast", Purpose = "Cardio" },
+            new() { Name = "Cardio Factory", Purpose = "Cardio" },
+            new() { Name = "Pace Builder", Purpose = "Cardio" },
+            new() { Name = "Spin and Sweat", Purpose = "Cardio" },
+            new() { Name = "Enduro Motion", Purpose = "Cardio" },
+            new() { Name = "Breath and Burn", Purpose = "Cardio" },
+            new() { Name = "Cardio 360", Purpose = "Cardio" },
+            new() { Name = "Step Pulse", Purpose = "Cardio" },
+            new() { Name = "Run Fit Lab", Purpose = "Cardio" },
+            new() { Name = "Cardio Storm", Purpose = "Cardio" },
+            new() { Name = "Tempo Motion", Purpose = "Cardio" },
+            new() { Name = "Aerobic Core", Purpose = "Cardio" },
+            new() { Name = "Endurance Rush", Purpose = "Cardio" },
+            new() { Name = "Pace Up", Purpose = "Cardio" },
+            new() { Name = "Cardio Sprint Lab", Purpose = "Cardio" },
+            new() { Name = "Energy Ride", Purpose = "Cardio" },
+
+            new() { Name = "Kick Start Combat", Purpose = "MartialArts" },
+            new() { Name = "Boxing Basics", Purpose = "MartialArts" },
+            new() { Name = "Combat Flow", Purpose = "MartialArts" },
+            new() { Name = "Martial Motion", Purpose = "MartialArts" },
+            new() { Name = "Kickboxing Power", Purpose = "MartialArts" },
+            new() { Name = "Strike Zone", Purpose = "MartialArts" },
+            new() { Name = "Fight Fit", Purpose = "MartialArts" },
+            new() { Name = "Combat Conditioning", Purpose = "MartialArts" },
+            new() { Name = "Punch and Move", Purpose = "MartialArts" },
+            new() { Name = "Warrior Session", Purpose = "MartialArts" },
+            new() { Name = "Karate Motion", Purpose = "MartialArts" },
+            new() { Name = "Muay Thai Core", Purpose = "MartialArts" },
+            new() { Name = "Strike and Sweat", Purpose = "MartialArts" },
+            new() { Name = "Martial Arts Lab", Purpose = "MartialArts" },
+            new() { Name = "Combat Burn", Purpose = "MartialArts" },
+            new() { Name = "Power Kick", Purpose = "MartialArts" },
+            new() { Name = "Shadow Boxing", Purpose = "MartialArts" },
+            new() { Name = "Defense Drill", Purpose = "MartialArts" },
+            new() { Name = "Fight Engine", Purpose = "MartialArts" },
+            new() { Name = "Combat Pulse", Purpose = "MartialArts" },
+            new() { Name = "Kick and Core", Purpose = "MartialArts" },
+            new() { Name = "Box Fit Pro", Purpose = "MartialArts" },
+            new() { Name = "Warrior Conditioning", Purpose = "MartialArts" },
+            new() { Name = "Striking Fundamentals", Purpose = "MartialArts" },
+            new() { Name = "Martial Fusion", Purpose = "MartialArts" },
+            new() { Name = "Boxing Circuit", Purpose = "MartialArts" },
+            new() { Name = "Combat Energy", Purpose = "MartialArts" },
+            new() { Name = "Strike Flow", Purpose = "MartialArts" },
+            new() { Name = "Fighter Core", Purpose = "MartialArts" },
+            new() { Name = "Kickstorm", Purpose = "MartialArts" },
+            new() { Name = "Power Combat", Purpose = "MartialArts" },
+            new() { Name = "Punch Lab", Purpose = "MartialArts" },
+            new() { Name = "Martial Burn", Purpose = "MartialArts" },
+            new() { Name = "Combat 360", Purpose = "MartialArts" },
+            new() { Name = "Strike Builder", Purpose = "MartialArts" },
+            new() { Name = "Warrior Move", Purpose = "MartialArts" },
+            new() { Name = "Kickboxing Rush", Purpose = "MartialArts" },
+            new() { Name = "Combat Focus", Purpose = "MartialArts" },
+            new() { Name = "Box and Burn", Purpose = "MartialArts" },
+            new() { Name = "Fight Motion", Purpose = "MartialArts" },
+
+            new() { Name = "Stretch Flow", Purpose = "Flexibility" },
+            new() { Name = "Mobility Basics", Purpose = "Flexibility" },
+            new() { Name = "Yoga Relax", Purpose = "Flexibility" },
+            new() { Name = "Pilates Balance", Purpose = "Flexibility" },
+            new() { Name = "Body Flex", Purpose = "Flexibility" },
+            new() { Name = "Flex and Breathe", Purpose = "Flexibility" },
+            new() { Name = "Core Stretch", Purpose = "Flexibility" },
+            new() { Name = "Mobility Motion", Purpose = "Flexibility" },
+            new() { Name = "Calm Body Flow", Purpose = "Flexibility" },
+            new() { Name = "Balance Studio", Purpose = "Flexibility" },
+            new() { Name = "Stretch and Recover", Purpose = "Flexibility" },
+            new() { Name = "Gentle Flow", Purpose = "Flexibility" },
+            new() { Name = "Flexibility Lab", Purpose = "Flexibility" },
+            new() { Name = "Yoga Energy", Purpose = "Flexibility" },
+            new() { Name = "Pilates Core", Purpose = "Flexibility" },
+            new() { Name = "Recovery Motion", Purpose = "Flexibility" },
+            new() { Name = "Deep Stretch", Purpose = "Flexibility" },
+            new() { Name = "Balance and Flow", Purpose = "Flexibility" },
+            new() { Name = "Flexible Body", Purpose = "Flexibility" },
+            new() { Name = "Stretch Reset", Purpose = "Flexibility" },
+            new() { Name = "Mobility Reset", Purpose = "Flexibility" },
+            new() { Name = "Yoga Calm", Purpose = "Flexibility" },
+            new() { Name = "Pilates Flow Pro", Purpose = "Flexibility" },
+            new() { Name = "Flex Fusion", Purpose = "Flexibility" },
+            new() { Name = "Posture and Stretch", Purpose = "Flexibility" },
+            new() { Name = "Body Alignment", Purpose = "Flexibility" },
+            new() { Name = "Stretch Therapy", Purpose = "Flexibility" },
+            new() { Name = "Mobility Builder", Purpose = "Flexibility" },
+            new() { Name = "Flex Start", Purpose = "Flexibility" },
+            new() { Name = "Calm Core", Purpose = "Flexibility" },
+            new() { Name = "Yoga Restore", Purpose = "Flexibility" },
+            new() { Name = "Pilates Precision", Purpose = "Flexibility" },
+            new() { Name = "Flexibility Focus", Purpose = "Flexibility" },
+            new() { Name = "Stretch and Stabilize", Purpose = "Flexibility" },
+            new() { Name = "Mobility 360", Purpose = "Flexibility" },
+            new() { Name = "Body Ease", Purpose = "Flexibility" },
+            new() { Name = "Flow and Lengthen", Purpose = "Flexibility" },
+            new() { Name = "Recovery Stretch Lab", Purpose = "Flexibility" },
+            new() { Name = "Total Body Flex", Purpose = "Flexibility" },
+            new() { Name = "Mindful Mobility", Purpose = "Flexibility" }
+        };
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -74,9 +305,6 @@ namespace Gymify.Services.Database
                 radnikHash, radnikSalt,
                 userHash, userSalt);
 
-            // 400 dodatnih usera:
-            // 300 ide u 2025
-            // 100 ide u 2026
             var additionalUsers = GenerateAdditionalUsers(userHash, userSalt, 400);
 
             var allUsers = baseUsers.Concat(additionalUsers).ToList();
@@ -130,6 +358,18 @@ namespace Gymify.Services.Database
                 userCreatedDates
             );
 
+            var harisMember = membershipSeed.Members.First(x => x.UserId == 11);
+            harisMember.MembershipId = 1;
+            harisMember.PaymentDate = new DateTime(2025, 1, 18);
+            harisMember.ExpirationDate = new DateTime(2026, 1, 18);
+
+            var harisPayment = membershipSeed.Payments.First(x => x.UserId == 11);
+            harisPayment.MembershipId = 1;
+            harisPayment.Amount = 300m;
+            harisPayment.PaymentDate = new DateTime(2025, 1, 18);
+            harisPayment.PaidAt = new DateTime(2025, 1, 18);
+            harisPayment.BillingPeriod = "yearly";
+
             modelBuilder.Entity<Member>().HasData(membershipSeed.Members);
             modelBuilder.Entity<Payment>().HasData(membershipSeed.Payments);
 
@@ -144,6 +384,179 @@ namespace Gymify.Services.Database
                 allUsers.Max(x => x.Id)
             );
             modelBuilder.Entity<Reservation>().HasData(reservations);
+
+            modelBuilder.Entity<Reservation>().HasData(
+    new Reservation
+    {
+        Id = 10006,
+        UserId = 11,
+        TrainingId = 4, // 15.1.2025 20:00
+        CreatedAt = new DateTime(2025, 1, 12),
+        Status = "Cancelled",
+        CancelledAt = new DateTime(2025, 1, 14),
+        CancelReason = "Privatne obaveze",
+
+    },
+    new Reservation
+    {
+        Id = 10007,
+        UserId = 11,
+        TrainingId = 44, // 18.1.2025 07:00
+        CreatedAt = new DateTime(2025, 1, 15),
+        Status = "Cancelled",
+        CancelledAt = new DateTime(2025, 1, 17),
+        CancelReason = "Prehlada",
+
+    },
+    new Reservation
+    {
+        Id = 10008,
+        UserId = 11,
+        TrainingId = 45, // 20.1.2025 13:00
+        CreatedAt = new DateTime(2025, 1, 17),
+        Status = "Cancelled",
+        CancelledAt = new DateTime(2025, 1, 19),
+        CancelReason = "Promjena rasporeda",
+
+    },
+    new Reservation
+    {
+        Id = 10009,
+        UserId = 11,
+        TrainingId = 57, // 5.2.2025 06:00
+        CreatedAt = new DateTime(2025, 2, 2),
+        Status = "Cancelled",
+        CancelledAt = new DateTime(2025, 2, 4),
+        CancelReason = "Poslovne obaveze",
+
+    },
+    new Reservation
+    {
+        Id = 10010,
+        UserId = 11,
+        TrainingId = 52,
+        CreatedAt = new DateTime(2025, 3, 9),
+        Status = "Cancelled",
+        CancelledAt = new DateTime(2025, 3, 11),
+        CancelReason = "Putovanje",
+
+    },
+    new Reservation
+    {
+        Id = 10011,
+        UserId = 11,
+        TrainingId = 51, // 13.3.2025 20:00
+        CreatedAt = new DateTime(2025, 3, 10),
+        Status = "Cancelled",
+        CancelledAt = new DateTime(2025, 3, 12),
+        CancelReason = "Zdravstveni razlozi",
+
+    },
+    new Reservation
+    {
+        Id = 10012,
+        UserId = 11,
+        TrainingId = 1, // 17.3.2025 12:00
+        CreatedAt = new DateTime(2025, 3, 14),
+        Status = "Cancelled",
+        CancelledAt = new DateTime(2025, 3, 16),
+        CancelReason = "Neodgodive obaveze",
+
+    },
+    new Reservation
+    {
+        Id = 10013,
+        UserId = 11,
+        TrainingId = 24, // 18.3.2025 07:00
+        CreatedAt = new DateTime(2025, 3, 15),
+        Status = "Cancelled",
+        CancelledAt = new DateTime(2025, 3, 17),
+        CancelReason = "Nedostatak vremena",
+
+    },
+
+    new Reservation
+    {
+        Id = 10014,
+        UserId = 11,
+        TrainingId = 2, // npr 10.1.2025
+        CreatedAt = new DateTime(2025, 1, 7),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10015,
+        UserId = 11,
+        TrainingId = 3, // 12.1.2025
+        CreatedAt = new DateTime(2025, 1, 9),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10016,
+        UserId = 11,
+        TrainingId = 5, // 22.1.2025
+        CreatedAt = new DateTime(2025, 1, 19),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10017,
+        UserId = 11,
+        TrainingId = 6, // 25.1.2025
+        CreatedAt = new DateTime(2025, 1, 22),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10018,
+        UserId = 11,
+        TrainingId = 7, // 30.1.2025
+        CreatedAt = new DateTime(2025, 1, 27),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10019,
+        UserId = 11,
+        TrainingId = 8, // 5.2.2025
+        CreatedAt = new DateTime(2025, 2, 2),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10020,
+        UserId = 11,
+        TrainingId = 9, // 10.2.2025
+        CreatedAt = new DateTime(2025, 2, 7),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10021,
+        UserId = 11,
+        TrainingId = 10, // 15.2.2025
+        CreatedAt = new DateTime(2025, 2, 12),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10022,
+        UserId = 11,
+        TrainingId = 11, // 20.2.2025
+        CreatedAt = new DateTime(2025, 2, 17),
+        Status = "Completed"
+    },
+    new Reservation
+    {
+        Id = 10023,
+        UserId = 11,
+        TrainingId = 12, // 25.2.2025
+        CreatedAt = new DateTime(2025, 2, 22),
+        Status = "Completed"
+    }
+
+);
 
             modelBuilder.Entity<Notification>().HasData(
                 new Notification
@@ -484,6 +897,36 @@ namespace Gymify.Services.Database
                     RedemptionCount = 0
                 }
             );
+
+            modelBuilder.Entity<UserReward>().HasData(
+    new UserReward
+    {
+        Id = 1,
+        UserId = 11,
+        RewardId = 6,
+        Code = "EJK65HC",
+        RedeemedAt = new DateTime(2025, 3, 10),
+        Status = "Used"
+    },
+    new UserReward
+    {
+        Id = 2,
+        UserId = 11,
+        RewardId = 7,
+        Code = "7MZ4X1WQ",
+        RedeemedAt = new DateTime(2025, 4, 22),
+        Status = "Used"
+    },
+    new UserReward
+    {
+        Id = 3,
+        UserId = 11,
+        RewardId = 1,
+        Code = "1BTR8LIP",
+        RedeemedAt = new DateTime(2026, 2, 15),
+        Status = "Active"
+    }
+);
 
             modelBuilder.Entity<LoyaltyPoint>().HasData(
                 new LoyaltyPoint
@@ -897,6 +1340,7 @@ namespace Gymify.Services.Database
         {
             var random = new Random(20260311);
             var users = new List<User>();
+            var usedFullNames = new HashSet<string>();
 
             int startId = 21;
             int counter = 0;
@@ -913,13 +1357,15 @@ namespace Gymify.Services.Database
 
                 var createdAt = new DateTime(2025, month, day);
 
+                var (firstName, lastName) = GetUniqueNameCombination(random, usedFullNames);
+
                 users.Add(new User
                 {
                     Id = id,
-                    FirstName = $"User{id}",
-                    LastName = $"Test{id}",
-                    Username = $"user{id}",
-                    Email = $"user{id}@gymify.com",
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = $"{firstName.ToLower()}{id}",
+                    Email = $"{firstName.ToLower()}.{lastName.ToLower()}{id}@gymify.com",
                     PhoneNumber = $"061{random.Next(100000, 999999)}",
                     DateOfBirth = new DateTime(
                         random.Next(1995, 2006),
@@ -946,13 +1392,15 @@ namespace Gymify.Services.Database
 
                 var createdAt = new DateTime(2026, month, day);
 
+                var (firstName, lastName) = GetUniqueNameCombination(random, usedFullNames);
+
                 users.Add(new User
                 {
                     Id = id,
-                    FirstName = $"User{id}",
-                    LastName = $"Test{id}",
-                    Username = $"user{id}",
-                    Email = $"user{id}@gymify.com",
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = $"{firstName.ToLower()}.{lastName.ToLower()}{id}",
+                    Email = $"{firstName.ToLower()}.{lastName.ToLower()}{id}@gymify.com",
                     PhoneNumber = $"061{random.Next(100000, 999999)}",
                     DateOfBirth = new DateTime(
                         random.Next(1995, 2006),
@@ -971,6 +1419,24 @@ namespace Gymify.Services.Database
             }
 
             return users;
+        }
+
+        private static (string firstName, string lastName) GetUniqueNameCombination(
+            Random random,
+            HashSet<string> usedFullNames)
+        {
+            while (true)
+            {
+                var firstName = FirstNames[random.Next(FirstNames.Length)];
+                var lastName = LastNames[random.Next(LastNames.Length)];
+
+                var fullNameKey = $"{firstName}|{lastName}";
+
+                if (usedFullNames.Add(fullNameKey))
+                {
+                    return (firstName, lastName);
+                }
+            }
         }
 
         private static List<UserRole> GenerateUserRoles(List<User> users)
@@ -1092,18 +1558,13 @@ namespace Gymify.Services.Database
             var trainings = new List<Training>();
 
             var trainerIds = new List<int> { 3, 4, 5, 6 };
-
-            var names = new[]
-            {
-        "HIIT","CrossFit","Yoga Flow","Pilates","Cardio Blast",
-        "Bootcamp","Boxing","Kickboxing","Strength Training",
-        "Zumba","Morning Fitness","Evening Cardio",
-        "Functional Training","Circuit Training","Powerlifting"
-    };
+            var shuffledSeedItems = TrainingSeedItems
+                .OrderBy(x => random.Next())
+                .Take(120)
+                .ToList();
 
             int id = 1;
 
-            // 2025 treninzi
             for (int i = 0; i < 60; i++)
             {
                 int trainerId = trainerIds[random.Next(trainerIds.Count)];
@@ -1111,16 +1572,17 @@ namespace Gymify.Services.Database
                 int day = random.Next(1, 25);
                 int duration = random.Next(35, 61);
 
+                var seedItem = shuffledSeedItems[i];
                 var startDate = new DateTime(2025, month, day, random.Next(6, 21), 0, 0);
 
                 trainings.Add(new Training
                 {
                     Id = id++,
                     UserId = trainerId,
-                    Name = names[random.Next(names.Length)],
+                    Name = seedItem.Name,
                     DurationMinutes = duration,
                     IntensityLevel = random.Next(1, 6),
-                    Purpose = "Fitness",
+                    Purpose = seedItem.Purpose,
                     MaxAmountOfParticipants = random.Next(10, 20),
                     CurrentParticipants = 0,
                     ParticipatedOfAllTime = random.Next(50, 300),
@@ -1130,7 +1592,6 @@ namespace Gymify.Services.Database
                 });
             }
 
-            // 2026 treninzi
             for (int i = 0; i < 60; i++)
             {
                 int trainerId = trainerIds[random.Next(trainerIds.Count)];
@@ -1138,16 +1599,17 @@ namespace Gymify.Services.Database
                 int day = random.Next(1, 25);
                 int duration = random.Next(35, 61);
 
+                var seedItem = shuffledSeedItems[60 + i];
                 var startDate = new DateTime(2026, month, day, random.Next(6, 21), 0, 0);
 
                 trainings.Add(new Training
                 {
                     Id = id++,
                     UserId = trainerId,
-                    Name = names[random.Next(names.Length)],
+                    Name = seedItem.Name,
                     DurationMinutes = duration,
                     IntensityLevel = random.Next(1, 6),
-                    Purpose = "Fitness",
+                    Purpose = seedItem.Purpose,
                     MaxAmountOfParticipants = random.Next(10, 20),
                     CurrentParticipants = 0,
                     ParticipatedOfAllTime = 0,

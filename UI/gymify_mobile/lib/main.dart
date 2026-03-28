@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gymify_mobile/providers/loyalty_point_history_provider.dart';
 import 'package:gymify_mobile/providers/loyalty_point_provider.dart';
@@ -21,7 +22,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('bs');
 
-  Stripe.publishableKey = "pk_test_51T6hS0CMbcejIOSaWb12W42JyQNdTJHRweDtYsN01qYQx1NFT04sUGdUIHKx1OV5MZJKvMHHpgoWzvOPi9955ZhJ002lptva2y";
+  await dotenv.load(fileName: ".env");
+
+  Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'] ?? '';
   await Stripe.instance.applySettings();
 
   runApp(

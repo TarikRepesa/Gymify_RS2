@@ -13,22 +13,23 @@ Widget UserRewardWidget() {
     create: (context) {
       final paging = UniversalPagingProvider<UserReward>(
         pageSize: 5,
-        fetcher: ({
-          required int page,
-          required int pageSize,
-          String? filter,
-          bool includeTotalCount = true,
-        }) {
-          return context.read<UserRewardProvider>().get(
-            filter: {
-              "page": page,
-              "pageSize": pageSize,
-              "includeTotalCount": includeTotalCount,
-              if (filter != null && filter.trim().isNotEmpty)
-                "fts": filter.trim(),
+        fetcher:
+            ({
+              required int page,
+              required int pageSize,
+              String? filter,
+              bool includeTotalCount = true,
+            }) {
+              return context.read<UserRewardProvider>().get(
+                filter: {
+                  "page": page,
+                  "pageSize": pageSize,
+                  "includeTotalCount": includeTotalCount,
+                  if (filter != null && filter.trim().isNotEmpty)
+                    "fts": filter.trim(),
+                },
+              );
             },
-          );
-        },
       );
 
       Future.microtask(() => paging.loadPage());
@@ -126,12 +127,9 @@ Widget UserRewardWidget() {
               ],
               onSubmit: (payload) async {
                 try {
-                  await context.read<UserRewardProvider>().update(
-                    ur.id,
-                    {
-                      "status": (payload["status"] ?? "").toString(),
-                    },
-                  );
+                  await context.read<UserRewardProvider>().update(ur.id, {
+                    "status": (payload["status"] ?? "").toString(),
+                  });
 
                   await paging.loadPage();
                   SnackbarHelper.showUpdate(
@@ -145,7 +143,17 @@ Widget UserRewardWidget() {
               },
             );
           },
-          onDelete: null,
+          onDelete: (ur) async {
+            try {
+              await context.read<UserRewardProvider>().delete(ur.id);
+
+              await paging.loadPage();
+
+              SnackbarHelper.showDelete(context, "Kod je uspješno obrisan.");
+            } catch (e) {
+              SnackbarHelper.showError(context, e.toString());
+            }
+          },
           footer: _pagingControls(paging),
         );
       },

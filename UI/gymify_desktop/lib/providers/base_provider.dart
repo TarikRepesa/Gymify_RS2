@@ -37,7 +37,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
         result.items.add(fromJson(item));
       }
     } else if (json is List) {
-      // fallback – API vraća listu
       result.totalCount = json.length;
 
       for (var item in json) {

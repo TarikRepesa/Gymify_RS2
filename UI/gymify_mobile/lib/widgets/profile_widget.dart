@@ -134,8 +134,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
       final result = await _loyaltyProvider.get(
         filter: <String, dynamic>{
           "UserId": userId,
-          "page": 0,
-          "pageSize": 1,
           "IncludeUser": false,
         },
       );
@@ -262,7 +260,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Greška: $e")));
+      ).showSnackBar(SnackBar(content: Text("$e")));
     }
   }
 
@@ -520,7 +518,7 @@ class _LoyaltyCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  "Svaka rezervacija = +1 poen",
+                  "Svaka rezervacija = +10 poena",
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.92),
                     fontWeight: FontWeight.w700,
@@ -1054,7 +1052,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Greška: $e")));
+      ).showSnackBar(SnackBar(content: Text("$e")));
 
       setState(() => _submitting = false);
     }

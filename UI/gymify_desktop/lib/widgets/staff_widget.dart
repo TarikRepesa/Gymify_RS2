@@ -651,7 +651,7 @@ Future<void> _openAddWorkerTaskDialog(BuildContext context, User worker) async {
     onSubmit: (payload) async {
       try {
         await context.read<WorkerTaskProvider>().insert({
-          "userId": payload["userId"],
+          "userId": worker.id,
           "name": payload["name"],
           "details": payload["details"],
           "createdTaskDate": DateHelper.toIsoFromUi(payload["createdTaskDate"]),

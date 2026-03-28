@@ -174,7 +174,7 @@ Widget WorkerTaskWidget() {
             try {
               await context.read<WorkerTaskProvider>().delete(task.id);
               await paging.loadPage();
-              SnackbarHelper.showInfo(context, "Zadatak obrisan.");
+              SnackbarHelper.showDelete(context, "Zadatak obrisan.");
             } catch (e) {
               SnackbarHelper.showError(context, e.toString());
             }

@@ -67,25 +67,25 @@ namespace Gymify.Services.Implementations
             var resolvedRewardStatus = ResolveRewardStatusForRead(reward);
 
             if (resolvedRewardStatus == "SoftDeleted")
-                throw new BusinessException("Nagrada je privremeno obrisana.");
+                throw new InvalidOperationException("Nagrada je privremeno obrisana.");
 
             if (resolvedRewardStatus == "Inactive")
-                throw new BusinessException("Nagrada nije aktivna.");
+                throw new InvalidOperationException("Nagrada nije aktivna.");
 
             if (resolvedRewardStatus == "Planned")
-                throw new BusinessException("Nagrada još nije dostupna za preuzimanje.");
+                throw new InvalidOperationException("Nagrada još nije dostupna za preuzimanje.");
 
             if (resolvedRewardStatus == "Expired")
-                throw new ValidationException("Nagrada je istekla.");
+                throw new InvalidOperationException("Nagrada je istekla.");
 
             var loyalty = await _context.LoyaltyPoints
                 .FirstOrDefaultAsync(x => x.UserId == request.UserId);
 
             if (loyalty == null)
-                throw new BusinessException("Korisnik nema loyalty bodove.");
+                throw new UserException("Korisnik nema loyalty bodove.");
 
             if (loyalty.TotalPoints < reward.RequiredPoints)
-                throw new BusinessException("Korisnik nema dovoljno bodova za ovu nagradu.");
+                throw new UserException("Korisnik nema dovoljno bodova za ovu nagradu.");
 
             loyalty.TotalPoints -= reward.RequiredPoints;
 
@@ -110,21 +110,21 @@ namespace Gymify.Services.Implementations
                 throw new NotFoundException("Korisnička nagrada nije pronađena.");
 
             if (string.IsNullOrWhiteSpace(request.Status))
-                throw new ValidationException("Status je obavezan.");
+                throw new UserException("Status je obavezan.");
 
             var newStatus = request.Status.Trim();
 
             if (newStatus != "Active" && newStatus != "Used" && newStatus != "Expired")
-                throw new ValidationException("Dozvoljeni statusi su: Active, Used, Expired.");
+                throw new UserException("Dozvoljeni statusi su: Active, Used, Expired.");
 
             if (existing.Status == "Used")
-                throw new BusinessException("Iskorištena nagrada ne može mijenjati status.");
+                throw new InvalidOperationException("Iskorištena nagrada ne može mijenjati status.");
 
             if (existing.Status == "Expired")
-                throw new BusinessException("Istekla nagrada ne može mijenjati status.");
+                throw new InvalidOperationException("Istekla nagrada ne može mijenjati status.");
 
             if (newStatus == "Active")
-                throw new ValidationException("Status se ne može vratiti na Active.");
+                throw new InvalidOperationException("Status se ne može vratiti na Active.");
 
             var reward = existing.Reward;
             if (reward == null)
@@ -134,18 +134,18 @@ namespace Gymify.Services.Implementations
             var rewardStatus = ResolveRewardStatusForRead(reward);
 
             if (rewardStatus == "SoftDeleted")
-                throw new BusinessException("Povezana nagrada je privremeno obrisana.");
+                throw new InvalidOperationException("Povezana nagrada je privremeno obrisana.");
 
             if (newStatus == "Used")
             {
                 if (reward.ValidTo < now)
-                    throw new BusinessException("Nagrada je istekla i više se ne može iskoristiti.");
+                    throw new InvalidOperationException("Nagrada je istekla i više se ne može iskoristiti.");
             }
 
             if (newStatus == "Expired")
             {
                 if (reward.ValidTo >= now)
-                    throw new BusinessException("Nagrada još nije istekla i ne može dobiti status Expired.");
+                    throw new InvalidOperationException("Nagrada još nije istekla i ne može dobiti status Expired.");
             }
 
             entity.Status = newStatus;
@@ -155,7 +155,12 @@ namespace Gymify.Services.Implementations
 
         protected override async Task BeforeDelete(UserReward entity)
         {
-            throw new ValidationException("Preuzeta nagrada se ne može obrisati.");
+            if (entity.Status?.ToLower() == "active")
+            {
+                throw new ForbiddenException("Aktivan kod se ne može obrisati.");
+            }
+
+            await base.BeforeDelete(entity);
         }
 
         public async Task<UserRewardResponse?> RedeemAsync(int userId, int rewardId)
@@ -168,16 +173,16 @@ namespace Gymify.Services.Implementations
             var resolvedRewardStatus = ResolveRewardStatusForRead(reward);
 
             if (resolvedRewardStatus == "SoftDeleted")
-                throw new BusinessException("Nagrada je privremeno obrisana.");
+                throw new InvalidOperationException("Nagrada je privremeno obrisana.");
 
             if (resolvedRewardStatus == "Inactive")
-                throw new BusinessException("Nagrada nije aktivna.");
+                throw new InvalidOperationException("Nagrada nije aktivna.");
 
             if (resolvedRewardStatus == "Planned")
-                throw new BusinessException("Nagrada još nije dostupna.");
+                throw new InvalidOperationException("Nagrada još nije dostupna.");
 
             if (resolvedRewardStatus == "Expired")
-                throw new ValidationException("Nagrada je istekla.");
+                throw new InvalidOperationException("Nagrada je istekla.");
 
             var loyalty = await _context.LoyaltyPoints
                 .FirstOrDefaultAsync(x => x.UserId == userId);
@@ -186,7 +191,7 @@ namespace Gymify.Services.Implementations
                 throw new NotFoundException("Loyalty podaci nisu pronađeni.");
 
             if (loyalty.TotalPoints < reward.RequiredPoints)
-                throw new ValidationException("Nemate dovoljno bodova za preuzimanje ove nagrade.");
+                throw new UserException("Nemate dovoljno bodova za preuzimanje ove nagrade.");
 
             loyalty.TotalPoints -= reward.RequiredPoints;
 

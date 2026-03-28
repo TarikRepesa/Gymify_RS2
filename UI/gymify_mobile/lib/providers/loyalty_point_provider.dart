@@ -25,7 +25,7 @@ class LoyaltyPointProvider extends BaseProvider<LoyaltyPoint> {
 
     HttpHelper.checkResponse(response);
 
-    throw Exception("Greška (${response.statusCode}): ${response.body}");
+    return LoyaltyPoint.fromJson(jsonDecode(response.body));
   }
 
   Future<LoyaltyPoint> subtractPoints(dynamic request) async {
@@ -39,6 +39,7 @@ class LoyaltyPointProvider extends BaseProvider<LoyaltyPoint> {
 
     HttpHelper.checkResponse(response);
 
-    throw Exception("Greška (${response.statusCode}): ${response.body}");
+    return LoyaltyPoint.fromJson(jsonDecode(response.body));
+
   }
 }

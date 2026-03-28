@@ -122,7 +122,6 @@ class _ReviewWidgetState extends State<ReviewWidget> {
     try {
       await context.read<ReviewProvider>().delete(id);
 
-      // refresh: zadrži trenutni search + stars filter
       await paging.search(_searchCtrl.text.trim());
 
       if (mounted) {

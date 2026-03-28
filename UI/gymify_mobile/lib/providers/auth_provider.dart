@@ -8,7 +8,7 @@ import '../models/login_response.dart';
 import '../utils/session.dart';
 
 class AuthProvider with ChangeNotifier {
-  static const String apiUrl = '${ApiConfig.apiBase}/api/User/login';
+  static String apiUrl = '${ApiConfig.apiBase}/api/User/login';
 
   Future<String> prijava(LoginRequest request) async {
     final url = Uri.parse(apiUrl);
@@ -29,7 +29,7 @@ class AuthProvider with ChangeNotifier {
     final imaPristup =
         loginResp.roles.any((role) => allowedRoles.contains(role));
 
-    if (!imaPristup) return "Zabranjen pristup";
+    if (!imaPristup) return "ZABRANJENO";
 
     Session.token = loginResp.token;
     Session.userId = loginResp.userId;

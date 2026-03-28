@@ -65,7 +65,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
 
-      ConnectionStrings__DefaultConnection: "Server=gymify-sqlserver,1433;Database=${MSSQL_DB};User Id=${MSSQL_USER};Password=${MSSQL_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=True"
+      ConnectionStrings__DefaultConnection: ${CONNECTION_STRING}
 
       RABBITMQ_HOST: gymify-rabbitmq
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}

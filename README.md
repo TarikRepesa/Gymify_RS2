@@ -27,6 +27,7 @@ Za provjeru i pokretanje projekta potrebno je imati instalirano:
 - **Android Studio**
 - **Flutter SDK**
 - **.NET SDK (za backend, ako se ručno pokreće)**
+- **Stripe CLI**
 
 ---
 
@@ -53,7 +54,7 @@ EnviormentalPostavke.7z
 
 1. Otvoriti šifrirani fajl `ENV.7z`
 2. Iz njega izvaditi fajl **`.env`**
-3. **Prije pokretanja Dockera**, `.env` fajl ubaciti u **root folder projekta**  
+3. **Prije pokretanja Dockera**, `.env` fajl ubaciti u **root folder projekta**
    (folder gdje je urađen `git clone`)
 
 ⚠️ **Bez ovog koraka Docker servisi se neće pravilno pokrenuti.**
@@ -68,13 +69,20 @@ Kada je `.env` fajl pravilno postavljen, u terminalu (root folder projekta) pokr
 docker compose up -d --build
 
 
+## ▶️ Pokretanje Stripe listenera
+
+Nakon što je Docker pokrenut, u novom terminalu pokrenuti:
+
+stripe listen --forward-to http://localhost:5265/api/payment/webhook
+
+Ako vam se uspjesno izgenerise webhook secret, onda ste uspjeli, ostavite cmd upaljen dok budete testirali plaćanje
 
 
 ## ▶️ Pokretanje aplikacije
 
 
 U projektu se nalazi **šifrirani fajl**:
-FIT-RS2-IB180019-DesktopApp.7z
+FIT-RS2-IB180019-Both-Apps.7z
 
 🔐 **Šifra arhive:** `FIT`
 
@@ -115,7 +123,7 @@ Za testiranje dolaska maila na email dummy korisnika
 "Tarik Malic (tare45)" koristite:
 
 - **Email:** `healthcaretest190@gmail.com`
-- **Password:** 
+- **Password:** `rs1healthcaretest`
 
 Za testiranje dolaska maila na email dummy korisnika
 "Haris Hasic (haris1)" koristite:

@@ -138,12 +138,12 @@ class _ReservationWidgetState extends State<ReservationWidget> {
 
       await trainingProvider.down(trainingId);
 
-      await lpProvider.subtractPoints({"userId": Session.userId, "points": 1});
+      await lpProvider.subtractPoints({"userId": Session.userId, "points": 10});
 
       await lpProviderH.insert({
         "userId": Session.userId,
         "status": "Otkazivanje rezervacije",
-        "amountPointsParticipation": 1,
+        "amountPointsParticipation": 10,
         "createdAt": DateTime.now().toIso8601String(),
       });
 

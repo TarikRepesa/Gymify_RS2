@@ -38,7 +38,7 @@ namespace Gymify.API.Controllers
             return base.GetById(id);
         }
 
-        [Authorize(Roles = "Admin,Radnik")]
+        [Authorize(Roles = "Korisnik,Admin,Radnik")]
         public override Task<bool> Delete(int id)
         {
             return base.Delete(id);

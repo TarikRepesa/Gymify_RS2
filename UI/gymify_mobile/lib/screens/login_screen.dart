@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacementNamed(context, AppRoutes.base);
     } catch (e) {
       if (!mounted) return;
-      SnackbarHelper.showError(context, 'Greška pri prijavi. Pokušaj ponovo: $e');
+      SnackbarHelper.showError(context, '$e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

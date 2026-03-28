@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gymify.API.Controllers
 {
-    public class LoyaltyPointController : BaseCRUDController<LoyaltyPointResponse, BaseSearchObject, LoyaltyPointUpsertRequest, LoyaltyPointUpsertRequest>
+    public class LoyaltyPointController : BaseCRUDController<LoyaltyPointResponse, LoyaltyPointSearchObject, LoyaltyPointUpsertRequest, LoyaltyPointUpsertRequest>
     {
         ILoyaltyPointService _service;
         public LoyaltyPointController(ILoyaltyPointService service) : base(service)

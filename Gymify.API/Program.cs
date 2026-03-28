@@ -2,6 +2,7 @@ using DotNetEnv;
 using Gymify.EmailConsumer.Configuration;
 using Gymify.Services;
 using Gymify.Services.Database;
+using Gymify.Services.Exceptions;
 using Gymify.Services.Implementations;
 using Gymify.Services.Interfaces;
 using Gymify.Services.Services;
@@ -10,6 +11,7 @@ using Gymify.WebAPI.Services;
 using Gymify.WebAPI.StripeConfig;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
@@ -166,6 +168,42 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
+
+        var error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+        switch (error)
+        {
+            case UserException ex:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            case ForbiddenException ex:
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            case NotFoundException ex:
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            default:
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    message = "Došlo je do neočekivane greške."
+                });
+                break;
+        }
+    });
+});
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -173,11 +211,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var db = scope.ServiceProvider.GetRequiredService<GymifyDbContext>();
-//     db.Database.Migrate();
-// }
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<GymifyDbContext>();
+    db.Database.Migrate();
+}
 
 app.UseStaticFiles();
 

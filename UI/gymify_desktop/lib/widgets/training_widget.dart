@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
+import 'package:gymify_desktop/helper/exception_read_helper.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymify_desktop/config/api_config.dart';
@@ -209,7 +210,9 @@ Future<void> _openEditTrainingDialog({
         Future<void> pickStartDate() async {
           final today = _todayOnlyDate();
           final currentStart = training.startDate ?? today;
-          final initialDate = currentStart.isBefore(today) ? today : currentStart;
+          final initialDate = currentStart.isBefore(today)
+              ? today
+              : currentStart;
 
           final picked = await showDatePicker(
             context: dialogCtx,
@@ -242,9 +245,17 @@ Future<void> _openEditTrainingDialog({
             if (dialogCtx.mounted) {
               Navigator.pop(dialogCtx);
             }
+
+            if (context.mounted) {
+              SnackbarHelper.showSuccess(context, "Trening uspješno obrisan.");
+            }
           } catch (e) {
             if (dialogCtx.mounted) {
-              SnackbarHelper.showError(dialogCtx, e.toString());
+              Navigator.pop(dialogCtx);
+            }
+
+            if (context.mounted) {
+              SnackbarHelper.showError(context, extractErrorMessage(e));
             }
           }
         }
@@ -273,7 +284,11 @@ Future<void> _openEditTrainingDialog({
             final maxP = int.parse(maxCtrl.text.trim());
             final startIso = DateHelper.toIsoFromUi(startDateCtrl.text.trim());
 
-            await dialogCtx.read<TrainingProvider>().update(training.id, {
+            final isOldTraining =
+                training.startDate != null &&
+                training.startDate!.isBefore(_todayOnlyDate());
+
+            final payload = <String, dynamic>{
               "id": training.id,
               "userId": trainerId,
               "name": nameCtrl.text.trim(),
@@ -283,7 +298,17 @@ Future<void> _openEditTrainingDialog({
               "maxAmountOfParticipants": maxP,
               "startDate": startIso,
               "trainingImage": trainingImageFileName,
-            });
+            };
+
+            if (!isOldTraining) {
+              payload["currentParticipants"] =
+                  training.currentParticipants ?? 0;
+            }
+
+            await dialogCtx.read<TrainingProvider>().update(
+              training.id,
+              payload,
+            );
 
             await paging.loadPage();
 
@@ -296,7 +321,7 @@ Future<void> _openEditTrainingDialog({
             }
           } catch (e) {
             if (dialogCtx.mounted) {
-              SnackbarHelper.showError(dialogCtx, e.toString());
+              SnackbarHelper.showError(dialogCtx, extractErrorMessage(e));
             }
           } finally {
             if (dialogCtx.mounted) {
@@ -365,7 +390,8 @@ Future<void> _openEditTrainingDialog({
                                                 errorBuilder: (_, __, ___) =>
                                                     const Center(
                                                       child: Icon(
-                                                        Icons.image_not_supported,
+                                                        Icons
+                                                            .image_not_supported,
                                                         color: Colors.white,
                                                         size: 46,
                                                       ),
@@ -396,8 +422,8 @@ Future<void> _openEditTrainingDialog({
                                     Text(
                                       pickedImage != null
                                           ? pickedImage!.path
-                                              .split(Platform.pathSeparator)
-                                              .last
+                                                .split(Platform.pathSeparator)
+                                                .last
                                           : (training.trainingImage ?? "Nema"),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
@@ -468,9 +494,10 @@ Future<void> _openEditTrainingDialog({
                         DropdownButtonFormField<String>(
                           isExpanded: true,
                           menuMaxHeight: 260,
-                          value: trainingPurposeDropdownItems.any(
-                            (item) => item.value == selectedPurpose,
-                          )
+                          value:
+                              trainingPurposeDropdownItems.any(
+                                (item) => item.value == selectedPurpose,
+                              )
                               ? selectedPurpose
                               : null,
                           items: trainingPurposeDropdownItems,
@@ -919,8 +946,8 @@ class _TrainingWidgetState extends State<TrainingWidget> {
                                       Text(
                                         pickedImage != null
                                             ? pickedImage!.path
-                                                .split(Platform.pathSeparator)
-                                                .last
+                                                  .split(Platform.pathSeparator)
+                                                  .last
                                             : "Nije odabrana slika.",
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
@@ -1005,9 +1032,10 @@ class _TrainingWidgetState extends State<TrainingWidget> {
                           DropdownButtonFormField<String>(
                             isExpanded: true,
                             menuMaxHeight: 260,
-                            value: trainingPurposeDropdownItems.any(
-                              (item) => item.value == selectedPurpose,
-                            )
+                            value:
+                                trainingPurposeDropdownItems.any(
+                                  (item) => item.value == selectedPurpose,
+                                )
                                 ? selectedPurpose
                                 : null,
                             items: trainingPurposeDropdownItems,
@@ -1162,10 +1190,7 @@ class _TrainingWidgetState extends State<TrainingWidget> {
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: const TextStyle(
-                fontSize: 13.5,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontSize: 13.5, color: Colors.black87),
               children: [
                 TextSpan(
                   text: "$label: ",
@@ -1203,8 +1228,8 @@ class _TrainingWidgetState extends State<TrainingWidget> {
     final startDateText = DateHelper.format(t.startDate!);
 
     final imgUrl = _trainingImageToUrl(t.trainingImage);
-    final isOld = t.startDate != null &&
-        t.startDate!.isBefore(_todayOnlyDate());
+    final isOld =
+        t.startDate != null && t.startDate!.isBefore(_todayOnlyDate());
 
     return Container(
       width: 300,
@@ -1308,7 +1333,11 @@ class _TrainingWidgetState extends State<TrainingWidget> {
           const SizedBox(height: 10),
           _infoRow(icon: Icons.flag_outlined, label: "Namjena", value: purpose),
           const SizedBox(height: 10),
-          _infoRow(icon: Icons.timer_outlined, label: "Trajanje", value: duration),
+          _infoRow(
+            icon: Icons.timer_outlined,
+            label: "Trajanje",
+            value: duration,
+          ),
           const SizedBox(height: 10),
           _infoRow(
             icon: Icons.local_fire_department_outlined,
@@ -1397,24 +1426,25 @@ class _TrainingWidgetState extends State<TrainingWidget> {
       create: (context) {
         final paging = UniversalPagingProvider<Training>(
           pageSize: 6,
-          fetcher: ({
-            required int page,
-            required int pageSize,
-            String? filter,
-            bool includeTotalCount = true,
-          }) {
-            return context.read<TrainingProvider>().get(
-              filter: {
-                "page": page,
-                "pageSize": pageSize,
-                "includeTotalCount": includeTotalCount,
-                if (filter != null && filter.trim().isNotEmpty)
-                  "FTS": filter.trim(),
-                "IncludeUser": true,
-                "IsOld": _showOldTrainings,
+          fetcher:
+              ({
+                required int page,
+                required int pageSize,
+                String? filter,
+                bool includeTotalCount = true,
+              }) {
+                return context.read<TrainingProvider>().get(
+                  filter: {
+                    "page": page,
+                    "pageSize": pageSize,
+                    "includeTotalCount": includeTotalCount,
+                    if (filter != null && filter.trim().isNotEmpty)
+                      "FTS": filter.trim(),
+                    "IncludeUser": true,
+                    "IsOld": _showOldTrainings,
+                  },
+                );
               },
-            );
-          },
         );
 
         Future.microtask(() => paging.loadPage());
@@ -1529,40 +1559,38 @@ class _TrainingWidgetState extends State<TrainingWidget> {
                   child: paging.isLoading && paging.items.isEmpty
                       ? const Center(child: CircularProgressIndicator())
                       : paging.items.isEmpty
-                          ? Center(
-                              child: Text(
-                                _showOldTrainings
-                                    ? "Nema starih treninga."
-                                    : "Nema aktivnih treninga.",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                ),
+                      ? Center(
+                          child: Text(
+                            _showOldTrainings
+                                ? "Nema starih treninga."
+                                : "Nema aktivnih treninga.",
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        )
+                      : SingleChildScrollView(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                top: 10,
+                                bottom: 18,
                               ),
-                            )
-                          : SingleChildScrollView(
-                              child: Align(
-                                alignment: Alignment.topCenter,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 10,
-                                    bottom: 18,
-                                  ),
-                                  child: Wrap(
-                                    spacing: 60,
-                                    runSpacing: 30,
-                                    children: paging.items
-                                        .map(
-                                          (t) => _card(
-                                            context: context,
-                                            paging: paging,
-                                            t: t,
-                                          ),
-                                        )
-                                        .toList(),
-                                  ),
-                                ),
+                              child: Wrap(
+                                spacing: 60,
+                                runSpacing: 30,
+                                children: paging.items
+                                    .map(
+                                      (t) => _card(
+                                        context: context,
+                                        paging: paging,
+                                        t: t,
+                                      ),
+                                    )
+                                    .toList(),
                               ),
                             ),
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 10),
                 _pagingControls(paging),

@@ -50,7 +50,7 @@ namespace Gymify.Services.Services
             var billingPeriod = (req.BillingPeriod ?? "monthly").Trim().ToLower();
 
             if (billingPeriod != "monthly" && billingPeriod != "yearly")
-                throw new ValidationException("BillingPeriod mora biti 'monthly' ili 'yearly'.");
+                throw new UserException("BillingPeriod mora biti 'monthly' ili 'yearly'.");
 
             var amount = billingPeriod == "yearly"
                 ? membership.YearPrice

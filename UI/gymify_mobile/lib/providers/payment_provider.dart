@@ -37,7 +37,8 @@ Future<String> createNewIntent(Map<String, dynamic> request) async {
 
   final response = await http.post(
     Uri.parse(url),
-    headers: HttpHelper.getHeaders()
+    headers: HttpHelper.getHeaders(),
+    body: jsonEncode(request)
   );
 
   HttpHelper.checkResponse(response);

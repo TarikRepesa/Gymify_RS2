@@ -4,7 +4,7 @@ using Gymify.Model.SearchObjects;
 
 namespace Gymify.Services.Interfaces
 {
-    public interface ILoyaltyPointService : ICRUDService<LoyaltyPointResponse, BaseSearchObject, LoyaltyPointUpsertRequest, LoyaltyPointUpsertRequest>
+    public interface ILoyaltyPointService : ICRUDService<LoyaltyPointResponse, LoyaltyPointSearchObject, LoyaltyPointUpsertRequest, LoyaltyPointUpsertRequest>
     {
         Task<LoyaltyPointResponse> AddPointsAsync(LoyaltyPointAdjustRequest req);
         Task<LoyaltyPointResponse> SubtractPointsAsync(LoyaltyPointAdjustRequest req);

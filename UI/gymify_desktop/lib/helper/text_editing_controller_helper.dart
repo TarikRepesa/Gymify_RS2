@@ -16,6 +16,8 @@ class Fields {
     });
   }
 
+  bool hasController(String name) => _c.containsKey(name);
+
   TextEditingController controller(String name) {
     final ctrl = _c[name];
     if (ctrl == null) throw ArgumentError('Ne postoji controller za "$name"');

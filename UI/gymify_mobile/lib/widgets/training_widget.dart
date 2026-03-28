@@ -82,7 +82,7 @@ class _TrainingWidgetState extends State<TrainingWidget> {
       final provider = context.read<TrainingProvider>();
 
       final items = await provider.getRecommended(
-        filter: {"userId": Session.userId, "take": 3, "IsOld": false},
+        filter: {"userId": Session.userId, "take": 3},
       );
 
       if (!mounted) return;
@@ -252,12 +252,12 @@ class _TrainingWidgetState extends State<TrainingWidget> {
 
     await trainingProvider.up(t.id);
 
-    await lpProvider.addPoints({"userId": Session.userId, "points": 1});
+    await lpProvider.addPoints({"userId": Session.userId, "points": 10});
 
     await lpProviderH.insert({
       "userId": Session.userId,
       "status": "Plaćanje nagrade",
-      "amountPointsParticipation": 1,
+      "amountPointsParticipation": 10,
       "createdAt": DateTime.now().toIso8601String(),
     });
 

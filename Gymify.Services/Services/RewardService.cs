@@ -49,13 +49,13 @@ namespace Gymify.Services.Implementations
         protected override async Task BeforeInsert(Reward entity, RewardInsertRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
-                throw new ValidationException("Naziv nagrade je obavezan.");
+                throw new UserException("Naziv nagrade je obavezan.");
 
             if (request.RequiredPoints <= 0)
-                throw new ValidationException("Potrebni poeni moraju biti veći od 0.");
+                throw new UserException("Potrebni poeni moraju biti veći od 0.");
 
             if (request.ValidTo < request.ValidFrom)
-                throw new ValidationException("Datum 'Vrijedi do' ne može biti prije datuma 'Vrijedi od'.");
+                throw new UserException("Datum 'Vrijedi do' ne može biti prije datuma 'Vrijedi od'.");
 
             entity.Status = ResolveRewardStatusForNormalFlow(request.ValidFrom, request.ValidTo);
             entity.IsLockedForEdit = false;
@@ -75,13 +75,13 @@ namespace Gymify.Services.Implementations
                 throw new NotFoundException("Nagrada nije pronađena.");
 
             if (string.IsNullOrWhiteSpace(request.Name))
-                throw new ValidationException("Naziv nagrade je obavezan.");
+                throw new UserException("Naziv nagrade je obavezan.");
 
             if (request.RequiredPoints <= 0)
-                throw new ValidationException("Potrebni poeni moraju biti veći od 0.");
+                throw new UserException("Potrebni poeni moraju biti veći od 0.");
 
             if (request.ValidTo < request.ValidFrom)
-                throw new ValidationException("Datum 'Vrijedi do' ne može biti prije datuma 'Vrijedi od'.");
+                throw new UserException("Datum 'Vrijedi do' ne može biti prije datuma 'Vrijedi od'.");
 
             var hasAnyRedemption = await _context.UserRewards
                 .AnyAsync(x => x.RewardId == entity.Id);
@@ -89,16 +89,16 @@ namespace Gymify.Services.Implementations
             if (hasAnyRedemption)
             {
                 if (!string.Equals(existing.Name, request.Name, StringComparison.Ordinal))
-                    throw new BusinessException("Naziv nagrade se ne može mijenjati nakon što je nagrada iskorištena.");
+                    throw new UserException("Naziv nagrade se ne može mijenjati nakon što je nagrada iskorištena.");
 
                 if (!string.Equals(existing.Description ?? "", request.Description ?? "", StringComparison.Ordinal))
-                    throw new BusinessException("Opis nagrade se ne može mijenjati nakon što je nagrada iskorištena.");
+                    throw new UserException("Opis nagrade se ne može mijenjati nakon što je nagrada iskorištena.");
 
                 if (existing.RequiredPoints != request.RequiredPoints)
-                    throw new BusinessException("Potrebni poeni se ne mogu mijenjati nakon što je nagrada iskorištena.");
+                    throw new UserException("Potrebni poeni se ne mogu mijenjati nakon što je nagrada iskorištena.");
 
                 if (existing.ValidFrom != request.ValidFrom)
-                    throw new BusinessException("Datum 'Vrijedi od' se ne može mijenjati nakon što je nagrada iskorištena.");
+                    throw new UserException("Datum 'Vrijedi od' se ne može mijenjati nakon što je nagrada iskorištena.");
             }
 
             entity.Status = ResolveRewardStatusForUpdate(
@@ -133,7 +133,7 @@ namespace Gymify.Services.Implementations
 
             if (hasBlockingCodes)
             {
-                throw new BusinessException(
+                throw new InvalidOperationException(
                     "Nagrada se ne može trajno obrisati dok postoje korisnici sa aktivnim kodovima koji još nisu iskorišteni ili nisu istekli.");
             }
 

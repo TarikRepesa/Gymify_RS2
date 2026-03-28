@@ -139,7 +139,7 @@ class _MembershipWidgetState extends State<MembershipWidget> {
   } catch (e) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Greška: $e")),
+      SnackBar(content: Text("$e")),
     );
   } finally {
     if (mounted) setState(() => _processing = false);
@@ -176,7 +176,7 @@ class _MembershipWidgetState extends State<MembershipWidget> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              "Greška pri učitavanju:\n$_error",
+              "$_error",
               textAlign: TextAlign.center,
             ),
           ),
