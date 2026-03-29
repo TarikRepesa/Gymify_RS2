@@ -390,7 +390,7 @@ namespace Gymify.Services.Database
     {
         Id = 10006,
         UserId = 11,
-        TrainingId = 4, // 15.1.2025 20:00
+        TrainingId = 4, 
         CreatedAt = new DateTime(2025, 1, 12),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 1, 14),
@@ -401,7 +401,7 @@ namespace Gymify.Services.Database
     {
         Id = 10007,
         UserId = 11,
-        TrainingId = 44, // 18.1.2025 07:00
+        TrainingId = 44, 
         CreatedAt = new DateTime(2025, 1, 15),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 1, 17),
@@ -412,7 +412,7 @@ namespace Gymify.Services.Database
     {
         Id = 10008,
         UserId = 11,
-        TrainingId = 45, // 20.1.2025 13:00
+        TrainingId = 45, 
         CreatedAt = new DateTime(2025, 1, 17),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 1, 19),
@@ -423,7 +423,7 @@ namespace Gymify.Services.Database
     {
         Id = 10009,
         UserId = 11,
-        TrainingId = 57, // 5.2.2025 06:00
+        TrainingId = 57, 
         CreatedAt = new DateTime(2025, 2, 2),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 2, 4),
@@ -445,7 +445,7 @@ namespace Gymify.Services.Database
     {
         Id = 10011,
         UserId = 11,
-        TrainingId = 51, // 13.3.2025 20:00
+        TrainingId = 51,
         CreatedAt = new DateTime(2025, 3, 10),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 3, 12),
@@ -456,7 +456,7 @@ namespace Gymify.Services.Database
     {
         Id = 10012,
         UserId = 11,
-        TrainingId = 1, // 17.3.2025 12:00
+        TrainingId = 1, 
         CreatedAt = new DateTime(2025, 3, 14),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 3, 16),
@@ -467,7 +467,7 @@ namespace Gymify.Services.Database
     {
         Id = 10013,
         UserId = 11,
-        TrainingId = 24, // 18.3.2025 07:00
+        TrainingId = 24, 
         CreatedAt = new DateTime(2025, 3, 15),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 3, 17),
@@ -479,49 +479,49 @@ namespace Gymify.Services.Database
     {
         Id = 10014,
         UserId = 11,
-        TrainingId = 2, // npr 10.1.2025
-        CreatedAt = new DateTime(2025, 1, 7),
-        Status = "Completed"
+        TrainingId = 2, 
+        CreatedAt = new DateTime(2025, 2, 7),
+        Status = "Confirmed"
     },
     new Reservation
     {
         Id = 10015,
         UserId = 11,
-        TrainingId = 3, // 12.1.2025
-        CreatedAt = new DateTime(2025, 1, 9),
-        Status = "Completed"
+        TrainingId = 3, 
+        CreatedAt = new DateTime(2025, 2, 9),
+        Status = "Confirmed"
     },
     new Reservation
     {
         Id = 10016,
         UserId = 11,
-        TrainingId = 5, // 22.1.2025
+        TrainingId = 5, 
         CreatedAt = new DateTime(2025, 1, 19),
-        Status = "Completed"
+        Status = "Confirmed"
     },
     new Reservation
     {
         Id = 10017,
         UserId = 11,
-        TrainingId = 6, // 25.1.2025
+        TrainingId = 6, 
         CreatedAt = new DateTime(2025, 1, 22),
-        Status = "Completed"
+        Status = "Confirmed"
     },
     new Reservation
     {
         Id = 10018,
         UserId = 11,
-        TrainingId = 7, // 30.1.2025
+        TrainingId = 7, 
         CreatedAt = new DateTime(2025, 1, 27),
-        Status = "Completed"
+        Status = "Confirmed"
     },
     new Reservation
     {
         Id = 10019,
         UserId = 11,
-        TrainingId = 8, // 5.2.2025
+        TrainingId = 8, 
         CreatedAt = new DateTime(2025, 2, 2),
-        Status = "Completed"
+        Status = "Confirmed"
     },
     new Reservation
     {
@@ -529,7 +529,7 @@ namespace Gymify.Services.Database
         UserId = 11,
         TrainingId = 9, // 10.2.2025
         CreatedAt = new DateTime(2025, 2, 7),
-        Status = "Completed"
+        Status = "Confirmed"
     },
     new Reservation
     {
@@ -537,7 +537,7 @@ namespace Gymify.Services.Database
         UserId = 11,
         TrainingId = 10, // 15.2.2025
         CreatedAt = new DateTime(2025, 2, 12),
-        Status = "Completed"
+        Status = "Confirmed"
     },
     new Reservation
     {
@@ -545,7 +545,7 @@ namespace Gymify.Services.Database
         UserId = 11,
         TrainingId = 11, // 20.2.2025
         CreatedAt = new DateTime(2025, 2, 17),
-        Status = "Completed"
+        Status = "Confirmed"
     },
     new Reservation
     {
@@ -553,7 +553,7 @@ namespace Gymify.Services.Database
         UserId = 11,
         TrainingId = 12, // 25.2.2025
         CreatedAt = new DateTime(2025, 2, 22),
-        Status = "Completed"
+        Status = "Confirmed"
     }
 
 );

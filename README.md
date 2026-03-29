@@ -61,21 +61,29 @@ EnviormentalPostavke.7z
 
 ---
 
+## ▶️ Pokretanje Stripe listenera
+
+1. Prije ovih koraka treba se instalirati Stripe CLI koji se moze naci na ovom linku: https://docs.stripe.com/stripe-cli/install?install-method=windows
+
+2. Kada ste uspjesno ispostovali korake, ukucajte komnadu `stripe --version` da provjerite da li stripe radi
+
+3. Ako uspjesno izbaci verziju, onda idite na ovaj link `https://dashboard.stripe.com/login`, te se ulogujte sa ovim kredencijalima
+
+- **Email:** `korisniktestiranje264@gmail.com`
+- **Password:** `Korisniktestiranje246
+
+4. Kada ste se ulogovali, vratite se na otvoren cmd, te kucajte `stripe login`, ovo ce prepoznati preko browser authentication da ste uspjesno ulogovani
+
+5. Nakon ovoga, ako zelite testirati stripe dio, u istom otvorenom terminalu kucate `stripe listen --forward-to http://localhost:5265/api/payment/webhook`.
+Ako vam se uspjesno izgenerise webhook secret, onda ste uspjeli, ostavite cmd upaljen dok budete testirali plaćanje
+
+
 ## 🐳 Pokretanje Dockera
 
 Kada je `.env` fajl pravilno postavljen, u terminalu (root folder projekta) pokrenuti:
 
 
 docker compose up -d --build
-
-
-## ▶️ Pokretanje Stripe listenera
-
-Nakon što je Docker pokrenut, u novom terminalu pokrenuti:
-
-stripe listen --forward-to http://localhost:5265/api/payment/webhook
-
-Ako vam se uspjesno izgenerise webhook secret, onda ste uspjeli, ostavite cmd upaljen dok budete testirali plaćanje
 
 
 ## ▶️ Pokretanje aplikacije
