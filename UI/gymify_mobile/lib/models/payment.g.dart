@@ -18,6 +18,7 @@ Payment _$PaymentFromJson(Map<String, dynamic> json) => Payment(
       : Membership.fromJson(json['membership'] as Map<String, dynamic>),
   amount: Payment._toDouble(json['amount']),
   paymentDate: DateTime.parse(json['paymentDate'] as String),
+  paymentStatus: json['paymentStatus'] as String?,
 );
 
 Map<String, dynamic> _$PaymentToJson(Payment instance) => <String, dynamic>{
@@ -26,6 +27,7 @@ Map<String, dynamic> _$PaymentToJson(Payment instance) => <String, dynamic>{
   'user': instance.user,
   'membershipId': instance.membershipId,
   'membership': instance.membership,
+  'paymentStatus': instance.paymentStatus,
   'amount': instance.amount,
   'paymentDate': instance.paymentDate.toIso8601String(),
 };

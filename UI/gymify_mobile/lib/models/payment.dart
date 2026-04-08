@@ -9,9 +9,9 @@ class Payment {
   final int id;
   final int userId;
   User? user;
-
   final int membershipId;
   final Membership? membership;
+  final String? paymentStatus;
 
   @JsonKey(fromJson: _toDouble)
   final double amount;
@@ -26,6 +26,7 @@ class Payment {
     this.membership,
     required this.amount,
     required this.paymentDate,
+    this.paymentStatus
   });
 
   factory Payment.fromJson(Map<String, dynamic> json) =>

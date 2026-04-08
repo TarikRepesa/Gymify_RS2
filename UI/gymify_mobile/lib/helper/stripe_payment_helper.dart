@@ -1,32 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:gymify_mobile/models/payment_intent_start_response.dart';
 import 'package:gymify_mobile/providers/payment_provider.dart';
 import 'package:provider/provider.dart';
 
 class StripePaymentHelper {
-  static Future<bool> pay(BuildContext context, {required int paymentId}) async {
-    try {
-      FocusManager.instance.primaryFocus?.unfocus(); 
-
-      final provider = context.read<PaymentProvider>();
-      final clientSecret = await provider.createStripeIntent(paymentId);
-
-      await Stripe.instance.initPaymentSheet(
-        paymentSheetParameters: SetupPaymentSheetParameters(
-          paymentIntentClientSecret: clientSecret,
-          merchantDisplayName: "Gymify",
-          style: ThemeMode.light,
-        ),
-      );
-
-      await Stripe.instance.presentPaymentSheet();
-      return true;
-    } on StripeException catch (e) {
-      return false;
-    }
-  }
-
-  static Future<bool> payMembership(
+  static Future<PaymentIntentStartResponse?> payMembership(
     BuildContext context, {
     required int userId,
     required int membershipId,
@@ -37,7 +16,7 @@ class StripePaymentHelper {
 
       final provider = context.read<PaymentProvider>();
 
-      final clientSecret = await provider.createNewIntent({
+      final paymentStart = await provider.createNewIntent({
         "userId": userId,
         "membershipId": membershipId,
         "billingPeriod": yearly ? "yearly" : "monthly",
@@ -45,19 +24,19 @@ class StripePaymentHelper {
 
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
-          paymentIntentClientSecret: clientSecret,
+          paymentIntentClientSecret: paymentStart.clientSecret,
           merchantDisplayName: "Gymify",
           style: ThemeMode.light,
         ),
       );
 
       await Stripe.instance.presentPaymentSheet();
-      return true;
-    } on StripeException catch (e) {
-     
-      return false;
-    } catch (e) {
-      return false;
+
+      return paymentStart;
+    } on StripeException {
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 }

@@ -8,6 +8,7 @@ class ConfirmDialogs {
   static const Color _primaryBlue = Color(0xFF1976D2);
   static const Color _primaryBlueDark = Color(0xFF0D47A1);
   static const Color _dangerRed = Color(0xFFE53935);
+  static const Color _warningOrange = Color(0xFFF59E0B);
   static const Color _text = Color(0xFF374151);
   static const Color _muted = Color(0xFF6B7280);
 
@@ -222,5 +223,145 @@ class ConfirmDialogs {
     );
 
     return res ?? false;
+  }
+
+  static Future<void> paymentSuccessDialog(
+    BuildContext context, {
+    String title = "Članarina aktivirana",
+    String message =
+        "Vaša uplata je uspješno evidentirana i članarina je aktivirana.",
+    String okText = "Nastavi",
+    bool barrierDismissible = false,
+  }) async {
+    await _baseDialog<void>(
+      context,
+      title: title,
+      message: message,
+      barrierDismissible: barrierDismissible,
+      headerColor: _primaryBlueDark,
+      headerIcon: Icons.check_circle_rounded,
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: _filledBtn(bg: _primaryBlue),
+          child: Text(
+            okText,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Future<void> paymentFailedDialog(
+    BuildContext context, {
+    String title = "Uplata nije završena",
+    String message =
+        "Uplata za članarinu nije uspješno završena. Pokušajte ponovo ili provjerite podatke kartice.",
+    String okText = "U redu",
+    bool barrierDismissible = false,
+  }) async {
+    await _baseDialog<void>(
+      context,
+      title: title,
+      message: message,
+      barrierDismissible: barrierDismissible,
+      headerColor: _dangerRed,
+      headerIcon: Icons.cancel_rounded,
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: _filledBtn(bg: _dangerRed),
+          child: Text(
+            okText,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Future<void> paymentCanceledDialog(
+    BuildContext context, {
+    String title = "Uplata otkazana",
+    String message =
+        "Proces plaćanja je otkazan. Članarina nije naplaćena i nije došlo do promjena na vašem članstvu.",
+    String okText = "U redu",
+    bool barrierDismissible = false,
+  }) async {
+    await _baseDialog<void>(
+      context,
+      title: title,
+      message: message,
+      barrierDismissible: barrierDismissible,
+      headerColor: _dangerRed,
+      headerIcon: Icons.remove_circle_outline_rounded,
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: _filledBtn(bg: _dangerRed),
+          child: Text(
+            okText,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Future<void> paymentPendingDialog(
+    BuildContext context, {
+    String title = "Provjera uplate",
+    String message =
+        "Uplata je pokrenuta, ali status još nije potvrđen. Molimo sačekajte nekoliko sekundi i provjerite ponovo.",
+    String okText = "U redu",
+    bool barrierDismissible = false,
+  }) async {
+    await _baseDialog<void>(
+      context,
+      title: title,
+      message: message,
+      barrierDismissible: barrierDismissible,
+      headerColor: _warningOrange,
+      headerIcon: Icons.hourglass_top_rounded,
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: _filledBtn(bg: _warningOrange),
+          child: Text(
+            okText,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Future<void> paymentErrorDialog(
+    BuildContext context, {
+    String title = "Greška pri provjeri uplate",
+    String message =
+        "Došlo je do greške pri provjeri statusa uplate za članarinu. Pokušajte ponovo za nekoliko trenutaka.",
+    String okText = "U redu",
+    bool barrierDismissible = false,
+  }) async {
+    await _baseDialog<void>(
+      context,
+      title: title,
+      message: message,
+      barrierDismissible: barrierDismissible,
+      headerColor: _warningOrange,
+      headerIcon: Icons.error_outline_rounded,
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: _filledBtn(bg: _warningOrange),
+          child: Text(
+            okText,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
+    );
   }
 }

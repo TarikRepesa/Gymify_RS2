@@ -35,7 +35,7 @@ namespace Gymify.Services.Services
             return base.AddInclude(query, search);
         }
 
-        public async Task<object> CreateNewPaymentIntentAsync(CreatePaymentIntentRequest req)
+        public async Task<PaymentIntentStartResponse> CreateNewPaymentIntentAsync(CreatePaymentIntentRequest req)
         {
             var membership = await _context.Memberships
                 .FirstOrDefaultAsync(x => x.Id == req.MembershipId);
@@ -94,13 +94,13 @@ namespace Gymify.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return new
+            return new PaymentIntentStartResponse
             {
-                clientSecret = intent.ClientSecret,
-                intentId = intent.Id,
-                paymentId = payment.Id,
-                amount,
-                billingPeriod
+                ClientSecret = intent.ClientSecret,
+                IntentId = intent.Id,
+                PaymentId = payment.Id,
+                Amount = amount,
+                BillingPeriod = billingPeriod
             };
         }
 

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:gymify_mobile/config/api_config.dart';
 import 'package:gymify_mobile/helper/http_helper.dart';
 import 'package:gymify_mobile/models/payment.dart';
+import 'package:gymify_mobile/models/payment_intent_start_response.dart';
 
 import '../utils/session.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +33,7 @@ class PaymentProvider extends BaseProvider<Payment> {
   return data["clientSecret"] as String;  
 }
 
-Future<String> createNewIntent(Map<String, dynamic> request) async {
+Future<PaymentIntentStartResponse> createNewIntent(Map<String, dynamic> request) async {
   final url = "${ApiConfig.apiBase}/api/payment/create-new-intent";
 
   final response = await http.post(
@@ -43,8 +44,8 @@ Future<String> createNewIntent(Map<String, dynamic> request) async {
 
   HttpHelper.checkResponse(response);
 
-  final data = jsonDecode(response.body);
+  final Map<String, dynamic> data = jsonDecode(response.body);
 
-  return data["clientSecret"] as String;
+  return PaymentIntentStartResponse.fromJson(data);
 }
 }

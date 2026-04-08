@@ -11,5 +11,6 @@ namespace Gymify.Model.ResponseObjects
         public MembershipResponse? Membership {get; set;}
         public double Amount { get; set; }
         public DateTime PaymentDate { get; set; }
+        public string PaymentStatus { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace Gymify.Services.Interfaces
     public interface IPaymentService : ICRUDService<PaymentResponse, PaymentSearchObject, PaymentUpsertRequest, PaymentUpsertRequest>
     {
         Task<object> CreatePaymentIntentForExistingPaymentAsync(int id);
-        Task<object> CreateNewPaymentIntentAsync(CreatePaymentIntentRequest req);
+        Task<PaymentIntentStartResponse> CreateNewPaymentIntentAsync(CreatePaymentIntentRequest req);
 
         Task HandlePaymentIntentSucceededAsync(string paymentIntentId, Dictionary<string, string> metadata);
         Task HandlePaymentIntentFailedAsync(string paymentIntentId, Dictionary<string, string> metadata);
