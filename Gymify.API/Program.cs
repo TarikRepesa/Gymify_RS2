@@ -5,6 +5,7 @@ using Gymify.Services.Database;
 using Gymify.Services.Exceptions;
 using Gymify.Services.Implementations;
 using Gymify.Services.Interfaces;
+using Gymify.Services.ReservationStateMachine;
 using Gymify.Services.Services;
 using Gymify.WebAPI.Authentication;
 using Gymify.WebAPI.Services;
@@ -116,6 +117,11 @@ TypeAdapterConfig.GlobalSettings.Default
 
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddTransient<IMapper, ServiceMapper>();
+
+builder.Services.AddScoped<BaseReservationState>();
+builder.Services.AddScoped<InitialReservationState>();
+builder.Services.AddScoped<ConfirmedReservationState>();
+builder.Services.AddScoped<CancelledReservationState>();
 
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILoyaltyPointHistoryService, LoyaltyPointHistoryService>();

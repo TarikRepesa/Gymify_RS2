@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Gymify.Model.RequestObjects;
 using Gymify.Model.ResponseObjects;
 using Gymify.Model.SearchObjects;
@@ -38,9 +39,17 @@ namespace Gymify.API.Controllers
 
         [HttpGet("recommended")]
         [Authorize(Roles = "Korisnik")]
-        public async Task<List<TrainingResponse>> GetRecommended([FromQuery] int userId, [FromQuery] int take = 3)
+        public async Task<IActionResult> GetRecommended([FromQuery] int take = 3)
         {
-            return await _trainingService.GetRecommended(userId, take);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var result = await _trainingService.GetRecommended(userId, take);
+            return Ok(result);
         }
 
         [Authorize(Roles = "Admin,Radnik")]

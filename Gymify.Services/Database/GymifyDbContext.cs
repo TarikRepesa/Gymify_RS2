@@ -39,6 +39,8 @@ namespace Gymify.Services.Database
 
             optionsBuilder.ConfigureWarnings(w =>
                 w.Ignore(RelationalEventId.PendingModelChangesWarning));
+
+
         }
 
         private static readonly string[] FirstNames =
@@ -287,6 +289,10 @@ namespace Gymify.Services.Database
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Reservation>()
+    .HasIndex(r => new { r.UserId, r.TrainingId })
+    .IsUnique();
+
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, Name = "Korisnik" },
                 new Role { Id = 2, Name = "Admin" },
@@ -390,7 +396,7 @@ namespace Gymify.Services.Database
     {
         Id = 10006,
         UserId = 11,
-        TrainingId = 4, 
+        TrainingId = 4,
         CreatedAt = new DateTime(2025, 1, 12),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 1, 14),
@@ -401,7 +407,7 @@ namespace Gymify.Services.Database
     {
         Id = 10007,
         UserId = 11,
-        TrainingId = 44, 
+        TrainingId = 44,
         CreatedAt = new DateTime(2025, 1, 15),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 1, 17),
@@ -412,7 +418,7 @@ namespace Gymify.Services.Database
     {
         Id = 10008,
         UserId = 11,
-        TrainingId = 45, 
+        TrainingId = 45,
         CreatedAt = new DateTime(2025, 1, 17),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 1, 19),
@@ -423,7 +429,7 @@ namespace Gymify.Services.Database
     {
         Id = 10009,
         UserId = 11,
-        TrainingId = 57, 
+        TrainingId = 57,
         CreatedAt = new DateTime(2025, 2, 2),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 2, 4),
@@ -456,7 +462,7 @@ namespace Gymify.Services.Database
     {
         Id = 10012,
         UserId = 11,
-        TrainingId = 1, 
+        TrainingId = 1,
         CreatedAt = new DateTime(2025, 3, 14),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 3, 16),
@@ -467,7 +473,7 @@ namespace Gymify.Services.Database
     {
         Id = 10013,
         UserId = 11,
-        TrainingId = 24, 
+        TrainingId = 24,
         CreatedAt = new DateTime(2025, 3, 15),
         Status = "Cancelled",
         CancelledAt = new DateTime(2025, 3, 17),
@@ -479,7 +485,7 @@ namespace Gymify.Services.Database
     {
         Id = 10014,
         UserId = 11,
-        TrainingId = 2, 
+        TrainingId = 2,
         CreatedAt = new DateTime(2025, 2, 7),
         Status = "Confirmed"
     },
@@ -487,7 +493,7 @@ namespace Gymify.Services.Database
     {
         Id = 10015,
         UserId = 11,
-        TrainingId = 3, 
+        TrainingId = 3,
         CreatedAt = new DateTime(2025, 2, 9),
         Status = "Confirmed"
     },
@@ -495,7 +501,7 @@ namespace Gymify.Services.Database
     {
         Id = 10016,
         UserId = 11,
-        TrainingId = 5, 
+        TrainingId = 5,
         CreatedAt = new DateTime(2025, 1, 19),
         Status = "Confirmed"
     },
@@ -503,7 +509,7 @@ namespace Gymify.Services.Database
     {
         Id = 10017,
         UserId = 11,
-        TrainingId = 6, 
+        TrainingId = 6,
         CreatedAt = new DateTime(2025, 1, 22),
         Status = "Confirmed"
     },
@@ -511,7 +517,7 @@ namespace Gymify.Services.Database
     {
         Id = 10018,
         UserId = 11,
-        TrainingId = 7, 
+        TrainingId = 7,
         CreatedAt = new DateTime(2025, 1, 27),
         Status = "Confirmed"
     },
@@ -519,7 +525,7 @@ namespace Gymify.Services.Database
     {
         Id = 10019,
         UserId = 11,
-        TrainingId = 8, 
+        TrainingId = 8,
         CreatedAt = new DateTime(2025, 2, 2),
         Status = "Confirmed"
     },

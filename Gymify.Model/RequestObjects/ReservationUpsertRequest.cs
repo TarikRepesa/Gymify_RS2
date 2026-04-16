@@ -10,8 +10,6 @@ namespace Gymify.Model.RequestObjects
 
         public DateTime CreatedAt { get; set; }
 
-        public string Status { get; set; }
-
         public DateTime? CancelledAt { get; set; }
 
         public string? CancelReason { get; set; }

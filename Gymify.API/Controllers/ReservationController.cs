@@ -14,6 +14,7 @@ namespace Gymify.API.Controllers
     public class ReservationController : BaseCRUDController<ReservationResponse, ReservationSearchObject, ReservationUpsertRequest, ReservationUpsertRequest>
     {
         IReservationService _service;
+
         public ReservationController(IReservationService service) : base(service)
         {
             _service = service;
@@ -38,7 +39,7 @@ namespace Gymify.API.Controllers
             return base.GetById(id);
         }
 
-        [Authorize(Roles = "Korisnik,Admin,Radnik")]
+        [Authorize(Roles = "Admin,Radnik")]
         public override Task<bool> Delete(int id)
         {
             return base.Delete(id);
@@ -54,6 +55,22 @@ namespace Gymify.API.Controllers
         public override Task<ReservationResponse> Create([FromBody] ReservationUpsertRequest request)
         {
             return base.Create(request);
+        }
+
+        [Authorize(Roles = "Korisnik")]
+        [HttpPost("{id}/cancel")]
+        public async Task<IActionResult> Cancel(int id, [FromBody] string reason)
+        {
+            var result = await _service.CancelAsync(id, reason);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin,Korisnik")]
+        [HttpGet("{id}/allowed-actions")]
+        public async Task<IActionResult> GetAllowedActions(int id)
+        {
+            var result = await _service.GetAllowedActions(id);
+            return Ok(result);
         }
     }
 }

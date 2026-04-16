@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymify_mobile/dialogs/base_dialogs.dart';
 import 'package:gymify_mobile/providers/loyalty_point_history_provider.dart';
 import 'package:gymify_mobile/providers/loyalty_point_provider.dart';
 import 'package:gymify_mobile/providers/training_provider.dart';
@@ -105,6 +106,133 @@ class _ReservationWidgetState extends State<ReservationWidget> {
     await _paging.applyExtra({"Status": "Confirmed"});
   }
 
+  Future<String?> _showCancelReasonDialog(BuildContext context) async {
+    final controller = TextEditingController();
+    String? errorText;
+
+    return await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return GymifyBaseDialog(
+              title: "Otkazivanje rezervacije",
+              onClose: () => Navigator.of(ctx).pop(),
+              width: 520,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Unesite razlog otkazivanja treninga:",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: controller,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      hintText: "Npr. Ne mogu stići na vrijeme...",
+                      errorText: errorText,
+                      filled: true,
+                      fillColor: const Color(0xFFF7F9FC),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF0D47A1),
+                          width: 1.4,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.all(14),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: OutlinedButton.icon(
+                            onPressed: () => Navigator.of(ctx).pop(),
+                            icon: const Icon(
+                              Icons.arrow_back_rounded,
+                              size: 18,
+                            ),
+                            label: const Text(
+                              "Nazad",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF0D47A1),
+                              side: const BorderSide(
+                                color: Color(0xFF0D47A1),
+                                width: 1.2,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              final reason = controller.text.trim();
+
+                              if (reason.isEmpty) {
+                                setState(() {
+                                  errorText = "Razlog otkazivanja je obavezan.";
+                                });
+                                return;
+                              }
+
+                              Navigator.of(ctx).pop(reason);
+                            },
+                            icon: const Icon(Icons.check_rounded, size: 18),
+                            label: const Text(
+                              "Potvrdi",
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0D47A1),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _cancelReservation(Reservation r) async {
     final lpProvider = context.read<LoyaltyPointProvider>();
     final lpProviderH = context.read<LoyaltyPointHistoryProvider>();
@@ -117,24 +245,20 @@ class _ReservationWidgetState extends State<ReservationWidget> {
       title: "Otkazivanje",
       question:
           "Da li ste sigurni da želite otkazati rezervaciju za:\n\n$trainingName?",
-      yesText: "Otkaži",
+      yesText: "Dalje",
       noText: "Nazad",
       danger: true,
     );
 
     if (!ok) return;
 
+    final reason = await _showCancelReasonDialog(context);
+    if (reason == null) return;
+
     try {
       final provider = context.read<ReservationProvider>();
 
-      await provider.update(r.id!, {
-        "userId": r.userId,
-        "trainingId": r.trainingId,
-        "createdAt": r.createdAt?.toIso8601String(),
-        "status": "Cancelled",
-        "cancelledAt": DateTime.now().toIso8601String(),
-        "cancelReason": "User cancelled",
-      });
+      await provider.cancelReservation(r.id!, reason);
 
       await trainingProvider.down(trainingId);
 
@@ -150,8 +274,7 @@ class _ReservationWidgetState extends State<ReservationWidget> {
       await ConfirmDialogs.okConfirmation(
         context,
         title: "Uspješno",
-        message:
-            "Rezervacija je uspješno otkazana.",
+        message: "Rezervacija je uspješno otkazana.",
         okText: "U redu",
       );
 

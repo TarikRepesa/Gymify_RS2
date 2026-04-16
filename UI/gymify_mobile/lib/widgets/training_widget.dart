@@ -82,7 +82,7 @@ class _TrainingWidgetState extends State<TrainingWidget> {
       final provider = context.read<TrainingProvider>();
 
       final items = await provider.getRecommended(
-        filter: {"userId": Session.userId, "take": 3},
+        filter: {"take": 3},
       );
 
       if (!mounted) return;
