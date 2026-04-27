@@ -28,6 +28,11 @@ namespace Gymify.Services.ReservationStateMachine
             throw new UserException("Akcija nije dozvoljena.");
         }
 
+        public virtual async Task<bool> DeleteAsync(int id)
+        {
+            throw new UserException("Akcija nije dozvoljena.");
+        }
+
         public virtual async Task<ReservationResponse> UpdateAsync(int id, ReservationUpsertRequest request)
         {
             throw new UserException("Akcija nije dozvoljena.");

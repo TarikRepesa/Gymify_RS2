@@ -7,6 +7,7 @@ using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Gymify.Services.Exceptions;
 using Gymify.Services.ReservationStateMachine;
+using Microsoft.Identity.Client;
 
 namespace Gymify.Services.Services
 {
@@ -76,7 +77,7 @@ namespace Gymify.Services.Services
 
             var state = _baseReservationState.GetState(nameof(InitialReservationState));
             return await state.CreateAsync(request);
-        }
+        } 
 
         protected override async Task BeforeInsert(Reservation entity, ReservationUpsertRequest request)
         {
@@ -119,6 +120,17 @@ namespace Gymify.Services.Services
             }
 
             return base.AddInclude(query, search);
+        }
+
+        public override Task<bool> DeleteAsync(int id)
+        {
+            var entity = _context.Reservations.Find(id);
+
+            if (entity == null)
+                throw new NotFoundException("Rezervacija nije pronađena.");
+
+            var state = GetStateForStatus(entity.Status);
+            return state.DeleteAsync(entity.Id);
         }
 
         public async Task<bool> ExistsAsync(ReservationCheckRequets req)

@@ -290,8 +290,8 @@ namespace Gymify.Services.Database
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Reservation>()
-    .HasIndex(r => new { r.UserId, r.TrainingId })
-    .IsUnique();
+                .HasIndex(r => new { r.UserId, r.TrainingId })
+                .IsUnique();
 
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, Name = "Korisnik" },
@@ -324,7 +324,7 @@ namespace Gymify.Services.Database
                     Id = 1,
                     Name = "Basic",
                     MonthlyPrice = 30,
-                    YearPrice = 300,
+                    YearPrice = 360,
                     CreatedAt = new DateTime(2025, 1, 1)
                 },
                 new Membership
@@ -332,7 +332,7 @@ namespace Gymify.Services.Database
                     Id = 2,
                     Name = "Standard",
                     MonthlyPrice = 45,
-                    YearPrice = 450,
+                    YearPrice = 540,
                     CreatedAt = new DateTime(2025, 1, 1)
                 },
                 new Membership
@@ -340,7 +340,7 @@ namespace Gymify.Services.Database
                     Id = 3,
                     Name = "Premium",
                     MonthlyPrice = 60,
-                    YearPrice = 600,
+                    YearPrice = 720,
                     CreatedAt = new DateTime(2025, 1, 1)
                 },
                 new Membership
@@ -348,7 +348,7 @@ namespace Gymify.Services.Database
                     Id = 4,
                     Name = "VIP",
                     MonthlyPrice = 80,
-                    YearPrice = 800,
+                    YearPrice = 960,
                     CreatedAt = new DateTime(2025, 1, 1)
                 }
             );
@@ -1497,9 +1497,9 @@ namespace Gymify.Services.Database
         }
 
         private static MembershipSeedBundle GenerateMembershipData(
-            int startUserId,
-            int endUserId,
-            Dictionary<int, DateTime> userCreatedDates)
+    int startUserId,
+    int endUserId,
+    Dictionary<int, DateTime> userCreatedDates)
         {
             var random = new Random(20260312);
 
@@ -1530,6 +1530,57 @@ namespace Gymify.Services.Database
                 int durationDays = yearly ? 365 : 30;
 
                 var paymentDate = createdAt.AddDays(random.Next(0, 15));
+                var expirationDate = paymentDate.AddDays(durationDays);
+
+                result.Members.Add(new Member
+                {
+                    Id = memberId++,
+                    UserId = userId,
+                    MembershipId = membershipId,
+                    PaymentDate = paymentDate,
+                    ExpirationDate = expirationDate
+                });
+
+                result.Payments.Add(new Payment
+                {
+                    Id = paymentId++,
+                    UserId = userId,
+                    MembershipId = membershipId,
+                    Amount = amount,
+                    PaymentDate = paymentDate,
+                    PaidAt = paymentDate,
+                    PaymentStatus = "Paid",
+                    StripePaymentIntentId = null,
+                    BillingPeriod = yearly ? "yearly" : "monthly"
+                });
+            }
+
+            // Dodatni random podaci za april 2026,
+            // generisani istom logikom kao postojeći seed podaci.
+            for (int i = 0; i < 60; i++)
+            {
+                int userId = random.Next(startUserId, endUserId + 1);
+
+                if (!userCreatedDates.ContainsKey(userId))
+                    continue;
+
+                int membershipId = random.Next(1, 5);
+                bool yearly = random.Next(0, 100) < 30;
+
+                decimal amount = membershipId switch
+                {
+                    1 => yearly ? 300m : 30m,
+                    2 => yearly ? 450m : 45m,
+                    3 => yearly ? 600m : 60m,
+                    4 => yearly ? 800m : 80m,
+                    _ => 30m
+                };
+
+                int durationDays = yearly ? 365 : 30;
+
+                int day = random.Next(1, 29);
+
+                var paymentDate = new DateTime(2026, 4, day);
                 var expirationDate = paymentDate.AddDays(durationDays);
 
                 result.Members.Add(new Member

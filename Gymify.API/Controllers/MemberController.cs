@@ -5,11 +5,6 @@ using Gymify.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-//Get: Korisnik,Admin,Radnik
-//Update: Korisnik,Admin,Radnik
-//Delete: Admin,Radnik
-//Create: Korisnik,Admin,Radnik
-
 namespace Gymify.API.Controllers
 {
     public class MemberController : BaseCRUDController<MemberResponse, MemberSearchObject, MemberInsertRequest, MemberUpdateRequest>

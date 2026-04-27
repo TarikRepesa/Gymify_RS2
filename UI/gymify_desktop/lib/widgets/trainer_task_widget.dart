@@ -45,7 +45,6 @@ Widget TrainerTaskWidget() {
           title: "Moji treninzi",
           addButtonText: null, 
 
-          // SEARCH
           onSearchChanged: (value) => paging.search(value),
           onClearSearch: () => paging.search(""),
 
@@ -75,7 +74,6 @@ Widget TrainerTaskWidget() {
             ),
           ],
 
-          // ✅ Trener nema edit/delete ovdje
           onEdit: null,
           onDelete: null,
 

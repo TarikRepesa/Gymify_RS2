@@ -40,7 +40,6 @@ class BaseDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 🔹 HEADER
             Container(
               decoration: const BoxDecoration(
                 color: Color(0xFF387EFF), 
@@ -77,10 +76,8 @@ class BaseDialog extends StatelessWidget {
               ),
             ),
 
-            // divider
             Container(height: 1, color: Colors.black.withOpacity(0.06)),
 
-            // 🔹 CONTENT
             Flexible(
               child: Padding(padding: const EdgeInsets.all(20), child: child),
             ),

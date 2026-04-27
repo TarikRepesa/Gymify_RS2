@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gymify_mobile/dialogs/confirmation_dialogs.dart';
+import 'package:gymify_mobile/helper/snackBar_helper.dart';
 import 'package:gymify_mobile/screens/login_screen.dart';
 import 'package:gymify_mobile/screens/reward_screen.dart';
 import 'package:provider/provider.dart';
@@ -251,9 +252,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profil je uspješno sačuvan.")),
-      );
+      SnackbarHelper.showSuccess(context, "Profil je uspješno sačuvan.");
 
       await _loadUser();
     } catch (e) {
@@ -272,9 +271,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
     );
 
     if (changed == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lozinka je uspješno promijenjena.")),
-      );
+      SnackbarHelper.showSuccess(context, "Lozinka je uspjesno promjenjena");
     }
   }
 
@@ -563,7 +560,7 @@ class _ProfileHeader extends StatelessWidget {
       final img = user.userImage;
       if (ImageHelper.hasValidImage(img)) {
         avatar = Image.network(
-          img!,
+          ImageHelper.httpCheck(img, "users"),
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => ImageHelper.userPlaceholder(username),
         );

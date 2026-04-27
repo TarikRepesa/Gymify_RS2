@@ -18,8 +18,8 @@ class ReviewWidget extends StatefulWidget {
 class _ReviewWidgetState extends State<ReviewWidget> {
   final TextEditingController _searchCtrl = TextEditingController();
 
-  int? _selectedStars; // dropdown filter (1-5)
-  // ako želiš: debounce za search, ali za sad je ok bez toga
+  int? _selectedStars; 
+
 
   @override
   void dispose() {
@@ -159,7 +159,7 @@ class _ReviewWidgetState extends State<ReviewWidget> {
           const Icon(Icons.person, size: 22, color: Colors.black87),
           const SizedBox(width: 10),
 
-          // ime
+
           SizedBox(
             width: 170,
             child: Text(
@@ -174,7 +174,6 @@ class _ReviewWidgetState extends State<ReviewWidget> {
             ),
           ),
 
-          // divider
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 14),
             width: 1,
@@ -182,7 +181,6 @@ class _ReviewWidgetState extends State<ReviewWidget> {
             color: Colors.black.withOpacity(0.18),
           ),
 
-          // komentar
           const Icon(
             Icons.chat_bubble_outline_rounded,
             size: 18,
@@ -204,12 +202,10 @@ class _ReviewWidgetState extends State<ReviewWidget> {
 
           const SizedBox(width: 14),
 
-          // zvjezdice
           _starRow(r.starNumber),
 
           const SizedBox(width: 16),
 
-          // delete
           IconButton(
             onPressed: paging.isLoading
                 ? null
@@ -301,7 +297,6 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                 ),
                 const SizedBox(height: 22),
 
-                // SEARCH + STARS FILTER
                 Row(
                   children: [
                     Expanded(
@@ -319,7 +314,7 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                           },
                         ),
                         onChanged: (v) {
-                          setState(() {}); // da suffix reaguje
+                          setState(() {}); 
                           paging.search(v);
                         },
                       ),
@@ -358,7 +353,6 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                         ],
                         onChanged: (v) async {
                           setState(() => _selectedStars = v);
-                          // zadrži trenutni search tekst
                           await paging.search(_searchCtrl.text.trim());
                         },
                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
@@ -366,7 +360,6 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                       ),
                     ),
 
-                    // opcionalno dugme za "reset star filter"
                     const SizedBox(width: 10),
                     SizedBox(
                       height: 42,

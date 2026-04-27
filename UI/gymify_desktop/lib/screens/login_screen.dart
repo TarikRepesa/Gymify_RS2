@@ -134,7 +134,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    /// LOGO
                     SizedBox(
                       height: 120,
                       child: Image.asset(
@@ -145,7 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 12),
 
-                    /// APP NAME
                     const Text(
                       "GYMIFY",
                       style: TextStyle(

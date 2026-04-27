@@ -30,7 +30,6 @@ class ConfirmDialogs {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 🔵 HEADER
                 Container(
                   width: 400,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -50,7 +49,6 @@ class ConfirmDialogs {
                   ),
                 ),
             
-                // BODY
                 Padding(
                   padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
                   child: Text(
@@ -64,7 +62,6 @@ class ConfirmDialogs {
                   ),
                 ),
             
-                // ACTIONS
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
                   child: Row(
@@ -104,7 +101,6 @@ class ConfirmDialogs {
     );
   }
 
-  // ✅ YES / NO
   static Future<bool> yesNoConfirmation(
     BuildContext context, {
     required String question,
@@ -136,7 +132,6 @@ class ConfirmDialogs {
     return res ?? false;
   }
 
-  // ✅ OK
   static Future<void> okConfirmation(
     BuildContext context, {
     required String message,
@@ -159,7 +154,6 @@ class ConfirmDialogs {
     );
   }
 
-  // ✅ BAD / GOOD (brisanje, odjava, opasne radnje)
   static Future<bool> badGoodConfirmation(
     BuildContext context, {
     required String question,
@@ -167,7 +161,7 @@ class ConfirmDialogs {
     required String goodText,
     required String badText,
     bool barrierDismissible = false,
-    bool goodIsGreen = true, // ako želiš nekad plavo umjesto zelenog
+    bool goodIsGreen = true, 
   }) async {
     final res = await _baseDialog<bool>(
       context,

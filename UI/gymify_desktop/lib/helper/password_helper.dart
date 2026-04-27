@@ -6,7 +6,6 @@ class CredentialHelper {
   static String _normalize(String s) {
     var x = s.trim().toLowerCase();
 
-    // najčešće balkanske zamjene (možeš proširiti)
     x = x
         .replaceAll('š', 's')
         .replaceAll('đ', 'dj')
@@ -14,7 +13,6 @@ class CredentialHelper {
         .replaceAll('ć', 'c')
         .replaceAll('ž', 'z');
 
-    // izbaci sve osim slova i brojeva
     x = x.replaceAll(RegExp(r'[^a-z0-9]'), '');
     return x;
   }
@@ -29,14 +27,14 @@ class CredentialHelper {
 
     if (fn.isEmpty || ln.isEmpty) return "";
 
-    final upper = String.fromCharCode(65 + _rng.nextInt(26)); // A-Z
-    final digit = _rng.nextInt(10); // 0-9
+    final upper = String.fromCharCode(65 + _rng.nextInt(26)); 
+    final digit = _rng.nextInt(10); 
 
     return "$fn.$ln$special$upper$digit";
   }
 
   static String generatePassword({int length = 10}) {
-    // Password: mix: lower/upper/digit/special
+
     const lowers = 'abcdefghijkmnopqrstuvwxyz';
     const uppers = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
     const digits = '23456789';
@@ -44,7 +42,6 @@ class CredentialHelper {
 
     final all = lowers + uppers + digits + specials;
 
-    // ensure at least 1 from each group
     final chars = <String>[
       lowers[_rng.nextInt(lowers.length)],
       uppers[_rng.nextInt(uppers.length)],

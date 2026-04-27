@@ -65,7 +65,7 @@ Future<User?> showUserPickDialog({
         "includeTotalCount": true,
         if (q.isNotEmpty) "fullNameSearch": q,
 
-        // ✅ filteri po ulozi
+
         if (mode == PickMode.user) "isUser": true,
         if (mode == PickMode.trainer) "isTrener": true,
         if (mode == PickMode.admin) "isAdmin": true,

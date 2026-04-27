@@ -99,7 +99,6 @@ Future<void> _submitAddMember({
   SnackbarHelper.showSuccess(context, "Član uspješno dodan.");
 }
 
-/// 4) Submit EDIT
 Future<void> _submitEditMember({
   required BuildContext context,
   required UniversalPagingProvider<Member> paging,
@@ -119,7 +118,7 @@ Future<void> _submitEditMember({
   );
 
   await context.read<MemberProvider>().update(memberId, {
-    "userId": userId, // ✅ možeš i promijeniti usera
+    "userId": userId,  
     "membershipId": membershipId,
     "paymentDate": DateTime.now().toIso8601String(),
     "expirationDate": DateHelper.toIsoFromUi(expiryUi),
@@ -129,7 +128,6 @@ Future<void> _submitEditMember({
   SnackbarHelper.showUpdate(context, "Član uspješno ažuriran.");
 }
 
-/// 5) Jedna funkcija koja vraća fields listu za ADD/EDIT
 List<BaseFormFieldDef> _memberFields({
   required List<DropdownMenuItem<String>> membershipItems,
   bool allowUserPick = true,
@@ -254,7 +252,6 @@ Widget MemberWidget() {
             );
           },
 
-          // ---------------- SEARCH ----------------
           onSearchChanged: (value) => paging.search(value),
           onClearSearch: () => paging.search(""),
 

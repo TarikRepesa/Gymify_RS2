@@ -36,6 +36,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final Map<String, String?> fieldErrors = {};
 
+  bool _showPassword = false;
+  bool _showConfirmPassword = false;
+
   DateTime? _dob;
   File? _pickedImage;
 
@@ -115,8 +118,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         children: [
                           _header(),
                           const SizedBox(height: 18),
-                          _avatarPicker(),
-                          const SizedBox(height: 18),
                           _sectionTitle("Osnovni podaci"),
                           const SizedBox(height: 10),
                           _field(
@@ -164,16 +165,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             label: "Lozinka",
                             controller: fields.controller('password'),
                             errorText: fieldErrors['password'],
-                            obscure: true,
+                            obscure: !_showPassword,
                             textInputAction: TextInputAction.next,
+                            showToggle: true,
+                            onToggle: () =>
+                                setState(() => _showPassword = !_showPassword),
                           ),
                           const SizedBox(height: 12),
                           _field(
                             label: "Potvrdi lozinku",
                             controller: fields.controller('confirmPassword'),
                             errorText: fieldErrors['confirmPassword'],
-                            obscure: true,
+                            obscure: !_showConfirmPassword,
                             textInputAction: TextInputAction.done,
+                            showToggle: true,
+                            onToggle: () => setState(
+                              () =>
+                                  _showConfirmPassword = !_showConfirmPassword,
+                            ),
                           ),
                           const SizedBox(height: 18),
                           _sectionTitle("Dodatno"),
@@ -296,72 +305,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _avatarPicker() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F7F7),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE9E9E9)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFE2E2E2)),
-            ),
-            child: _pickedImage != null
-                ? ClipOval(child: Image.file(_pickedImage!, fit: BoxFit.cover))
-                : Icon(
-                    _hasImage ? Icons.check_circle : Icons.person,
-                    color: RegisterScreen.gymBlueDark,
-                  ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Profilna slika",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    color: RegisterScreen.textDark,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _hasImage ? "Slika odabrana" : "Odaberi sliku (opcionalno)",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF6E6E6E),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          IconButton(
-            onPressed: _pickImage,
-            icon: const Icon(Icons.photo_library_outlined),
-            color: RegisterScreen.gymBlueDark,
-            tooltip: "Odaberi",
-          ),
-          IconButton(
-            onPressed: _pickedImage == null ? null : _removeImage,
-            icon: const Icon(Icons.delete_outline),
-            color: const Color(0xFF8A8A8A),
-            tooltip: "Ukloni",
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _dateTile({
     required String label,
     required String valueText,
@@ -462,6 +405,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required String label,
     required TextEditingController controller,
     String? errorText,
+    bool showToggle = false,
+    VoidCallback? onToggle,
     bool obscure = false,
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
@@ -489,6 +434,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: RegisterScreen.gymBlueDark),
         ),
+
+        // 👇 OVO DODAJ
+        suffixIcon: showToggle
+            ? IconButton(
+                icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
+                onPressed: onToggle,
+              )
+            : null,
       ),
     );
   }
@@ -565,37 +518,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
         fields.text('username'),
         'Username je obavezan.',
       ),
-      Rules.username(
-        'username',
-        fields.text('username'),
-      ),
-      Rules.requiredText(
-        'email',
-        fields.text('email'),
-        'Email je obavezan.',
-      ),
-      Rules.email(
-        'email',
-        fields.text('email'),
-      ),
+      Rules.username('username', fields.text('username')),
+      Rules.requiredText('email', fields.text('email'), 'Email je obavezan.'),
+      Rules.email('email', fields.text('email')),
       Rules.requiredText(
         'phoneNumber',
         fields.text('phoneNumber'),
         'Telefon je obavezan.',
       ),
-      Rules.phone(
-        'phoneNumber',
-        fields.text('phoneNumber'),
-      ),
+      Rules.phone('phoneNumber', fields.text('phoneNumber')),
       Rules.requiredText(
         'password',
         fields.text('password'),
         'Lozinka je obavezna.',
       ),
-      Rules.strongPassword(
-        'password',
-        fields.text('password'),
-      ),
+      Rules.strongPassword('password', fields.text('password')),
       Rules.requiredText(
         'confirmPassword',
         fields.text('confirmPassword'),
@@ -622,15 +559,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _submitting = true);
 
     try {
-      String? uploadedImageName;
-
-      if (_pickedImage != null) {
-        uploadedImageName = await img_app.ImageAppProvider.upload(
-          file: _pickedImage!,
-          folder: "users",
-        );
-      }
-
       final payload = <String, dynamic>{
         'firstName': fields.text('firstName').trim(),
         'lastName': fields.text('lastName').trim(),
@@ -641,7 +569,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'dateOfBirth': DateHelper.toUtcIsoNullable(_dob),
         'isActive': true,
         'isUser': true,
-        if (uploadedImageName != null) 'userImage': uploadedImageName,
       };
 
       await _userProvider.insert(payload);
@@ -654,10 +581,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         message: "Račun je kreiran. Sada se možeš prijaviti.",
       );
 
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.login,
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
     } catch (e) {
       if (!mounted) return;
       await ConfirmDialogs.okConfirmation(

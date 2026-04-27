@@ -26,33 +26,6 @@ class Rules {
     return FieldRule(field, () => date == null ? message : null);
   }
 
-  // static FieldRule atLeastOneImage(
-  //   String field,
-  //   List<PropertyImageDisplay>? images,
-  //   String message,
-  // ) {
-  //   return FieldRule(field, () {
-  //     if (images == null) return message;
-  //     final visible = images.where((e) => !e.isDeleted);
-  //     return visible.isEmpty ? message : null;
-  //   });
-  // }
-
-  // static FieldRule mainImageRequired(
-  //   String field,
-  //   List<PropertyImageDisplay>? images,
-  //   String message,
-  // ) {
-  //   return FieldRule(field, () {
-  //     if (images == null) return message;
-
-  //     final visible = images.where((e) => !e.isDeleted);
-  //     final mainCount = visible.where((e) => e.propertyImage.isMain).length;
-
-  //     return mainCount == 1 ? null : message;
-  //   });
-  // }
-
   static FieldRule requiredMapPoint(
     String field,
     dynamic pickedPoint,
@@ -101,23 +74,19 @@ static FieldRule username(
       return 'Username ne smije sadržavati razmake.';
     }
 
-    // dozvoli sve osim razmaka
     final allowed = RegExp(r'^[^\s]+$');
     if (!allowed.hasMatch(v)) {
       return 'Username sadrži nedozvoljene znakove.';
     }
 
-    // mora imati barem jedno slovo
     if (!RegExp(r'[a-zA-Z]').hasMatch(v)) {
       return 'Username mora sadržavati barem jedno slovo.';
     }
 
-    // mora imati barem jedan broj
     if (!RegExp(r'\d').hasMatch(v)) {
       return 'Username mora sadržavati barem jedan broj.';
     }
 
-    // ne smije početi ili završiti specijalnim znakom
     final isFirstSpecial = RegExp(r'^[^a-zA-Z0-9]').hasMatch(v);
     final isLastSpecial = RegExp(r'[^a-zA-Z0-9]$').hasMatch(v);
 

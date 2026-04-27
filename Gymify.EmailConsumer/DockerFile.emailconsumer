@@ -1,8 +1,34 @@
 
+# # --------------------
+# # BUILD STAGE
+# # --------------------
+# FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# WORKDIR /src
+
+# # Kopiraj csproj i restore
+# COPY Gymify.EmailConsumer/Gymify.EmailConsumer.csproj Gymify.EmailConsumer/
+# RUN dotnet restore Gymify.EmailConsumer/Gymify.EmailConsumer.csproj
+
+# # Kopiraj sve i publish
+# COPY . .
+# WORKDIR /src/Gymify.EmailConsumer
+# RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
+
+# # --------------------
+# # RUNTIME STAGE
+# # --------------------
+# FROM mcr.microsoft.com/dotnet/runtime:9.0
+# WORKDIR /app
+
+# COPY --from=build /app/publish .
+
+# ENTRYPOINT ["dotnet", "Gymify.EmailConsumer.dll"]
+
+
 # --------------------
 # BUILD STAGE
 # --------------------
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 WORKDIR /src
 
 # Kopiraj csproj i restore
@@ -17,7 +43,7 @@ RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 # --------------------
 # RUNTIME STAGE
 # --------------------
-FROM mcr.microsoft.com/dotnet/runtime:9.0
+FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish .

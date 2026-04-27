@@ -55,6 +55,7 @@ EnviormentalPostavke.7z
 1. Otvoriti šifrirani fajl `ENV.7z`
 2. Iz njega izvaditi fajl **`.env`**
 3. **Prije pokretanja Dockera**, `.env` fajl ubaciti u **root folder projekta**
+
    (folder gdje je urađen `git clone`)
 
 ⚠️ **Bez ovog koraka Docker servisi se neće pravilno pokrenuti.**

@@ -19,6 +19,7 @@ using System.Security.Cryptography;
 using Gymify.Services.Exceptions;
 using Gymify.EmailConsumer.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Gymify.Services.Services
 {
@@ -33,6 +34,12 @@ namespace Gymify.Services.Services
             _configuration = configuration;
             _rabbitConnection = rabbitConnection;
             _appConfig = appConfig.Value;
+        }
+
+        [AllowAnonymous]
+        public override Task<UserResponse> CreateAsync(UserInsertRequest request)
+        {
+            return base.CreateAsync(request);
         }
 
         protected override IQueryable<User> ApplyFilter(IQueryable<User> query, UserSearchObject search)

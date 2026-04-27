@@ -44,9 +44,8 @@ Widget WorkerTaskWidget() {
         return BaseSearchAndTable<WorkerTask>(
           title: "Zadaci radnika",
           isStatusMode: true,
-          addButtonText:
-              null, // ovdje admin može imati add u posebnom widgetu ako želiš
-          // SEARCH
+          addButtonText: null,
+
           onSearchChanged: (value) => paging.search(value),
           onClearSearch: () => paging.search(""),
 
@@ -171,9 +170,21 @@ Widget WorkerTaskWidget() {
               return;
             }
 
+            final ok = await ConfirmDialogs.badGoodConfirmation(
+              context,
+              title: "Brisanje zadatka",
+              question:
+                  "Da li ste sigurni da želite TRAJNO obrisati zadatak:\n\n${task.name}?",
+              goodText: "Obriši",
+              badText: "Odustani",
+            );
+
+            if (ok != true) return;
+
             try {
               await context.read<WorkerTaskProvider>().delete(task.id);
               await paging.loadPage();
+
               SnackbarHelper.showDelete(context, "Zadatak obrisan.");
             } catch (e) {
               SnackbarHelper.showError(context, e.toString());
@@ -198,11 +209,7 @@ Widget _statusChip(bool isFinished) {
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     child: Text(
       text,
-      style: TextStyle(
-        color: fg, // zelena ili narandžasta
-        fontWeight: FontWeight.w600,
-        fontSize: 12,
-      ),
+      style: TextStyle(color: fg, fontWeight: FontWeight.w600, fontSize: 12),
     ),
   );
 }

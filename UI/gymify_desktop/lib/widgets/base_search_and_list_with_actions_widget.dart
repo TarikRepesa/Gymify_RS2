@@ -31,7 +31,6 @@ class TableActionItem<T> {
 class BaseSearchAndActionsTable<T> extends StatelessWidget {
   final String title;
 
-  /// Top bar
   final String searchHint;
   final void Function(String value)? onSearchChanged;
   final VoidCallback? onClearSearch;
@@ -39,11 +38,9 @@ class BaseSearchAndActionsTable<T> extends StatelessWidget {
   final String? addButtonText;
   final VoidCallback? onAdd;
 
-  /// Table
   final List<CustomTableColumn<T>> columns;
   final List<T> items;
 
-  /// Actions per row
   final List<TableActionItem<T>> Function(T item)? actionsBuilder;
 
   final EdgeInsets padding;

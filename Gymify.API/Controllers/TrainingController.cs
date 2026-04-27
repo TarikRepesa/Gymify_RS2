@@ -5,6 +5,7 @@ using Gymify.Model.SearchObjects;
 using Gymify.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Bcpg;
 
 //Get: Korisnik,Admin,Radnik,Trener
 //Create: Admin,Radnik

@@ -23,34 +23,42 @@ namespace Gymify.Services.Services
         }
 
         protected override IQueryable<Database.Notification> ApplyFilter(
-            IQueryable<Database.Notification> query,
-            NotificationSearchObject search)
+    IQueryable<Database.Notification> query,
+    NotificationSearchObject search)
+{
+    query = base.ApplyFilter(query, search);
+
+    if (search?.UserId.HasValue == true)
+    {
+        query = query.Where(x => x.UserId == search.UserId.Value);
+    }
+
+    if (!string.IsNullOrEmpty(search.SortBy))
+    {
+        if (search.SortBy == "createdAt")
         {
-            query = base.ApplyFilter(query, search);
-
-            if (search?.UserId.HasValue == true)
-            {
-                query = query.Where(x => x.UserId == search.UserId.Value);
-            }
-
-            if (!string.IsNullOrEmpty(search.SortBy))
-            {
-                if (search.SortBy == "createdAt")
-                {
-                    query = search.SortDirection == "desc"
-                        ? query.OrderByDescending(x => x.CreatedAt)
-                        : query.OrderBy(x => x.CreatedAt);
-                }
-            }
-
-            if (!string.IsNullOrEmpty(search.FTS))
-            {
-                query = query.Where(x => x.Title.ToLower().Contains(search.FTS)
-                || x.Content.ToLower().Contains(search.FTS));
-            }
-
-            return query;
+            query = search.SortDirection == "desc"
+                ? query.OrderByDescending(x => x.CreatedAt)
+                : query.OrderBy(x => x.CreatedAt);
         }
+    }
+
+    if (!string.IsNullOrWhiteSpace(search.FTS))
+    {
+        var fts = search.FTS.ToLower();
+
+        query = query.Where(x =>
+            x.Title.ToLower().Contains(fts) ||
+            x.Content.ToLower().Contains(fts) ||
+            (x.User != null && x.User.FirstName.ToLower().Contains(fts)) ||
+            (x.User != null && x.User.LastName.ToLower().Contains(fts)) ||
+            (x.User != null &&
+             (x.User.FirstName + " " + x.User.LastName).ToLower().Contains(fts))
+        );
+    }
+
+    return query;
+}
 
         protected override IQueryable<Database.Notification> AddInclude(
             IQueryable<Database.Notification> query,

@@ -200,23 +200,19 @@ Widget StaffWidget() {
                 ),
               ],
               onFieldChanged: (name, values, setValue) {
-  // 🔒 reaguj SAMO na ime i prezime
   if (name != "firstName" && name != "lastName") return;
 
   final fn = (values["firstName"] ?? "").toString().trim();
   final ln = (values["lastName"] ?? "").toString().trim();
   final username = (values["username"] ?? "").toString().trim();
 
-  // ❌ ako user ručno dira username → ne diraj
   if (name == "username") return;
 
-  // 🔴 ako fali ime ili prezime → reset
   if (fn.isEmpty || ln.isEmpty) {
     setValue("username", "");
     return;
   }
 
-  // 🟢 generiši SAMO ako je username prazan
   if (username.isEmpty) {
     final generated = CredentialHelper.generateUsername(
       firstName: fn,

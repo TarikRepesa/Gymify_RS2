@@ -47,7 +47,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return result;
   }
 
-  // GET by ID
   Future<T> getById(int id) async {
     final url = "${ApiConfig.apiBase}/api/$endpoint/$id";
 
@@ -61,7 +60,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return fromJson(jsonDecode(response.body));
   }
 
-  // POST
   Future<T> insert(dynamic request) async {
     final url = "${ApiConfig.apiBase}/api/$endpoint";
 
@@ -76,7 +74,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return fromJson(jsonDecode(response.body));
   }
 
-  // PUT
   Future<T> update(int id, dynamic request) async {
     final url = "${ApiConfig.apiBase}/api/$endpoint/$id";
 
@@ -91,7 +88,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return fromJson(jsonDecode(response.body));
   }
 
-  // DELETE
   Future<bool> delete(int? id) async {
     final url = "${ApiConfig.apiBase}/api/$endpoint/$id";
 
@@ -104,10 +100,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return true;
   }
 
-  // Parse JSON into model
   T fromJson(dynamic data);
 
-  // Query builder
   String _buildQuery(Map<String, dynamic> params) {
     return params.entries
         .map((e) =>

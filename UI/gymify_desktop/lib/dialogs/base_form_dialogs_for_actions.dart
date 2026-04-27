@@ -116,14 +116,13 @@ values.putIfAbsent("trainerId", () => "");
         void notifyChanged(String fieldName) {
           values[fieldName] = fields.text(fieldName);
 
-          // 👇 ako je user mijenjao field → zapamti
           manuallyEditedFields.add(fieldName);
 
           if (onFieldChanged != null) {
             onFieldChanged(
               fieldName,
               Map<String, dynamic>.from(values),
-              (k, v) => setValueInternal(k, v), // ⚠️ BITNO
+              (k, v) => setValueInternal(k, v), 
             );
           }
         }
@@ -284,7 +283,7 @@ values.putIfAbsent("trainerId", () => "");
                             final picked = await showUserPickDialog(
                               context: context,
                               mode:
-                                  PickMode.user, // možeš kasnije parametrisati
+                                  PickMode.user, 
                             );
 
                             if (picked != null) {

@@ -8,6 +8,7 @@ import 'package:gymify_desktop/helper/image_helper.dart';
 import 'package:gymify_desktop/helper/text_editing_controller_helper.dart';
 import 'package:gymify_desktop/providers/image_provider.dart';
 import 'package:gymify_desktop/routes/app_routes.dart';
+import 'package:gymify_desktop/validation/validation_model/validation_rules.dart';
 import 'package:gymify_desktop/widgets/old_reservations_widget.dart';
 import 'package:gymify_desktop/widgets/reward_widget.dart';
 import 'package:gymify_desktop/widgets/trainer_task_widget.dart';
@@ -49,7 +50,6 @@ class _BaseScreenState extends State<BaseScreen> {
   final _formKey = GlobalKey<FormState>();
   late Fields fields;
 
-  // ---------------- ROLE HELPERS ----------------
   bool _hasRole(String role) =>
       Session.roles.any((r) => r.toLowerCase() == role.toLowerCase());
 
@@ -111,7 +111,6 @@ class _BaseScreenState extends State<BaseScreen> {
   void initState() {
     super.initState();
 
-    // Postavi početni meni po roli
     final menus = _allowedMenus();
     _activeItem = menus.isNotEmpty ? menus.first : "Obavijesti";
     _bodyWidget = _getWidgetForMenu(_activeItem);
@@ -136,7 +135,6 @@ class _BaseScreenState extends State<BaseScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // didChangeDependencies može više puta
     if (!_loadedOnce) {
       _loadedOnce = true;
       _userProvider = context.read<UserProvider>();
@@ -159,7 +157,6 @@ class _BaseScreenState extends State<BaseScreen> {
         _isLoadingUser = false;
       });
 
-      // ako se role/meni promijene, osiguraj active
       _ensureActiveMenuAllowed();
     } catch (_) {
       if (!mounted) return;
@@ -185,14 +182,13 @@ class _BaseScreenState extends State<BaseScreen> {
         return ReviewWidget();
       case 'Otkazane Rezervacije':
         return CancelledReservationsWidget();
-      case 'Pregled Nagrada' :
+      case 'Pregled Nagrada':
         return RewardWidget();
-      case 'Kupljene Nagrade' :
+      case 'Kupljene Nagrade':
         return UserRewardWidget();
       case 'Izvještaj':
         return ReportWidget();
 
-      // NOVO:
       case 'Moji zadaci':
         return WorkerTaskWidget();
       case 'Moji treninzi':
@@ -393,233 +389,264 @@ class _BaseScreenState extends State<BaseScreen> {
       return const Center(child: Text("Korisnik nije učitan."));
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF7F9FF),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.black12),
-          ),
-          child: Row(
+    final scrollCtrl = ScrollController();
+
+    return PrimaryScrollController(
+      controller: scrollCtrl,
+      child: Scrollbar(
+        controller: scrollCtrl,
+        thumbVisibility: true,
+        child: SingleChildScrollView(
+          primary: true,
+          padding: const EdgeInsets.only(right: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  width: 150,
-                  height: 150,
-                  color: const Color(0x11000000),
-                  child: _pickedImage != null
-                      ? Image.file(_pickedImage!, fit: BoxFit.cover)
-                      : (ImageHelper.hasValidImage(user.userImage)
-                            ? Image.network(
-                                ImageHelper.isHttp(user.userImage!)
-                                    ? user.userImage!
-                                    : "${ApiConfig.apiBase}/images/users/${user.userImage!}",
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    ImageHelper.userPlaceholder(user.username),
-                              )
-                            : ImageHelper.userPlaceholder(user.username)),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF7F9FF),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.black12),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Text(
-                      "${user.firstName} ${user.lastName}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF3F3F3F),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        width: 150,
+                        height: 150,
+                        color: const Color(0x11000000),
+                        child: _pickedImage != null
+                            ? Image.file(_pickedImage!, fit: BoxFit.cover)
+                            : (ImageHelper.hasValidImage(user.userImage)
+                                  ? Image.network(
+                                      ImageHelper.isHttp(user.userImage!)
+                                          ? user.userImage!
+                                          : "${ApiConfig.apiBase}/images/users/${user.userImage!}",
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          ImageHelper.userPlaceholder(
+                                            user.username,
+                                          ),
+                                    )
+                                  : ImageHelper.userPlaceholder(user.username)),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      user.email,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF6B6B6B),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${user.firstName} ${user.lastName}",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF3F3F3F),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            user.email,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF6B6B6B),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(width: 10),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        await onChangeImage();
+                        onAnyChanged();
+                      },
+                      icon: const Icon(Icons.photo_camera_outlined, size: 18),
+                      label: const Text('Promijeni sliku'),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  await onChangeImage();
-                  onAnyChanged();
-                },
-                icon: const Icon(Icons.photo_camera_outlined, size: 18),
-                label: const Text('Promijeni sliku'),
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+
+              const SizedBox(height: 14),
+
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.black12),
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _settingsField(
+                              label: "Ime",
+                              controller: fields.controller("firstName"),
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? "Ime je obavezno."
+                                  : null,
+                              onChanged: (_) => onAnyChanged(),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _settingsField(
+                              label: "Prezime",
+                              controller: fields.controller("lastName"),
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? "Prezime je obavezno."
+                                  : null,
+                              onChanged: (_) => onAnyChanged(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _settingsField(
+                              label: "Email",
+                              controller: fields.controller("email"),
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (v) => (v == null || !v.contains("@"))
+                                  ? "Unesite ispravan email."
+                                  : null,
+                              onChanged: (_) => onAnyChanged(),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _settingsField(
+                              label: "Username",
+                              controller: fields.controller("username"),
+                              validator: (v) =>
+                                  (v == null || v.trim().length < 3)
+                                  ? "Username min 3 znaka."
+                                  : null,
+                              onChanged: (_) => onAnyChanged(),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      _datePickerField(
+                        context: context,
+                        label: "Datum rođenja",
+                        controller: fields.controller("birthDate"),
+                        onAnyChanged: onAnyChanged,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      _settingsField(
+                        label: "Telefon",
+                        controller: fields.controller("phoneNumber"),
+                        keyboardType: TextInputType.phone,
+                        validator: (v) {
+                          final value = (v ?? "").trim();
+
+                          return Rules.phone(
+                            "phoneNumber",
+                            value,
+                            required: true,
+                          ).validate();
+                        },
+                        onChanged: (_) => onAnyChanged(),
+                      ),
+                    ],
                   ),
                 ),
+              ),
+
+              const SizedBox(height: 18),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      final confirmed = await ConfirmDialogs.yesNoConfirmation(
+                        context,
+                        title: "Odjava",
+                        question: "Da li ste sigurni da se želite odjaviti?",
+                        yesText: "Da, odjavi me",
+                        noText: "Otkaži",
+                      );
+
+                      if (!confirmed) return;
+
+                      Session.odjava();
+
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.login,
+                        (route) => false,
+                      );
+                    },
+                    icon: const Icon(Icons.logout, color: Colors.red),
+                    label: const Text(
+                      "Odjava",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.red),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+
+                  ElevatedButton(
+                    onPressed: isSaveEnabled ? () => onSave() : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF387EFF),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Sačuvaj",
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
-        const SizedBox(height: 14),
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.black12),
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _settingsField(
-                        label: "Ime",
-                        controller: fields.controller("firstName"),
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? "Ime je obavezno."
-                            : null,
-                        onChanged: (_) => onAnyChanged(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _settingsField(
-                        label: "Prezime",
-                        controller: fields.controller("lastName"),
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? "Prezime je obavezno."
-                            : null,
-                        onChanged: (_) => onAnyChanged(),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _settingsField(
-                        label: "Email",
-                        controller: fields.controller("email"),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (v) => (v == null || !v.contains("@"))
-                            ? "Unesite ispravan email."
-                            : null,
-                        onChanged: (_) => onAnyChanged(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _settingsField(
-                        label: "Username",
-                        controller: fields.controller("username"),
-                        validator: (v) => (v == null || v.trim().length < 3)
-                            ? "Username min 3 znaka."
-                            : null,
-                        onChanged: (_) => onAnyChanged(),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                _datePickerField(
-                  context: context,
-                  label: "Datum rođenja",
-                  controller: fields.controller("birthDate"),
-                  onAnyChanged: onAnyChanged,
-                ),
-                const SizedBox(height: 12),
-                _settingsField(
-                  label: "Telefon",
-                  controller: fields.controller("phoneNumber"),
-                  keyboardType: TextInputType.phone,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? "Telefon je obavezan."
-                      : null,
-                  onChanged: (_) => onAnyChanged(),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const Spacer(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            /// 🔴 LOGOUT BUTTON
-            OutlinedButton.icon(
-              onPressed: () async {
-                final confirmed = await ConfirmDialogs.yesNoConfirmation(
-                  context,
-                  title: "Odjava",
-                  question: "Da li ste sigurni da se želite odjaviti?",
-                  yesText: "Da, odjavi me",
-                  noText: "Otkaži",
-                );
-
-                if (!confirmed) return;
-
-                Session.odjava();
-
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
-              },
-              icon: const Icon(Icons.logout, color: Colors.red),
-              label: const Text(
-                "Odjava",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.red),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-
-            ElevatedButton(
-              onPressed: isSaveEnabled ? () => onSave() : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF387EFF),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                "Sačuvaj",
-                style: TextStyle(fontWeight: FontWeight.w800),
-              ),
-            ),
-          ],
-        ),
-      ],
+      ),
     );
   }
 

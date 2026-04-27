@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymify_desktop/dialogs/base_form_dialogs_for_actions.dart';
+import 'package:gymify_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:gymify_desktop/helper/date_helper.dart';
 import 'package:gymify_desktop/helper/snackBar_helper.dart';
 import 'package:gymify_desktop/helper/univerzal_pagging_helper.dart';
@@ -134,7 +135,7 @@ Widget UserRewardWidget() {
                   await paging.loadPage();
                   SnackbarHelper.showUpdate(
                     context,
-                    "Status user reward-a je uspješno ažuriran.",
+                    "Status koda je uspješno ažuriran.",
                   );
                 } catch (e) {
                   SnackbarHelper.showError(context, e.toString());
@@ -144,6 +145,17 @@ Widget UserRewardWidget() {
             );
           },
           onDelete: (ur) async {
+            final ok = await ConfirmDialogs.badGoodConfirmation(
+              context,
+              title: "Brisanje koda",
+              question:
+                  "Da li ste sigurni da želite TRAJNO obrisati kod:\n\n${ur.code ?? "-"}?",
+              goodText: "Obriši",
+              badText: "Odustani",
+            );
+
+            if (ok != true) return;
+
             try {
               await context.read<UserRewardProvider>().delete(ur.id);
 

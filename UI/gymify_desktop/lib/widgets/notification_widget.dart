@@ -112,10 +112,6 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     required NotificationModel n,
   }) async {
     final id = n.id;
-    if (id == null) {
-      SnackbarHelper.showError(context, "Ne mogu obrisati – ID nedostaje.");
-      return;
-    }
 
     final ok = await _confirmDelete(context, n);
     if (!ok) return;
@@ -196,6 +192,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
 
               final payload = {
                 "userId": userId,
+                "includeUser":true,
                 "title": titleCtrl.text.trim(),
                 "content": messageCtrl.text.trim(),
               };
@@ -397,9 +394,9 @@ class _NotificationWidgetState extends State<NotificationWidget> {
           ),
           const SizedBox(width: 12),
 
-          // ✅ autor + uloga
+
           SizedBox(
-            width: 190, // malo veće da stane "Ime Prezime (Admin)"
+            width: 190, 
             child: Text(
               author,
               maxLines: 1,

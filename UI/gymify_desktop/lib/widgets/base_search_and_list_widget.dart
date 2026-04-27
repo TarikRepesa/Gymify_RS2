@@ -11,7 +11,6 @@ class BaseColumn<T> {
 class BaseSearchAndTable<T> extends StatelessWidget {
   final String title;
 
-  /// Top bar
   final String searchHint;
   final void Function(String value)? onSearchChanged;
   final VoidCallback? onClearSearch;
@@ -19,7 +18,6 @@ class BaseSearchAndTable<T> extends StatelessWidget {
   final String? addButtonText;
   final VoidCallback? onAdd;
 
-  /// Table
   final List<BaseColumn<T>> columns;
   final List<T> items;
 
@@ -61,7 +59,6 @@ class BaseSearchAndTable<T> extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // TITLE
           Text(
             title,
             style: const TextStyle(
@@ -73,7 +70,6 @@ class BaseSearchAndTable<T> extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          // SEARCH + BUTTON
           Row(
             children: [
               Expanded(
@@ -110,7 +106,6 @@ class BaseSearchAndTable<T> extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          // TABLE HEADER
           Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: const BoxDecoration(
@@ -140,7 +135,6 @@ class BaseSearchAndTable<T> extends StatelessWidget {
             ),
           ),
 
-          // TABLE BODY
           Expanded(
             child: items.isEmpty
                 ? const Center(
