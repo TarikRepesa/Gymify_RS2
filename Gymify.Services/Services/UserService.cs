@@ -36,12 +36,6 @@ namespace Gymify.Services.Services
             _appConfig = appConfig.Value;
         }
 
-        [AllowAnonymous]
-        public override Task<UserResponse> CreateAsync(UserInsertRequest request)
-        {
-            return base.CreateAsync(request);
-        }
-
         protected override IQueryable<User> ApplyFilter(IQueryable<User> query, UserSearchObject search)
         {
             query = base.ApplyFilter(query, search);
